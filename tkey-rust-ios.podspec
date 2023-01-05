@@ -10,9 +10,14 @@ Pod::Spec.new do |spec|
   spec.module_name = "tkey"
   spec.source       = { :git => "https://github.com/torusresearch/tkey-rust-ios.git", :tag => spec.version }
 
-  spec.subspec "lib" do |spec|
+  spec.subspec "libtkey" do |spec|
     spec.source_files = "Sources/libtkey/bridge.c","Sources/libtkey/include/*.{h}"
     spec.vendored_frameworks = "Sources/libtkey/libtkey.xcframework"
+  end
+  
+  spec.subspec "lib" do |spec|
+    spec.source_files = "Sources/libtkey"
+    spec.dependency "tkey-rust-ios/libtkey"
   end
     
   spec.subspec "tkey" do |spec|
