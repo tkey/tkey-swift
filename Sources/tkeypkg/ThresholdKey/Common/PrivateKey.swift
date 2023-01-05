@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class PrivateKey {
+public final class PrivateKey {
     var hex: String
 
     init(pointer: UnsafeMutablePointer<Int8>) {

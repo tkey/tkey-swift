@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ShareStoreMap {
+public final class ShareStoreMap {
     var share_maps = [String: ShareStore]()
 
     init(pointer: OpaquePointer) throws {

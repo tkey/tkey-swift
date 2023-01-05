@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class KeyReconstructionDetails: Codable {
+public final class KeyReconstructionDetails: Codable {
     var key: String
     var seed_phrase: [String]
     var all_keys: [String]

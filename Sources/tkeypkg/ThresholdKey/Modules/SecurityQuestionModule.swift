@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class SecurityQuestionModule {
+public final class SecurityQuestionModule {
     static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)

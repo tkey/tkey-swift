@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class KeyPoint: Codable {
+public final class KeyPoint: Codable {
     var x, y: String
     var compressed: String
 

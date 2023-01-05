@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ShareTransferStore {
+public final class ShareTransferStore {
     private(set) var pointer: OpaquePointer?
 
     init(pointer: OpaquePointer) {

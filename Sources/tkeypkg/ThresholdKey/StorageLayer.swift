@@ -18,7 +18,7 @@ extension NSMutableData {
 }
 */
 
-final class StorageLayer {
+public final class StorageLayer {
     private(set) var pointer: OpaquePointer?
 
     init(pointer: OpaquePointer) {

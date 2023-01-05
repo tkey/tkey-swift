@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-func library_version() throws -> String {
+public func library_version() throws -> String {
     var errorCode: Int32 = -1
     let result = withUnsafeMutablePointer(to: &errorCode, { error in
         get_version(error)

@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ShareStorePolyIdIndexMap {
+public final class ShareStorePolyIdIndexMap {
     var share_maps = [String: ShareStoreMap]()
 
     init(pointer: OpaquePointer) throws {

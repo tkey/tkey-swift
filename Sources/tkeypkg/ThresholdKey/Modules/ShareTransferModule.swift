@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ShareTransferModule {
+public final class ShareTransferModule {
    static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, curve_n: String) throws -> String {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)

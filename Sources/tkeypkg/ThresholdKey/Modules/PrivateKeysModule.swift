@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class PrivateKeysModule {
+public final class PrivateKeysModule {
     static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, curve_n: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)

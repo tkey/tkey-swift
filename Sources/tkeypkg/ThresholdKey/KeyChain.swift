@@ -9,7 +9,7 @@ import Foundation
 
 import Security
 
-class KeychainInterface {
+public class KeychainInterface {
 
     enum KeychainError: Error {
         // Attempted read for an item that does not exist.

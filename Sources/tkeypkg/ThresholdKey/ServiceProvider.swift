@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ServiceProvider {
+public final class ServiceProvider {
     private(set) var pointer: OpaquePointer?
 
     init(pointer: OpaquePointer) {

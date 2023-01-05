@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class Metadata {
+public final class Metadata {
     private(set) var pointer: OpaquePointer?
 
     init(pointer: OpaquePointer) {

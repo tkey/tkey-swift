@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class KeyDetails: Codable {
+public final class KeyDetails: Codable {
     let pub_key: KeyPoint
     let required_shares: Int32
     let threshold: UInt32

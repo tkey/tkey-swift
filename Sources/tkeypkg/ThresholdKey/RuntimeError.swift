@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RuntimeError: Error {
+public struct RuntimeError: Error {
     let message: String
 
     init(_ message: String) {

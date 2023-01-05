@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class ThresholdKey {
+public final class ThresholdKey {
     private(set) var pointer: OpaquePointer?
 
     init(pointer: OpaquePointer) {

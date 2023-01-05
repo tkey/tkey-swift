@@ -8,7 +8,7 @@
 import Foundation
 import lib
 
-final class GenerateShareStoreResult {
+public final class GenerateShareStoreResult {
     private(set) var pointer: OpaquePointer?
     var hex: String
     var share_store: ShareStoreMap
