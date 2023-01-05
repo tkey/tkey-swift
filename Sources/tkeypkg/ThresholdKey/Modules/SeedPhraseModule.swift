@@ -14,7 +14,7 @@ public struct seedPhraseStruct: Codable {
 }
 
 public final class SeedPhraseModule {
-    static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, curve_n: String) throws {
+    public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, curve_n: String) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
@@ -31,7 +31,7 @@ public final class SeedPhraseModule {
             }
     }
 
-    static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, curve_n: String) throws {
+    public static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, curve_n: String) throws {
         var errorCode: Int32 = -1
         let oldPointer = UnsafeMutablePointer<Int8>(mutating: (old_phrase as NSString).utf8String)
         let newPointer = UnsafeMutablePointer<Int8>(mutating: (new_phrase as NSString).utf8String)
@@ -44,7 +44,7 @@ public final class SeedPhraseModule {
             }
     }
 
-    static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [seedPhraseStruct] {
+    public static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [seedPhraseStruct] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             seed_phrase_get_seed_phrases(threshold_key.pointer, error)
@@ -59,7 +59,7 @@ public final class SeedPhraseModule {
         return seed_array
     }
 
-    static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, curve_n: String) throws {
+    public static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, curve_n: String) throws {
         let Phrase = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
 
         var errorCode: Int32 = -1

@@ -9,7 +9,7 @@ import Foundation
 import lib
 
 public final class PrivateKeysModule {
-    static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, curve_n: String) throws -> Bool {
+    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, curve_n: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         var keyPointer: UnsafeMutablePointer<Int8>?
@@ -26,7 +26,7 @@ public final class PrivateKeysModule {
         return result
     }
 
-    static func get_private_keys(threshold_key: ThresholdKey) throws -> String {
+    public static func get_private_keys(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             private_keys_get_private_keys(threshold_key.pointer, error)
@@ -39,7 +39,7 @@ public final class PrivateKeysModule {
         return json
     }
 
-    static func get_private_key_accounts(threshold_key: ThresholdKey) throws -> [String] {
+    public static func get_private_key_accounts(threshold_key: ThresholdKey) throws -> [String] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             private_keys_get_accounts(threshold_key.pointer, error)

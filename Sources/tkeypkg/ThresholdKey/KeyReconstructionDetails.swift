@@ -9,11 +9,11 @@ import Foundation
 import lib
 
 public final class KeyReconstructionDetails: Codable {
-    var key: String
-    var seed_phrase: [String]
-    var all_keys: [String]
+    public var key: String
+    public var seed_phrase: [String]
+    public var all_keys: [String]
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let key = withUnsafeMutablePointer(to: &errorCode, { error in
            key_reconstruction_get_private_key(pointer, error)

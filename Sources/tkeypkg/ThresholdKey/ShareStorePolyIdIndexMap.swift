@@ -9,9 +9,9 @@ import Foundation
 import lib
 
 public final class ShareStorePolyIdIndexMap {
-    var share_maps = [String: ShareStoreMap]()
+    public var share_maps = [String: ShareStoreMap]()
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in
             share_store_poly_id_index_map_get_keys(pointer, error)

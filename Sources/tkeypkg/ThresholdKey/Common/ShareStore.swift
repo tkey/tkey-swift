@@ -11,11 +11,11 @@ import lib
 public final class ShareStore {
     private(set) var pointer: OpaquePointer?
 
-    init(pointer: OpaquePointer) {
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
 
-    init(json: String) throws {
+    public init(json: String) throws {
         var errorCode: Int32 = -1
         let jsonPointer = UnsafeMutablePointer<Int8>(mutating: (json as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -27,7 +27,7 @@ public final class ShareStore {
         pointer = result
     }
 
-    func toJsonString() throws -> String {
+    public func toJsonString() throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             share_store_to_json(pointer, error)

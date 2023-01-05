@@ -9,7 +9,7 @@ import Foundation
 import lib
 
 public final class SecurityQuestionModule {
-    static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> GenerateShareStoreResult {
+    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -23,7 +23,7 @@ public final class SecurityQuestionModule {
         return try! GenerateShareStoreResult.init(pointer: result!)
     }
 
-    static func input_share(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
+    public static func input_share(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -36,7 +36,7 @@ public final class SecurityQuestionModule {
         return result
     }
 
-    static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> Bool {
+    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -50,7 +50,7 @@ public final class SecurityQuestionModule {
         return result
     }
 
-    static func store_answer(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
+    public static func store_answer(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -63,7 +63,7 @@ public final class SecurityQuestionModule {
         return result
     }
 
-    static func get_answer(threshold_key: ThresholdKey) throws -> String {
+    public static func get_answer(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             security_question_get_answer(threshold_key.pointer, error)
@@ -76,7 +76,7 @@ public final class SecurityQuestionModule {
         return string
     }
 
-    static func get_questions(threshold_key: ThresholdKey) throws -> String {
+    public static func get_questions(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             security_question_get_questions(threshold_key.pointer, error)

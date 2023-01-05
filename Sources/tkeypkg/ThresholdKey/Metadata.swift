@@ -11,11 +11,11 @@ import lib
 public final class Metadata {
     private(set) var pointer: OpaquePointer?
 
-    init(pointer: OpaquePointer) {
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
 
-    init(json: String) throws {
+    public init(json: String) throws {
         var errorCode: Int32 = -1
         let jsonPointer = UnsafeMutablePointer<Int8>(mutating: (json as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in

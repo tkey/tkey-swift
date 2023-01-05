@@ -10,10 +10,10 @@ import lib
 
 public final class GenerateShareStoreResult {
     private(set) var pointer: OpaquePointer?
-    var hex: String
-    var share_store: ShareStoreMap
+    public var hex: String
+    public var share_store: ShareStoreMap
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         self.pointer = pointer
         var errorCode: Int32 = -1
         let hexPtr = withUnsafeMutablePointer(to: &errorCode, { error in

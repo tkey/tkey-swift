@@ -15,7 +15,7 @@ public final class ThresholdKey {
         self.pointer = pointer
     }
 
-    init(metadata: Metadata? = nil, shares: OpaquePointer? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: OpaquePointer? = nil, last_fetch_cloud_metadata: OpaquePointer? = nil, enable_logging: Bool, manual_sync: Bool) throws {
+    public init(metadata: Metadata? = nil, shares: OpaquePointer? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: OpaquePointer? = nil, last_fetch_cloud_metadata: OpaquePointer? = nil, enable_logging: Bool, manual_sync: Bool) throws {
         var errorCode: Int32 = -1
 
         var providerPointer: OpaquePointer?

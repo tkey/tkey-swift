@@ -21,7 +21,7 @@ extension NSMutableData {
 public final class StorageLayer {
     private(set) var pointer: OpaquePointer?
 
-    init(pointer: OpaquePointer) {
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
 
@@ -40,7 +40,7 @@ public final class StorageLayer {
       }
      */
 
-    static func percentEscapeString( string: String) -> String {
+    public static func percentEscapeString( string: String) -> String {
       var characterSet = CharacterSet.alphanumerics
       characterSet.insert(charactersIn: "-.* ")
 
@@ -50,7 +50,7 @@ public final class StorageLayer {
         .replacingOccurrences(of: " ", with: "+", options: [], range: nil)
     }
 
-    init(enable_logging: Bool, host_url: String, server_time_offset: Int64) throws {
+    public init(enable_logging: Bool, host_url: String, server_time_offset: Int64) throws {
         var errorCode: Int32 = -1
         let urlPointer = UnsafeMutablePointer<Int8>(mutating: (host_url as NSString).utf8String)
 

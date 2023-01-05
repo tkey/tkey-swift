@@ -9,10 +9,10 @@ import Foundation
 import lib
 
 public final class KeyPoint: Codable {
-    var x, y: String
-    var compressed: String
+    public var x, y: String
+    public var compressed: String
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         var result = withUnsafeMutablePointer(to: &errorCode, { error in
             point_get_x(pointer, error)

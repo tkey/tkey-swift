@@ -9,9 +9,9 @@ import Foundation
 import lib
 
 public final class ShareStoreMap {
-    var share_maps = [String: ShareStore]()
+    public var share_maps = [String: ShareStore]()
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in
             share_store_map_get_keys(pointer, error)

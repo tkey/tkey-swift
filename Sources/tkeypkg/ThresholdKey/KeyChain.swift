@@ -11,7 +11,7 @@ import Security
 
 public class KeychainInterface {
 
-    enum KeychainError: Error {
+    public enum KeychainError: Error {
         // Attempted read for an item that does not exist.
         case itemNotFound
 
@@ -26,7 +26,7 @@ public class KeychainInterface {
         case unexpectedStatus(OSStatus)
     }
 
-    static func syncShare( threshold_key: ThresholdKey, share_index: String?, curve_n: String ) throws {
+    public static func syncShare( threshold_key: ThresholdKey, share_index: String?, curve_n: String ) throws {
          let key_detail = try! threshold_key.get_key_details()
 
          if  key_detail.required_shares > 0 {
@@ -56,7 +56,7 @@ public class KeychainInterface {
          }
      }
 
-    static func getAllAccounts() throws -> [[String: Any]] {
+    public static func getAllAccounts() throws -> [[String: Any]] {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrService as String: "tkey_ios" as AnyObject,
@@ -75,7 +75,7 @@ public class KeychainInterface {
             }
         }
 
-    static func save(password: Data, service: String, account: String) throws {
+    public static func save(password: Data, service: String, account: String) throws {
 
         let query: [String: AnyObject] = [
             // kSecAttrService,  kSecAttrAccount, and kSecClass
@@ -110,7 +110,7 @@ public class KeychainInterface {
         }
     }
 
-    static func update(password: Data, service: String, account: String) throws {
+    public static func update(password: Data, service: String, account: String) throws {
         let query: [String: AnyObject] = [
             // kSecAttrService,  kSecAttrAccount, and kSecClass
             // uniquely identify the item to update in Keychain
@@ -147,7 +147,7 @@ public class KeychainInterface {
         }
     }
 
-    static func readPassword(service: String, account: String) throws -> Data {
+    public static func readPassword(service: String, account: String) throws -> Data {
         let query: [String: AnyObject] = [
             // kSecAttrService,  kSecAttrAccount, and kSecClass
             // uniquely identify the item to read in Keychain
@@ -196,7 +196,7 @@ public class KeychainInterface {
         return password
     }
 
-    static func deletePassword(service: String, account: String) throws {
+    public static func deletePassword(service: String, account: String) throws {
         let query: [String: AnyObject] = [
             // kSecAttrService,  kSecAttrAccount, and kSecClass
             // uniquely identify the item to delete in Keychain

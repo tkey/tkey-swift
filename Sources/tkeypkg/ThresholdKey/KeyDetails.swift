@@ -9,13 +9,13 @@ import Foundation
 import lib
 
 public final class KeyDetails: Codable {
-    let pub_key: KeyPoint
-    let required_shares: Int32
-    let threshold: UInt32
-    let total_shares: UInt32
-    let share_descriptions: String
+    public let pub_key: KeyPoint
+    public let required_shares: Int32
+    public let threshold: UInt32
+    public let total_shares: UInt32
+    public let share_descriptions: String
 
-    init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let point = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_pub_key_point(pointer, error)
