@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "tkey-rust-ios"
-  spec.version      = "0.0.1"
+  spec.version      = "0.0.2"
   spec.platform = :ios, "15.0"
   spec.summary      = "SDK allows you to create threshold key setup natively"
   spec.homepage     = "https://github.com/torusresearch/tkey-rust-ios"
@@ -9,19 +9,7 @@ Pod::Spec.new do |spec|
   spec.author       = { "Torus Labs" => "rathishubham017@gmail.com" }
   spec.module_name = "tkey"
   spec.source       = { :git => "https://github.com/torusresearch/tkey-rust-ios.git", :tag => spec.version }
-
-  spec.subspec "libtkey" do |spec|
-    spec.source_files = "Sources/libtkey/bridge.c","Sources/libtkey/include/*.{h}"
-    spec.vendored_frameworks = "Sources/libtkey/libtkey.xcframework"
-  end
-  
-  spec.subspec "lib" do |spec|
-    spec.source_files = "Sources/libtkey"
-    spec.dependency "tkey-rust-ios/libtkey"
-  end
-    
-  spec.subspec "tkey" do |spec|
-    spec.source_files = "Sources/ThresholdKey/*.{swift}","Sources/ThresholdKey/**/*.{swift}"
-    spec.dependency "tkey-rust-ios/lib"
-  end
+  spec.private_header_files = "Sources/libtkey/include/tkey.h"
+  spec.vendored_framework = "Sources/libtkey/libtkey.xcframework"
+  spec.source_files = "Sources/libtkey,Sources/ThresholdKey"
 end
