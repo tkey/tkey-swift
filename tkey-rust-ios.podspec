@@ -9,7 +9,6 @@ Pod::Spec.new do |spec|
   spec.author       = { "Torus Labs" => "rathishubham017@gmail.com" }
   spec.module_name = "tkey"
   spec.source       = { :git => "https://github.com/torusresearch/tkey-rust-ios.git", :tag => spec.version }
-  spec.private_header_files = "Sources/libtkey/include/tkey.h"
   spec.vendored_framework = "Sources/libtkey/libtkey.xcframework"
-  spec.source_files = "Sources/libtkey,Sources/ThresholdKey"
+  spec.source_files = "Sources/ThresholdKey/**/*.{swift}","Sources/libtkey/include/tkey.h"
 end

@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public func library_version() throws -> String {
     var errorCode: Int32 = -1

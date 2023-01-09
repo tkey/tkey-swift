@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class ThresholdKey {
     private(set) var pointer: OpaquePointer?

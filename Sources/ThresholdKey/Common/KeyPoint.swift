@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class KeyPoint: Codable {
     public var x, y: String

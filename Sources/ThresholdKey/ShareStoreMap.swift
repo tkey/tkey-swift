@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class ShareStoreMap {
     public var share_maps = [String: ShareStore]()

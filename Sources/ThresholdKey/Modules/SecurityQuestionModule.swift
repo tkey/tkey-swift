@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class SecurityQuestionModule {
     public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> GenerateShareStoreResult {

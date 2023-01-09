@@ -6,7 +6,9 @@
 //
 
 import Foundation
-import lib
+#if canImport(lib)
+    import lib
+#endif
 
 public final class ShareStorePolyIdIndexMap {
     public var share_maps = [String: ShareStoreMap]()

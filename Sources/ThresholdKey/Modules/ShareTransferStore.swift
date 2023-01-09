@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class ShareTransferStore {
     private(set) var pointer: OpaquePointer?

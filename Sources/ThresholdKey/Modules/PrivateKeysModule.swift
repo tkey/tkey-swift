@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class PrivateKeysModule {
     public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, curve_n: String) throws -> Bool {

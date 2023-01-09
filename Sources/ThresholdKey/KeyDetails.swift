@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public final class KeyDetails: Codable {
     public let pub_key: KeyPoint

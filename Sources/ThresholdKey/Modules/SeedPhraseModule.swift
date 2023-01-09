@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(lib)
 import lib
+#endif
 
 public struct seedPhraseStruct: Codable {
     var seedPhrase: String
