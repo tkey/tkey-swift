@@ -8,9 +8,8 @@ final class tkey_pkgTests: XCTestCase {
 
     func testGenerateDeleteShare() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -41,9 +40,8 @@ final class tkey_pkgTests: XCTestCase {
 
     func testThresholdInputOutputShare() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -73,9 +71,8 @@ final class tkey_pkgTests: XCTestCase {
 
     func testSecurityQuestionModule() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -126,9 +123,8 @@ final class tkey_pkgTests: XCTestCase {
     func testThresholdShareTransfer () {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -162,10 +158,9 @@ final class tkey_pkgTests: XCTestCase {
     }
 
     func testPrivateKeyModule() {
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -179,11 +174,11 @@ final class tkey_pkgTests: XCTestCase {
         let result = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result.count, 0)
 
-        let key_module = try! PrivateKey.generate(curve_n: curve_n)
-        let key_module2 = try! PrivateKey.generate(curve_n: curve_n)
+        let key_module = try! PrivateKey.generate()
+        let key_module2 = try! PrivateKey.generate()
         // Done setup
         // Try set and get privatekey from privatekey module
-        _ = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: key_module.hex, format: "secp256k1n")
+        _ = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key:     key_module.hex, format: "secp256k1n")
         let result_1 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result_1, [key_module.hex] )
 
@@ -204,9 +199,8 @@ final class tkey_pkgTests: XCTestCase {
 
     func testSeedPhraseModule() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -249,11 +243,10 @@ final class tkey_pkgTests: XCTestCase {
     }
 
     func test_get_metadata() {
-        let curve_n = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-        let key1 = try! PrivateKey.generate(curve_n: curve_n)
+        let key1 = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex, curve_n: curve_n)
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,

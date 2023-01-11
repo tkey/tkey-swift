@@ -44,7 +44,7 @@ public class KeychainInterface {
          }
 
          // TODO: get right index for device share
-         // let share = try! threshold_key.output_share(shareIndex: index!, shareType: "hex", curve_n: curve_n)
+         // let share = try! threshold_key.output_share(shareIndex: index!, shareType: "hex")
          let share = try threshold_key.output_share_store(shareIndex: index!, polyId: nil)
          let share_str = try! share.toJsonString()
 

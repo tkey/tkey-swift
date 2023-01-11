@@ -13,7 +13,7 @@ import Foundation
 public final class Metadata {
     private(set) var pointer: OpaquePointer?
 
-    public init(pointer: OpaquePointer) {
+    public init(pointer: OpaquePointer?) {
         self.pointer = pointer
     }
 
