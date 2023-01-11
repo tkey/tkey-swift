@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class ShareStoreMap {
@@ -22,7 +22,7 @@ public final class ShareStoreMap {
             throw RuntimeError("Error in ShareStoreMap")
             }
         let value = String.init(cString: keys!)
-        string_destroy(keys)
+        string_free(keys)
         let data = Data(value.utf8)
         let key_array = try JSONSerialization.jsonObject(with: data) as! [String]
         for item in key_array {

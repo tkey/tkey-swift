@@ -26,14 +26,14 @@ public class KeychainInterface {
         case unexpectedStatus(OSStatus)
     }
 
-    public static func syncShare( threshold_key: ThresholdKey, share_index: String?, curve_n: String ) throws {
+    public static func syncShare( threshold_key: ThresholdKey, share_index: String?) throws {
          let key_detail = try! threshold_key.get_key_details()
 
          if  key_detail.required_shares > 0 {
          // get share from keychain
              let share = try! readPassword(service: "tkey_ios", account: key_detail.pub_key.compressed)
              let shareStore = try! ShareStore(json: String(data: share, encoding: .utf8)!)
-             try! threshold_key.input_share_store(shareStore: shareStore, curve_n: curve_n)
+             try! threshold_key.input_share_store(shareStore: shareStore)
 
          } else {
          // save/update keychain
@@ -44,8 +44,8 @@ public class KeychainInterface {
          }
 
          // TODO: get right index for device share
-         // let share = try! threshold_key.output_share(shareIndex: index!, shareType: "hex", curve_n: curve_n)
-         let share = try threshold_key.output_share_store(shareIndex: index!, polyId: nil, curve_n: curve_n)
+         // let share = try! threshold_key.output_share(shareIndex: index!, shareType: "hex")
+         let share = try threshold_key.output_share_store(shareIndex: index!, polyId: nil)
          let share_str = try! share.toJsonString()
 
          do {

@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class KeyDetails: Codable {
@@ -58,7 +58,7 @@ public final class KeyDetails: Codable {
             throw RuntimeError("Error in KeyDetails, field Share Descriptions")
             }
         self.share_descriptions = String.init(cString: share_descriptions!)
-        string_destroy(share_descriptions)
+        string_free(share_descriptions)
         key_details_free(pointer)
     }
 }

@@ -1,22 +1,3 @@
-/*
-//
-//  tkeywrapper.h
-//  tkeywrapper
-//
-//  Created by David Main on 2023/01/04.
-//
-
-#import <Foundation/Foundation.h>
-
-//! Project version number for tkeywrapper.
-FOUNDATION_EXPORT double tkeywrapperVersionNumber;
-
-//! Project version string for tkeywrapper.
-FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <tkeywrapper/PublicHeader.h>
-
-*/
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -35,16 +16,16 @@ FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
         struct KeyReconstructionDetails;
         struct ServiceProvider;
         struct Metadata;
-        struct ShareStorePolyIDShareIndexMap;
         struct LocalMetadataTransitions;
         struct KeyDetails;
         struct KeyPoint;
         struct ShareTransferStore;
         struct GenerateShareStoreResult;
+        struct LocalMetadataTransitions;
 
         //Methods
         char* get_version(int* error_code);
-        void string_destroy(char *ptr);
+        void string_free(char *ptr);
         char* generate_private_key( char* curve_n, int* error_code);
         char* point_get_x(struct KeyPoint* point, int* error_code);
         char* point_get_y(struct KeyPoint* point, int* error_code);
@@ -91,11 +72,17 @@ FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
         void threshold_key_delete_share(struct FFIThresholdKey* threshold_key, char* share_index, char* curve_n, int* error_code);
         void threshold_key_delete_tkey(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         char* threshold_key_output_share(struct FFIThresholdKey* threshold_key, char* share_index, char* share_type, char* curve_n, int* error_code);
+        char* threshold_key_get_tkey_store(struct FFIThresholdKey* threshold_key, char* module_name, int* error_code);
+        char* threshold_key_get_tkey_store_item(struct FFIThresholdKey* threshold_key, char* module_name, char* identifier, int* error_code);
         void threshold_key_input_share(struct FFIThresholdKey* threshold_key, char* share, char* share_type, char* curve_n, int* error_code);
         struct ShareStore* threshold_key_output_share_store(struct FFIThresholdKey* threshold_key, char* share_index, char* poly_id, char* curve_n, int* error_code);
         struct Polynomial* threshold_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         void threshold_key_input_share_store(struct FFIThresholdKey* threshold_key, struct ShareStore* share_store, int* error_code);
         char* threshold_key_get_shares_indexes(struct FFIThresholdKey* threshold_key, int* error_code);
+        char* threshold_key_encrypt(struct FFIThresholdKey* threshold_key, char* data, char* curve_n, int* error_code);
+        char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
+        struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
+        struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
@@ -149,8 +136,9 @@ FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
         struct KeyPoint* public_polynomial_poly_commitment_eval(struct PublicPolynomial* public_polynomial, char* index, char* curve_n,int* error_code);
 
         void public_polynomial_free(struct PublicPolynomial* public_polynomial);
+        //LocalMetadataTransitions
+        void local_metadata_transitions_free(struct LocalMetadataTransitions* transitions);
     #ifdef __cplusplus
     } // extern "C"
     #endif
 #endif // __TKEY_H__
-

@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class ShareStore {
@@ -38,7 +38,7 @@ public final class ShareStore {
             throw RuntimeError("Error in ShareStore to Json \(errorCode)")
         }
         let string = String(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return string
     }
 
@@ -51,7 +51,7 @@ public final class ShareStore {
             throw RuntimeError("Error in ShareStore")
             }
         let value = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return value
     }
 
@@ -64,7 +64,7 @@ public final class ShareStore {
             throw RuntimeError("Error in ShareStore")
             }
         let value = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return value
     }
 
@@ -77,7 +77,7 @@ public final class ShareStore {
             throw RuntimeError("Error in ShareStore")
             }
         let value = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return value
     }
 
