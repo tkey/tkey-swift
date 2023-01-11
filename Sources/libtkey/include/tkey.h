@@ -93,6 +93,7 @@ FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
         char* threshold_key_output_share(struct FFIThresholdKey* threshold_key, char* share_index, char* share_type, char* curve_n, int* error_code);
         void threshold_key_input_share(struct FFIThresholdKey* threshold_key, char* share, char* share_type, char* curve_n, int* error_code);
         struct ShareStore* threshold_key_output_share_store(struct FFIThresholdKey* threshold_key, char* share_index, char* poly_id, char* curve_n, int* error_code);
+        struct Polynomial* threshold_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         void threshold_key_input_share_store(struct FFIThresholdKey* threshold_key, struct ShareStore* share_store, int* error_code);
         char* threshold_key_get_shares_indexes(struct FFIThresholdKey* threshold_key, int* error_code);
         // share description
@@ -137,6 +138,17 @@ FOUNDATION_EXPORT const unsigned char tkeywrapperVersionString[];
         void metadata_free(struct Metadata* metadata);
         struct Metadata* metadata_from_json(char* json, int* error_code);
         char* metadata_to_json(struct Metadata* metadata, int* error_code);
+        // polynomial
+        struct ShareMap* polynomial_generate_shares(struct Polynomial* polynomial, char* share_indexes, char* curve_n, int* error_code);
+        char* polynomial_get_polynomial_id(struct Polynomial* polynomial, int* error_code);
+        struct PublicPolynomial* polynomial_get_public_polynomial(struct Polynomial* polynomial, int* error_code);
+        void polynomial_free(struct Polynomial* polynomial);
+        // public polynomial
+        char* public_polynomial_get_polynomial_id(struct PublicPolynomial* public_polynomial, int* error_code);
+        unsigned int public_polynomial_get_threshold(struct PublicPolynomial* public_polynomial, int* error_code);
+        struct KeyPoint* public_polynomial_poly_commitment_eval(struct PublicPolynomial* public_polynomial, char* index, char* curve_n,int* error_code);
+
+        void public_polynomial_free(struct PublicPolynomial* public_polynomial);
     #ifdef __cplusplus
     } // extern "C"
     #endif
