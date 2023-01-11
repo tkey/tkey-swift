@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class GenerateShareStoreResult {
@@ -25,7 +25,7 @@ public final class GenerateShareStoreResult {
         throw RuntimeError("Error in GenerateShareStoreResult, field hex")
         }
         hex = String.init(cString: hexPtr!)
-        string_destroy(hexPtr)
+        string_free(hexPtr)
         let storePtr = withUnsafeMutablePointer(to: &errorCode, { error in
            generate_new_share_store_result_get_share_store_map(pointer, error)
                })

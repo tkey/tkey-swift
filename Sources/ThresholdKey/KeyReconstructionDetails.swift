@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class KeyReconstructionDetails: Codable {
@@ -24,7 +24,7 @@ public final class KeyReconstructionDetails: Codable {
             throw RuntimeError("Error in KeyDetails, field Private Key")
             }
         self.key = String.init(cString: key!)
-        string_destroy(key)
+        string_free(key)
 
         self.seed_phrase = []
         let seed_len = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -42,7 +42,7 @@ public final class KeyReconstructionDetails: Codable {
                     throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + index.formatted())
                     }
                 self.seed_phrase.append(String.init(cString: seed_item!))
-                string_destroy(seed_item)
+                string_free(seed_item)
             }
         }
 
@@ -62,7 +62,7 @@ public final class KeyReconstructionDetails: Codable {
                     throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + index.formatted())
                     }
                 self.all_keys.append(String.init(cString: seed_item!))
-                string_destroy(seed_item)
+                string_free(seed_item)
             }
         }
 

@@ -7,13 +7,13 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class Metadata {
     private(set) var pointer: OpaquePointer?
 
-    public init(pointer: OpaquePointer) {
+    public init(pointer: OpaquePointer?) {
         self.pointer = pointer
     }
 
@@ -38,7 +38,7 @@ public final class Metadata {
             throw RuntimeError("Error in ShareStore")
             }
         let value = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return value
     }
 
