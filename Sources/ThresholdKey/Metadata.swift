@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class Metadata {
@@ -38,7 +38,7 @@ public final class Metadata {
             throw RuntimeError("Error in ShareStore")
             }
         let value = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return value
     }
 

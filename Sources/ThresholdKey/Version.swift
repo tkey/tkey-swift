@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public func library_version() throws -> String {
@@ -21,6 +21,6 @@ public func library_version() throws -> String {
     }
 
     let version = String.init(cString: result!)
-    string_destroy(result)
+    string_free(result)
     return version
 }

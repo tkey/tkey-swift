@@ -7,13 +7,13 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class PrivateKeysModule {
-    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, curve_n: String) throws -> Bool {
+    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
         var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         var keyPointer: UnsafeMutablePointer<Int8>?
         if key != nil {
             keyPointer = UnsafeMutablePointer<Int8>(mutating: (key! as NSString).utf8String)
@@ -37,7 +37,7 @@ public final class PrivateKeysModule {
             throw RuntimeError("Error in PrivateKeysModule, private_keys_get_private_keys")
             }
         let json = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return json
     }
 
@@ -50,7 +50,7 @@ public final class PrivateKeysModule {
             throw RuntimeError("Error in PrivateKeysModule, private_keys_get_accounts")
             }
         let json = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         let account_array = try! JSONSerialization.jsonObject(with: json.data(using: String.Encoding.utf8)!, options: .allowFragments) as! [String]
         return account_array
     }

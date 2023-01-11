@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 /*
@@ -42,7 +42,7 @@ public final class StorageLayer {
       }
      */
 
-    public static func percentEscapeString( string: String) -> String {
+    public static func percentEscapeString( string: String ) -> String {
       var characterSet = CharacterSet.alphanumerics
       characterSet.insert(charactersIn: "-.* ")
 
@@ -60,8 +60,8 @@ public final class StorageLayer {
             let sem = DispatchSemaphore.init(value: 0)
             let urlString = String.init(cString: url!)
             let dataString = String.init(cString: data!)
-            string_destroy(url)
-            string_destroy(data)
+            string_free(url)
+            string_free(data)
             let url = URL(string: urlString)!
             let session = URLSession.shared
             var request = URLRequest(url: url)

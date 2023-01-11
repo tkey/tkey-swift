@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "tkey-rust-ios"
-  spec.version      = "0.0.2"
+  spec.version      = "0.0.3"
   spec.platform = :ios, "15.0"
   spec.summary      = "SDK allows you to create threshold key setup natively"
   spec.homepage     = "https://github.com/torusresearch/tkey-rust-ios"

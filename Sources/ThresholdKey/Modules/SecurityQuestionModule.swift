@@ -7,13 +7,13 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class SecurityQuestionModule {
-    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> GenerateShareStoreResult {
+    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -25,9 +25,9 @@ public final class SecurityQuestionModule {
         return try! GenerateShareStoreResult.init(pointer: result!)
     }
 
-    public static func input_share(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
+    public static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             security_question_input_share(threshold_key.pointer, answerPointer, curvePointer, error)
@@ -38,9 +38,9 @@ public final class SecurityQuestionModule {
         return result
     }
 
-    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, curve_n: String) throws -> Bool {
+    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -52,9 +52,9 @@ public final class SecurityQuestionModule {
         return result
     }
 
-    public static func store_answer(threshold_key: ThresholdKey, answer: String, curve_n: String) throws -> Bool {
+    public static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             security_question_store_answer(threshold_key.pointer, answerPointer, curvePointer, error)
@@ -74,7 +74,7 @@ public final class SecurityQuestionModule {
             throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
             }
         let string = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return string
     }
 
@@ -87,7 +87,7 @@ public final class SecurityQuestionModule {
             throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
             }
         let string = String.init(cString: result!)
-        string_destroy(result)
+        string_free(result)
         return string
     }
 }

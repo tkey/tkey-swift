@@ -11,6 +11,7 @@ import Foundation
 #endif
 
 public final class ShareStorePolyIdIndexMap {
+    private(set) var pointer: OpaquePointer;
     public var share_maps = [String: ShareStoreMap]()
 
     public init(pointer: OpaquePointer) throws {
@@ -22,7 +23,7 @@ public final class ShareStorePolyIdIndexMap {
             throw RuntimeError("Error in ShareStorePolyIdIndexMap")
             }
         let value = String.init(cString: keys!)
-        string_destroy(keys)
+        string_free(keys)
         let data = Data(value.utf8)
         let key_array = try JSONSerialization.jsonObject(with: data) as! [String]
         for item in key_array {
@@ -36,6 +37,10 @@ public final class ShareStorePolyIdIndexMap {
             share_maps[item] = try! ShareStoreMap.init(pointer: value!)
         }
 
+        self.pointer = pointer
+    }
+    
+    deinit {
         share_store_poly_id_index_map_free(pointer)
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 #if canImport(lib)
-import lib
+    import lib
 #endif
 
 public final class PrivateKey {
@@ -15,7 +15,7 @@ public final class PrivateKey {
 
     public init(pointer: UnsafeMutablePointer<Int8>) {
         hex = String.init(cString: pointer)
-        string_destroy(pointer)
+        string_free(pointer)
     }
 
     public static func generate(curve_n: String) throws -> PrivateKey {
