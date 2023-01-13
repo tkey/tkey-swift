@@ -12,6 +12,7 @@ import lib
 
 public final class PublicPolynomial {
     public let pointer: OpaquePointer?
+    internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
     public init(pointer: OpaquePointer?) throws {
         var errorCode: Int32 = -1
@@ -31,25 +32,15 @@ public final class PublicPolynomial {
             public_polynomial_get_threshold(self.pointer, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in get threshold")
+            throw RuntimeError("Error in Public Polynomial, get threshold")
         }
         return result;
     }
-    public func getPolynomialId() throws -> String {
+
+    public func polyCommitmentEval(index: String) throws -> KeyPoint {
         var errorCode: Int32  = -1
         
-        let result = withUnsafeMutablePointer(to: &errorCode, {error in
-            public_polynomial_get_polynomial_id(self.pointer, error)
-        })
-        guard errorCode == 0 else {
-            throw RuntimeError("Error in getPolynomialId")
-        }
-        return String.init(cString: result!)
-    }
-    public func polyCommitmentEval(curve_n: String, index: String) throws -> KeyPoint {
-        var errorCode: Int32  = -1
-        
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curve_n as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (index as NSString).utf8String)
         
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
