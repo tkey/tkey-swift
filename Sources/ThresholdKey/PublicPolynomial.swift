@@ -40,10 +40,9 @@ public final class PublicPolynomial {
             public_polynomial_poly_commitment_eval(self.pointer, indexesPointer,curvePointer, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in polyCommitmentEval")
+            throw RuntimeError("Error in PublicPolynomial, polyCommitmentEval")
         }
-        let point = try! KeyPoint(pointer: result!);
-        return point;
+        return try! KeyPoint(pointer: result!);
     }
     deinit {
         public_polynomial_free(pointer);
