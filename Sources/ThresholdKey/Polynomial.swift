@@ -14,7 +14,7 @@ public final class Polynomial {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
     
-    public init(pointer: OpaquePointer?) {
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
     
@@ -26,9 +26,7 @@ public final class Polynomial {
         guard errorCode == 0 else {
             throw RuntimeError("Error in getPublicPolynomial")
         }
-        let publicPolynomial = try! PublicPolynomial(pointer: result);
-        return publicPolynomial
-        
+        return try! PublicPolynomial.init(pointer: result!);
     }
     
     public func generateShares(share_index: String) throws -> ShareMap? {

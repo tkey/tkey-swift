@@ -11,20 +11,13 @@ import lib
 #endif
 
 public final class PublicPolynomial {
-    public let pointer: OpaquePointer?
+    private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
-    public init(pointer: OpaquePointer?) throws {
-        var errorCode: Int32 = -1
-  
-        let publicPolynomial = withUnsafeMutablePointer(to: &errorCode, { error in
-            polynomial_get_public_polynomial(pointer, error)
-       })
-        guard errorCode == 0 else {
-            throw RuntimeError("Error in Pub Polynomial, init")
-            }
-        self.pointer = publicPolynomial;
+    public init(pointer: OpaquePointer) throws {
+        self.pointer = pointer;
     }
+
     public func getThreshold() throws -> UInt32  {
         var errorCode: Int32  = -1
         
