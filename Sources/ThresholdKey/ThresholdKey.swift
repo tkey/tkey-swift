@@ -296,6 +296,19 @@ public final class ThresholdKey {
         return String.init(cString: result!)
     }
     
+    public func sync_local_metadata_transistions() throws {
+        var errorCode: Int32  = -1
+        
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: curveN).utf8String)
+        
+        withUnsafeMutablePointer(to: &errorCode, {error in
+            threshold_key_sync_local_metadata_transitions(pointer, curvePointer, error )
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in ThresholdKey sync_local_metadata_transistions")
+        }
+    }
+    
     deinit {
         threshold_key_free(pointer)
     }

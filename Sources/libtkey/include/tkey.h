@@ -82,6 +82,7 @@
         char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
         struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
         struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
+        void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
@@ -126,6 +127,9 @@
         char* metadata_to_json(struct Metadata* metadata, int* error_code);
         //LocalMetadataTransitions
         void local_metadata_transitions_free(struct LocalMetadataTransitions* transitions);
+        //share serialization
+        char* share_serialization_serialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
+        char* share_serialization_deserialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
     #ifdef __cplusplus
     } // extern "C"
     #endif
