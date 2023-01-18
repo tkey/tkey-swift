@@ -129,6 +129,7 @@
         struct Metadata* metadata_from_json(char* json, int* error_code);
         char* metadata_to_json(struct Metadata* metadata, int* error_code);
         // polynomial
+        struct Polynomial* polynomial(char* polynomials, struct PublicPolynomial* public_polynomial, int* error_code);
         struct ShareMap* polynomial_generate_shares(struct Polynomial* polynomial, char* share_indexes, char* curve_n, int* error_code);
         struct PublicPolynomial* polynomial_get_public_polynomial(struct Polynomial* polynomial, int* error_code);
         void polynomial_free(struct Polynomial* polynomial);
@@ -139,7 +140,7 @@
         // share map
         void share_map_free(struct ShareMap* share_map);
         char* share_map_get_share_keys(struct ShareMap* share_map, int* error_code);
-        char* share_map_get_share_by_key(struct ShareMap* share_map, int* error_code);
+        char* share_map_get_share_by_key(struct ShareMap* share_map, char* key, int* error_code);
         //LocalMetadataTransitions
         void local_metadata_transitions_free(struct LocalMetadataTransitions* transitions);
     #ifdef __cplusplus

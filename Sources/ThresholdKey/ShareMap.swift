@@ -12,38 +12,31 @@ import Foundation
 #endif
 
 public final class ShareMap {
-    private(set) var pointer: OpaquePointer?
-
+    public var share_map = [String: String]()
+    
     public init(pointer: OpaquePointer) throws {
-        self.pointer = pointer
-    }
-
-    public func getShareIndexes() throws -> String {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_map_get_share_keys(self.pointer, error)
+            share_map_get_share_keys(pointer, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ShareMap, getShareIndexes")
+            throw RuntimeError("Error in Share Map")
         }
-        let shareIndexes = String.init(cString: keys!)
-        return shareIndexes
-    }
-
-    public func getShareByKey() throws -> String {
-        var errorCode: Int32 = -1
-        let values = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_map_get_share_by_key(self.pointer, error)
-        })
-        guard errorCode == 0 else {
-            throw RuntimeError("Error in ShareMap, getShareIndexes")
+        let value = String.init(cString: keys!)
+        string_free(keys)
+        let data = Data(value.utf8)
+        let key_array = try JSONSerialization.jsonObject(with: data) as! [String]
+        for item in key_array {
+            let keyPointer = UnsafeMutablePointer<Int8>(mutating: (item as NSString).utf8String)
+            let value = withUnsafeMutablePointer(to: &errorCode, { error in
+                share_map_get_share_by_key(pointer, keyPointer, error)
+                    })
+            guard errorCode == 0 else {
+                throw RuntimeError("Error in Share Map")
+                }
+            share_map[item] = String.init(cString: value!);
         }
-        let share = String.init(cString: values!)
-        return share
-    }
-    
-    deinit {
-        share_map_free(pointer);
+        share_map_free(pointer)
     }
 }
 

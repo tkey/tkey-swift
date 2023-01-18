@@ -14,7 +14,7 @@ public final class PublicPolynomial {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
-    public init(pointer: OpaquePointer) throws {
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer;
     }
 

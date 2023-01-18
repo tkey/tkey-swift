@@ -17,7 +17,7 @@ public final class Polynomial {
     public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
-    
+
     public func getPublicPolynomial() throws -> PublicPolynomial {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -29,14 +29,14 @@ public final class Polynomial {
         return try! PublicPolynomial.init(pointer: result!);
     }
     
-    public func generateShares(share_index: String) throws -> ShareMap? {
+    public func generateShares(share_index: String) throws -> ShareMap {
         var errorCode: Int32  = -1
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
         
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
-            polynomial_generate_shares(self.pointer, curvePointer, indexesPointer, error)
+            polynomial_generate_shares(self.pointer, indexesPointer, curvePointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in Polynomial, generateShares")
