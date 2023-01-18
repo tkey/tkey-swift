@@ -206,7 +206,7 @@ final class tkey_pkgTests: XCTestCase {
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: true)
-
+        
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         
         let poly = try! threshold_key.reconstruct_latest_poly()
@@ -219,6 +219,11 @@ final class tkey_pkgTests: XCTestCase {
         let share_map = try! poly.generateShares(share_index: share_index);
         
         XCTAssertEqual(share_map.share_map.count, 3 );
+        for item in share_map.share_map {
+            let point = try! pub_poly.polyCommitmentEval(index: item.key);
+            XCTAssertNotNil(point.x);
+            XCTAssertNotNil(point.y);
+        }
         
     }
 
