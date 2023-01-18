@@ -103,7 +103,7 @@ public final class ThresholdKey {
         guard errorCode == 0 else {
             throw RuntimeError("Error in getPublicPolynomial")
         }
-        return try! Polynomial(pointer: result!)
+        return Polynomial(pointer: result!)
     }
 
     public func generate_new_share() throws -> GenerateShareStoreResult {

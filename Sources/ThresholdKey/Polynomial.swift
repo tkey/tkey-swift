@@ -26,7 +26,7 @@ public final class Polynomial {
         guard errorCode == 0 else {
             throw RuntimeError("Error in getPublicPolynomial")
         }
-        return try! PublicPolynomial.init(pointer: result!);
+        return PublicPolynomial.init(pointer: result!);
     }
     
     public func generateShares(share_index: String) throws -> ShareMap {
