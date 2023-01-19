@@ -14,7 +14,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
@@ -46,7 +46,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -59,7 +59,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -77,7 +77,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -129,7 +129,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -138,7 +138,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -165,8 +165,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true
-        )
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
@@ -197,6 +196,36 @@ final class tkey_pkgTests: XCTestCase {
 
     }
 
+    func testPolyModule() {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: false)
+        
+        _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        
+        let poly = try! threshold_key.reconstruct_latest_poly()
+        
+        let pub_poly = try! poly.getPublicPolynomial();
+        let threshold_count = try! pub_poly.getThreshold();
+        XCTAssertEqual(threshold_count, 2 );
+        
+        let share_index: String = "[4,6,12]";
+        let share_map = try! poly.generateShares(share_index: share_index);
+        
+        XCTAssertEqual(share_map.share_map.count, 3 );
+        for item in share_map.share_map {
+            let point = try! pub_poly.polyCommitmentEval(index: item.key);
+            XCTAssertNotNil(point.x);
+            XCTAssertNotNil(point.y);
+        }
+        
+    }
+
     func testSeedPhraseModule() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
@@ -205,8 +234,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true
-            )
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
@@ -251,7 +279,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
         let metadata = try! threshold_key.get_metadata()

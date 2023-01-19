@@ -22,6 +22,9 @@
         struct ShareTransferStore;
         struct GenerateShareStoreResult;
         struct LocalMetadataTransitions;
+        struct Polynomial;
+        struct PublicPolynomial;
+        struct ShareMap;
 
         //Methods
         char* get_version(int* error_code);
@@ -81,6 +84,7 @@
         char* threshold_key_encrypt(struct FFIThresholdKey* threshold_key, char* data, char* curve_n, int* error_code);
         char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
         struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
+        struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
         // share description
@@ -125,6 +129,19 @@
         void metadata_free(struct Metadata* metadata);
         struct Metadata* metadata_from_json(char* json, int* error_code);
         char* metadata_to_json(struct Metadata* metadata, int* error_code);
+        // polynomial
+        struct Polynomial* polynomial(char* polynomials, struct PublicPolynomial* public_polynomial, int* error_code);
+        struct ShareMap* polynomial_generate_shares(struct Polynomial* polynomial, char* share_indexes, char* curve_n, int* error_code);
+        struct PublicPolynomial* polynomial_get_public_polynomial(struct Polynomial* polynomial, int* error_code);
+        void polynomial_free(struct Polynomial* polynomial);
+        // public polynomial
+        unsigned int public_polynomial_get_threshold(struct PublicPolynomial* public_polynomial, int* error_code);
+        struct KeyPoint* public_polynomial_poly_commitment_eval(struct PublicPolynomial* public_polynomial, char* index, char* curve_n,int* error_code);
+        void public_polynomial_free(struct PublicPolynomial* public_polynomial);
+        // share map
+        void share_map_free(struct ShareMap* share_map);
+        char* share_map_get_share_keys(struct ShareMap* share_map, int* error_code);
+        char* share_map_get_share_by_key(struct ShareMap* share_map, char* key, int* error_code);
         //LocalMetadataTransitions
         void local_metadata_transitions_free(struct LocalMetadataTransitions* transitions);
         //share serialization

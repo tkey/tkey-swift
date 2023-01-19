@@ -94,6 +94,18 @@ public final class ThresholdKey {
         return try! KeyReconstructionDetails(pointer: result!)
     }
 
+    public func reconstruct_latest_poly() throws -> Polynomial {
+        var errorCode: Int32 = -1
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_reconstruct_latest_poly(pointer, curvePointer,error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in getPublicPolynomial")
+        }
+        return Polynomial(pointer: result!)
+    }
+
     public func generate_new_share() throws -> GenerateShareStoreResult {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
