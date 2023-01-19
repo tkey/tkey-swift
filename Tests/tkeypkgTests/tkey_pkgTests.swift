@@ -14,7 +14,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
@@ -46,7 +46,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -59,7 +59,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -77,7 +77,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -129,7 +129,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! threshold_key.reconstruct()
@@ -138,7 +138,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
 
         _ = try! threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -165,8 +165,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true
-        )
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
@@ -205,7 +204,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
         
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         
@@ -235,8 +234,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true
-            )
+            manual_sync: false)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
@@ -281,7 +279,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: true)
+            manual_sync: false)
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
         let metadata = try! threshold_key.get_metadata()

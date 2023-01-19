@@ -35,6 +35,7 @@ public final class ShareMap {
                 throw RuntimeError("Error in Share Map")
                 }
             share_map[item] = String.init(cString: value!);
+            string_free(value)
         }
         share_map_free(pointer)
     }
