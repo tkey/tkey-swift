@@ -1,0 +1,22 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "14.2.0"
+      - name: package
+        run: xcodebuild test -scheme tkey_pkg -destination "platform=iOS Simulator,OS=16.2,name=iPhone 14" COMPILER_INDEX_STORE_ENABLE=NO
