@@ -30,7 +30,9 @@
         char* get_version(int* error_code);
         void string_free(char *ptr);
         char* generate_private_key( char* curve_n, int* error_code);
+        struct Polynomial* lagrange_interpolate_polynomial( char* points, char* curve_n, int* error_code);
         char* point_get_x(struct KeyPoint* point, int* error_code);
+        struct KeyPoint* point(char* x, char* y, int* error_code);
         char* point_get_y(struct KeyPoint* point, int* error_code);
         char* point_encode(struct KeyPoint* point, char* enc, int* error_code);
         void point_free(struct KeyPoint* point);
@@ -87,6 +89,7 @@
         struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
+        char* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey*, char* curve_n, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);

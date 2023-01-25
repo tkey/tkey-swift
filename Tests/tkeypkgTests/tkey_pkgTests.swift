@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 @testable import tkey_pkg
 
 final class tkey_pkgTests: XCTestCase {
@@ -165,7 +166,8 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: false
+        )
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()
@@ -214,15 +216,31 @@ final class tkey_pkgTests: XCTestCase {
         let threshold_count = try! pub_poly.getThreshold();
         XCTAssertEqual(threshold_count, 2 );
         
+        // get all share store
+        let share_store = try! threshold_key.get_all_share_stores_for_latest_polynomial();
+        XCTAssertEqual(share_store.count, 2 );
+        
         let share_index: String = "[4,6,12]";
         let share_map = try! poly.generateShares(share_index: share_index);
-        
+        var points_arr: [KeyPoint] = [];
         XCTAssertEqual(share_map.share_map.count, 3 );
         for item in share_map.share_map {
+            let share_index = item.key;
+            let share = item.value;
+            let poly_point = try! KeyPoint(x: share_index, y: share);
+            points_arr.append(poly_point);
+            
             let point = try! pub_poly.polyCommitmentEval(index: item.key);
             XCTAssertNotNil(point.x);
             XCTAssertNotNil(point.y);
         }
+        
+        // lagrange interpolation
+        let poly_lagrange = try! Lagrange.lagrange(points_arr: points_arr);
+
+        let share_index_1: String = "[5,9,15]";
+        let share_map_1 = try! poly_lagrange.generateShares(share_index: share_index_1);
+        XCTAssertEqual(share_map_1.share_map.count, 3 );
         
     }
 
@@ -234,7 +252,8 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: false
+            )
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! threshold_key.reconstruct()

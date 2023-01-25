@@ -105,7 +105,33 @@ public final class ThresholdKey {
         }
         return Polynomial(pointer: result!)
     }
+    
+    public func get_all_share_stores_for_latest_polynomial() throws -> [ShareStore] {
+        var errorCode: Int32 = -1
+        
+        var shareStores: [ShareStore] = [];
+        
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_all_share_stores_for_latest_polynomial(pointer, curvePointer,error)
+        })
 
+        let value = String.init(cString: result!);
+        let data = Data(value.utf8)
+        let shareStoreArray = try JSONSerialization.jsonObject(with: data) as! NSArray
+        for item in shareStoreArray {
+            let jsonData = try JSONSerialization.data(withJSONObject: item)
+            let jsonString = String(data: jsonData, encoding: .utf8);
+            let shareStore = try! ShareStore(json: jsonString!);
+            shareStores.append(shareStore);
+        }
+        
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in getAllShareStoreForLatestPoly")
+        }
+        return shareStores;
+    }
+    
     public func generate_new_share() throws -> GenerateShareStoreResult {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
