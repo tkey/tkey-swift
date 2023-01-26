@@ -11,8 +11,8 @@ import Foundation
 #endif
 
 public struct seedPhraseStruct: Codable {
-    var seedPhrase: String
-    var type: String
+    public var seedPhrase: String
+    public var type: String
 }
 
 public final class SeedPhraseModule {
