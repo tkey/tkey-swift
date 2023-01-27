@@ -194,7 +194,7 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in Threshold while Getting Key Details")
                 }
                 let keyDetails = try! KeyDetails(pointer: result!)
-                completion(.success(<#T##KeyDetails#>))
+                completion(.success(keyDetails))
             } catch {
                 completion(.failure(error))
             }
