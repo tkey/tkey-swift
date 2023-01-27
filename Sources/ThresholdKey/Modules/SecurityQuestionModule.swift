@@ -25,7 +25,7 @@ public final class SecurityQuestionModule {
         return try! GenerateShareStoreResult.init(pointer: result!)
     }
     
-    public static func generateNewShareAsync(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<KeyDetails, Error>) -> Void) {
+    public static func generateNewShareAsync(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -39,8 +39,8 @@ public final class SecurityQuestionModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in SecurityQuestionModule, generate_new_share")
                     }
-                let keyDetails = try! KeyDetails(pointer: result!)
-                completion(.success(keyDetails))
+                let shareStoreResult = try! GenerateShareStoreResult(pointer: result!)
+                completion(.success(shareStoreResult))
             } catch {
                 completion(.failure(error))
             }
