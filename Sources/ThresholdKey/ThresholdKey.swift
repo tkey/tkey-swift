@@ -160,7 +160,7 @@ public final class ThresholdKey {
     }
     
     public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue(label: "testqueue", attributes: .concurrent).async {
+        DispatchQueue.main.async {
             do {
                 var errorCode: Int32  = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
@@ -178,6 +178,47 @@ public final class ThresholdKey {
             
         }
     }
+    
+    public func generateNewShareAsync_GCD(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+        DispatchQueue.global(qos: .background).async {
+            do {
+                var errorCode: Int32  = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_generate_share(self.pointer, curvePointer, error )
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey generate_new_share")
+                }
+                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
+                completion(.success(shareStoreResult))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func generateNewShareAsync_OperationQueue(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+        let operation = BlockOperation {
+            do {
+                var errorCode: Int32  = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_generate_share(self.pointer, curvePointer, error )
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey generate_new_share")
+                }
+                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
+                completion(.success(shareStoreResult))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+        let queue = OperationQueue()
+        queue.addOperation(operation)
+    }
+
 
     public func delete_share(share_index: String) throws {
         var errorCode: Int32 = -1
