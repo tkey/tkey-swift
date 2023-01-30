@@ -202,6 +202,29 @@ public final class ThresholdKey {
         }
     }
     
+    public func generateNewShareAsync_GCD2(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+        DispatchQueue.main.async {
+            do {
+                var errorCode: Int32  = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_generate_share(self.pointer, curvePointer, error )
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey generate_new_share")
+                }
+                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
+                DispatchQueue.global(qos: .background).async {
+                    completion(.success(shareStoreResult))
+                }
+            } catch {
+                DispatchQueue.global(qos: .background).async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
     public func generateNewShareAsync_OperationQueue(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         let operation = BlockOperation {
             do {
