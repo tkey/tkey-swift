@@ -191,9 +191,13 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in ThresholdKey generate_new_share")
                 }
                 let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                completion(.success(shareStoreResult))
+                DispatchQueue.main.async {
+                    completion(.success(shareStoreResult))
+                }
             } catch {
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     }
