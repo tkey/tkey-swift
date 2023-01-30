@@ -115,21 +115,24 @@ public final class ThresholdKey {
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_all_share_stores_for_latest_polynomial(pointer, curvePointer,error)
         })
-
-        let value = String.init(cString: result!);
-        let data = Data(value.utf8)
-        let shareStoreArray = try JSONSerialization.jsonObject(with: data) as! NSArray
-        for item in shareStoreArray {
-            let jsonData = try JSONSerialization.data(withJSONObject: item)
-            let jsonString = String(data: jsonData, encoding: .utf8);
-            let shareStore = try! ShareStore(json: jsonString!);
-            shareStores.append(shareStore);
-        }
-        
         guard errorCode == 0 else {
-            throw RuntimeError("Error in getAllShareStoreForLatestPoly")
+            throw RuntimeError("Error in ThresholdKey get_all_share_stores_for_latest_polynomial")
         }
-        return shareStores;
+        let length = withUnsafeMutablePointer(to: &errorCode, { error in
+            share_stores_get_len(result,error)
+        })
+        if length > 0 {
+            for index in 0...length-1 {
+                let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_store_map_by_index(result, index, error)
+                       })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + index.formatted())
+                    }
+                shareStores.append(ShareStore.init(pointer: share_store!));
+            }
+        }
+        return shareStores
     }
     
     public func generate_new_share() throws -> GenerateShareStoreResult {

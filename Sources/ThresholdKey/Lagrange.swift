@@ -18,16 +18,20 @@ public class Lagrange {
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
-        let data = try! encoder.encode(points_arr)
-        let jsonString = String(data: data, encoding: .utf8)!
+        let data = try! JSONSerialization.data(withJSONObject: points_arr, options: .prettyPrinted)
+        let point_string = String(data: data, encoding: String.Encoding.utf8) ?? ""
+
         let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
         
-        let pointString = UnsafeMutablePointer<Int8>(mutating: (jsonString as NSString).utf8String);
+        let pointString = UnsafeMutablePointer<Int8>(mutating: (point_string as NSString).utf8String);
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
 
         let poly_result = withUnsafeMutablePointer(to: &errorCode, { error in
             lagrange_interpolate_polynomial(pointString, curvePointer, error)
         })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in lagrange method")
+        }
         return Polynomial.init(pointer: poly_result!);
     }
 }

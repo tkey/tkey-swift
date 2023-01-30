@@ -227,8 +227,13 @@ final class tkey_pkgTests: XCTestCase {
         for item in share_map.share_map {
             let share_index = item.key;
             let share = item.value;
-            let poly_point = try! KeyPoint(x: share_index, y: share);
-            points_arr.append(poly_point);
+
+            let poly_point = ["x": share_index, "y": share];
+            let data = try! JSONSerialization.data(withJSONObject: poly_point, options: .prettyPrinted)
+            let point_string = String(data: data, encoding: String.Encoding.utf8) ?? ""
+
+            let new_point = try! KeyPoint.from_json(json: point_string);
+            points_arr.append(new_point);
             
             let point = try! pub_poly.polyCommitmentEval(index: item.key);
             XCTAssertNotNil(point.x);
