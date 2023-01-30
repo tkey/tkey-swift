@@ -160,7 +160,7 @@ public final class ThresholdKey {
     }
     
     public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.main.async {
+        DispatchQueue(label: "testqueue", attributes: .concurrent).async {
             do {
                 var errorCode: Int32  = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
