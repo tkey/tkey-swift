@@ -84,7 +84,7 @@ public final class ThresholdKey {
     }
     
     public func initializeAsync(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             do {
                 var errorCode: Int32 = -1
                 var sharePointer: UnsafeMutablePointer<Int8>?
@@ -118,7 +118,7 @@ public final class ThresholdKey {
     }
     
     public func reconstructAsync(completion: @escaping (Result<KeyReconstructionDetails, Error>) -> Void) {
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             do {
                 var errorCode: Int32 = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
@@ -160,7 +160,7 @@ public final class ThresholdKey {
     }
     
     public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             do {
                 var errorCode: Int32  = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
@@ -203,7 +203,7 @@ public final class ThresholdKey {
     }
     
     public func getKeyDetailsAsync(completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             do {
                 var errorCode: Int32 = -1
                 let result = withUnsafeMutablePointer(to: &errorCode, {error in
