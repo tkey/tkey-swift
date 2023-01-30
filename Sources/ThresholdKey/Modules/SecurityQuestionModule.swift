@@ -26,7 +26,7 @@ public final class SecurityQuestionModule {
     }
     
     public static func generateNewShareAsync(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.main.async{
+        DispatchQueue(label: "testqueue", attributes: .concurrent).async{
             do {
                 var errorCode: Int32 = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
