@@ -161,7 +161,7 @@ public final class ThresholdKey {
     
     let generateShareQueue = DispatchQueue(label: "generateShareQueue", qos: .background)
 
-    public func generateNewShareAsync_background(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+    public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         generateShareQueue.async {
             do {
                 var errorCode: Int32  = -1
@@ -183,93 +183,7 @@ public final class ThresholdKey {
             }
         }
     }
-    
-    public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.main.async {
-            do {
-                var errorCode: Int32  = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
-                let result = withUnsafeMutablePointer(to: &errorCode, {error in
-                    threshold_key_generate_share(self.pointer, curvePointer, error )
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey generate_new_share")
-                }
-                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                completion(.success(shareStoreResult))
-            } catch {
-                completion(.failure(error))
-            }
-            
-        }
-    }
-    
-    public func generateNewShareAsync_GCD(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.global(qos: .background).async {
-            do {
-                var errorCode: Int32  = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
-                let result = withUnsafeMutablePointer(to: &errorCode, {error in
-                    threshold_key_generate_share(self.pointer, curvePointer, error )
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey generate_new_share")
-                }
-                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                DispatchQueue.main.async {
-                    completion(.success(shareStoreResult))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-            }
-        }
-    }
-    
-    public func generateNewShareAsync_GCD2(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue.main.async {
-            do {
-                var errorCode: Int32  = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
-                let result = withUnsafeMutablePointer(to: &errorCode, {error in
-                    threshold_key_generate_share(self.pointer, curvePointer, error )
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey generate_new_share")
-                }
-                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                DispatchQueue.global(qos: .background).async {
-                    completion(.success(shareStoreResult))
-                }
-            } catch {
-                DispatchQueue.global(qos: .background).async {
-                    completion(.failure(error))
-                }
-            }
-        }
-    }
-    
-    public func generateNewShareAsync_OperationQueue(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        let operation = BlockOperation {
-            do {
-                var errorCode: Int32  = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
-                let result = withUnsafeMutablePointer(to: &errorCode, {error in
-                    threshold_key_generate_share(self.pointer, curvePointer, error )
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey generate_new_share")
-                }
-                let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                completion(.success(shareStoreResult))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-        let queue = OperationQueue()
-        queue.addOperation(operation)
-    }
+
 
 
     public func delete_share(share_index: String) throws {
