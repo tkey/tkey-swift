@@ -11,6 +11,8 @@ import Foundation
 #endif
 
 public final class ThresholdKey {
+    static let initQueue = DispatchQueue(label: "initQueue", qos: .background)
+
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
