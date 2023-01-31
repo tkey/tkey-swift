@@ -26,7 +26,9 @@ public final class SecurityQuestionModule {
     }
     
     public static func generateNewShareAsync(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        DispatchQueue(label: "testqueue", attributes: .concurrent).async{
+        let generateShareQueue = DispatchQueue(label: "generateShareQueue", qos: .background)
+
+        generateShareQueue.async{
             do {
                 var errorCode: Int32 = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
@@ -39,9 +41,13 @@ public final class SecurityQuestionModule {
                     throw RuntimeError("Error in SecurityQuestionModule, generate_new_share")
                     }
                 let shareStoreResult = try! GenerateShareStoreResult(pointer: result!)
-                completion(.success(shareStoreResult))
+                DispatchQueue.main.async {
+                    completion(.success(shareStoreResult))
+                }
             } catch {
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     }

@@ -83,8 +83,10 @@ public final class ThresholdKey {
         return try! KeyDetails(pointer: result!)
     }
     
+    let initQueue = DispatchQueue(label: "initQueue", qos: .background)
+
     public func initializeAsync(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        DispatchQueue.main.async {
+        initQueue.async {
             do {
                 var errorCode: Int32 = -1
                 var sharePointer: UnsafeMutablePointer<Int8>?
@@ -98,9 +100,13 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in ThresholdKey Initialize")
                 }
                 let keyDetails = try! KeyDetails(pointer: result!)
-                completion(.success(keyDetails))
+                DispatchQueue.main.async {
+                    completion(.success(keyDetails))
+                }
             } catch {
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     }
@@ -209,8 +215,10 @@ public final class ThresholdKey {
         return try! KeyDetails(pointer: result!)
     }
     
+    let keyDetailQueue = DispatchQueue(label: "keyDetailQueue", qos: .background)
+
     public func getKeyDetailsAsync(completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        DispatchQueue.main.async {
+        keyDetailQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let result = withUnsafeMutablePointer(to: &errorCode, {error in
@@ -220,9 +228,13 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in Threshold while Getting Key Details")
                 }
                 let keyDetails = try! KeyDetails(pointer: result!)
-                completion(.success(keyDetails))
+                DispatchQueue.main.async {
+                    completion(.success(keyDetails))
+                }
             } catch {
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
             }
         }
     
