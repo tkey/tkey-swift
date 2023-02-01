@@ -11,7 +11,9 @@ import Foundation
 #endif
 
 public final class ThresholdKey {
-    static let initQueue = DispatchQueue(label: "initQueue", qos: .background)
+    let tkeyQueue = DispatchQueue(label: "tkeyQueue", qos: .background)
+    // concurrent queue for external module
+    static let moduleQueue = DispatchQueue(label: "moduleQueue", qos: .background)
 
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
@@ -85,10 +87,8 @@ public final class ThresholdKey {
         return try! KeyDetails(pointer: result!)
     }
     
-    let initQueue = DispatchQueue(label: "initQueue", qos: .background)
-
     public func initializeAsync(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        initQueue.async {
+        tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 var sharePointer: UnsafeMutablePointer<Int8>?
@@ -126,7 +126,7 @@ public final class ThresholdKey {
     }
     
     public func reconstructAsync(completion: @escaping (Result<KeyReconstructionDetails, Error>) -> Void) {
-        DispatchQueue.main.async {
+        tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
@@ -167,10 +167,9 @@ public final class ThresholdKey {
         return try! GenerateShareStoreResult( pointer: result!)
     }
     
-    let generateShareQueue = DispatchQueue(label: "generateShareQueue", qos: .background)
 
     public func generateNewShareAsync(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        generateShareQueue.async {
+        tkeyQueue.async {
             do {
                 var errorCode: Int32  = -1
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
@@ -217,10 +216,9 @@ public final class ThresholdKey {
         return try! KeyDetails(pointer: result!)
     }
     
-    let keyDetailQueue = DispatchQueue(label: "keyDetailQueue", qos: .background)
 
     public func getKeyDetailsAsync(completion: @escaping (Result<KeyDetails, Error>) -> Void) {
-        keyDetailQueue.async {
+        tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let result = withUnsafeMutablePointer(to: &errorCode, {error in
