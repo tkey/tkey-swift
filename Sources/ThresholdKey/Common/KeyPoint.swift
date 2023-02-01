@@ -13,8 +13,7 @@ import Foundation
 public final class KeyPoint: Codable {
     public var x, y: String
     public var compressed: String
-    internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-
+    
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         var result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -38,29 +37,28 @@ public final class KeyPoint: Codable {
         result = withUnsafeMutablePointer(to: &errorCode, { error in
             point_encode(pointer, encoder_format, error)
         })
-        if ((result) != nil) {
-            compressed = String.init(cString: result!)
-            string_free(result)
-            guard errorCode == 0 else {
-                throw RuntimeError("Error in KeyPoint, field Y")
+        compressed = String.init(cString: result!)
+        string_free(result)
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in KeyPoint, field Y")
             }
-            
-        } else {
-            compressed = ""
-        }
-        
 
         point_free(pointer)
     }
-    public static func from_json(json: String) throws -> KeyPoint {
+
+    public static func from_point(x: String, y: String) throws -> KeyPoint {
         var errorCode: Int32 = -1
-        let jsonPointer = UnsafeMutablePointer<Int8>(mutating: (json as NSString).utf8String)
-        let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            point_from_json(jsonPointer, error)
+
+        let x_ptr = UnsafeMutablePointer<Int8>(mutating: NSString(string: x).utf8String)
+        let y_ptr = UnsafeMutablePointer<Int8>(mutating: NSString(string: y).utf8String)
+        
+        let point_ptr = withUnsafeMutablePointer(to: &errorCode, { error in
+            point_new(x_ptr, y_ptr, error)
         })
-        guard errorCode == 0 else {
-            throw RuntimeError("Error in ShareStore \(errorCode)")
-            }
-        return try! KeyPoint.init(pointer: result!);
+       guard errorCode == 0 else {
+           throw RuntimeError("Error in KeyPoint, from_point")
+       }
+
+        return try! KeyPoint.init(pointer: point_ptr!);
     }
 }

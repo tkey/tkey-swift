@@ -124,7 +124,7 @@ public final class ThresholdKey {
         if length > 0 {
             for index in 0...length-1 {
                 let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_store_map_by_index(result, index, error)
+                    share_store_map_get_value_by_index(result, index, error)
                        })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + index.formatted())

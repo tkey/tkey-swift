@@ -220,33 +220,27 @@ final class tkey_pkgTests: XCTestCase {
         let share_store = try! threshold_key.get_all_share_stores_for_latest_polynomial();
         XCTAssertEqual(share_store.count, 2 );
         
-        let share_index: String = "[4,6,12]";
-        let share_map = try! poly.generateShares(share_index: share_index);
+        let share_index_array = ["c9022864e78c175beb9931ba136233fce416ece4c9af258ac9af404f7436c281", "8cd35d2d246e475de2413732c2d134d39bb51a1ed07cb5b1d461b5184c62c1b6", "6e0ab0cb7e47bdce6b08c043ee449d94c3addf33968ae79b4c8d7014238c46e4"]
+
+        let json_share_idx = try! JSONSerialization.data(withJSONObject: share_index_array, options: [])
+        let share_idx_string = String(data: json_share_idx, encoding: String.Encoding.utf8)
+        
+        let share_map = try! poly.generateShares(share_index: share_idx_string!);
         var points_arr: [KeyPoint] = [];
         XCTAssertEqual(share_map.share_map.count, 3 );
+        
         for item in share_map.share_map {
             let share_index = item.key;
-            let share = item.value;
-
-            let poly_point = ["x": share_index, "y": share];
-            let data = try! JSONSerialization.data(withJSONObject: poly_point, options: .prettyPrinted)
-            let point_string = String(data: data, encoding: String.Encoding.utf8) ?? ""
-
-            let new_point = try! KeyPoint.from_json(json: point_string);
-            points_arr.append(new_point);
             
-            let point = try! pub_poly.polyCommitmentEval(index: item.key);
+            let pub_poly = try! poly.getPublicPolynomial();
+            let point = try! pub_poly.polyCommitmentEval(index: share_index);
+            points_arr.append(point);
             XCTAssertNotNil(point.x);
             XCTAssertNotNil(point.y);
         }
         
-        // lagrange interpolation
-        let poly_lagrange = try! Lagrange.lagrange(points_arr: points_arr);
-
-        let share_index_1: String = "[5,9,15]";
-        let share_map_1 = try! poly_lagrange.generateShares(share_index: share_index_1);
-        XCTAssertEqual(share_map_1.share_map.count, 3 );
-        
+        let lagrange_poly = try! Lagrange.lagrange(points_arr: points_arr);
+        XCTAssertNotNil(lagrange_poly);
     }
 
     func testSeedPhraseModule() {

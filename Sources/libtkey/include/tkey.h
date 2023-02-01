@@ -26,14 +26,15 @@
         struct PublicPolynomial;
         struct ShareMap;
         struct ShareStoreArray;
+        struct KeyPointArray;
 
         //Methods
         char* get_version(int* error_code);
         void string_free(char *ptr);
         char* generate_private_key( char* curve_n, int* error_code);
-        struct Polynomial* lagrange_interpolate_polynomial( char* points, char* curve_n, int* error_code);
+        struct Polynomial* lagrange_interpolate_polynomial(struct KeyPointArray* points, char* curve_n, int* error_code);
         char* point_get_x(struct KeyPoint* point, int* error_code);
-        struct KeyPoint* point_from_json(char* point_json, int* error_code);
+        struct KeyPoint* point_new(char* x, char* y, int* error_code);
         char* point_get_y(struct KeyPoint* point, int* error_code);
         char* point_encode(struct KeyPoint* point, char* enc, int* error_code);
         void point_free(struct KeyPoint* point);
@@ -55,7 +56,6 @@
         char* share_store_get_share_index(struct ShareStore* store, int* error_code);
         char* share_store_get_polynomial_id(struct ShareStore* store, int* error_code);
         void share_store_free(struct ShareStore* ptr);
-        void share_store_vec_free(struct ShareStoreArray* ptr);
         struct FFIStorageLayer* storage_layer(bool enable_logging, char* host_url, long long int server_time_offset, char* (*network_callback)(char*, char*, int*), int* error_code);
         void storage_layer_free(struct FFIStorageLayer* ptr);
         struct ServiceProvider* service_provider(bool enable_logging, char* postbox_key, char* curve_n, int* error_code);
@@ -67,8 +67,6 @@
         void threshold_key_free(struct FFIThresholdKey* ptr);
         char* share_store_map_get_keys(struct ShareStoreMap* map, int* error_code);
         struct ShareStore* share_store_map_get_value_by_key(struct ShareStoreMap* map, char* key, int* error_code);
-        int share_stores_get_len(struct ShareStoreArray* share_stores, int* error_code);
-        struct ShareStore* share_store_map_by_index(struct ShareStoreArray* share_stores, int index, int* error_code);
         void share_store_map_free(struct ShareStoreMap* ptr);
         char* share_store_poly_id_index_map_get_keys(struct ShareStoreMap* map, int* error_code);
         struct ShareStoreMap* share_store_poly_id_index_map_get_value_by_key(struct ShareStoreMap* map, char* key, int* error_code);
@@ -154,6 +152,18 @@
         //share serialization
         char* share_serialization_serialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
         char* share_serialization_deserialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
+        // share store array
+        int share_stores_get_len(struct ShareStoreArray* share_stores, int* error_code);
+        struct ShareStore* share_store_map_get_value_by_index(struct ShareStoreArray* share_stores, int index, int* error_code);
+        void share_store_array_free(struct ShareStoreArray* ptr);
+        // key point array
+        struct KeyPointArray* key_point_array_new();
+        void key_point_array_insert(struct KeyPointArray* key_point_array, struct KeyPoint* point, int* error_code);
+        void key_point_array_update_at_index(struct KeyPointArray* key_point_array, int index, struct KeyPoint* point, int* error_code);
+        void key_point_array_remove(struct KeyPointArray* key_point_array, int index, int* error_code);
+        int key_point_array_get_len(struct KeyPointArray* key_point_array, int* error_code);
+        struct KeyPoint* key_point_array_get_value_by_index(struct KeyPointArray* key_point_array, int index, int* error_code);
+        void key_point_array_free(struct KeyPointArray* ptr);
     #ifdef __cplusplus
     } // extern "C"
     #endif
