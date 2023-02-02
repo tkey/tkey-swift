@@ -13,14 +13,12 @@ import Foundation
 
 public class Lagrange {
 
-    public static func lagrange(points_arr: [KeyPoint]) throws -> Polynomial {
+    public static func lagrange(points: KeyPointArray) throws -> Polynomial {
         var errorCode: Int32 = -1
 
 
         let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
-        
-        let points = try! KeyPointArray.init(point_arr: points_arr);
 
         let poly_result = withUnsafeMutablePointer(to: &errorCode, { error in
             lagrange_interpolate_polynomial(points.pointer, curvePointer, error)

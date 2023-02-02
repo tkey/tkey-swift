@@ -218,7 +218,7 @@ final class tkey_pkgTests: XCTestCase {
         
         // get all share store
         let share_store = try! threshold_key.get_all_share_stores_for_latest_polynomial();
-        XCTAssertEqual(share_store.count, 2 );
+        XCTAssertEqual(try! share_store.getShareStoreArrayLength(), 2 );
         
         let share_index_array = ["c9022864e78c175beb9931ba136233fce416ece4c9af258ac9af404f7436c281", "8cd35d2d246e475de2413732c2d134d39bb51a1ed07cb5b1d461b5184c62c1b6", "6e0ab0cb7e47bdce6b08c043ee449d94c3addf33968ae79b4c8d7014238c46e4"]
 
@@ -226,7 +226,7 @@ final class tkey_pkgTests: XCTestCase {
         let share_idx_string = String(data: json_share_idx, encoding: String.Encoding.utf8)
         
         let share_map = try! poly.generateShares(share_index: share_idx_string!);
-        var points_arr: [KeyPoint] = [];
+        let points_arr =  KeyPointArray.init();
         XCTAssertEqual(share_map.share_map.count, 3 );
         
         for item in share_map.share_map {
@@ -234,12 +234,12 @@ final class tkey_pkgTests: XCTestCase {
             
             let pub_poly = try! poly.getPublicPolynomial();
             let point = try! pub_poly.polyCommitmentEval(index: share_index);
-            points_arr.append(point);
-            XCTAssertNotNil(point.x);
-            XCTAssertNotNil(point.y);
+            XCTAssertNotNil(try! point.getX());
+            XCTAssertNotNil(try! point.getY());
+            try! points_arr.insertKeyPoint(point: point);
         }
         
-        let lagrange_poly = try! Lagrange.lagrange(points_arr: points_arr);
+        let lagrange_poly = try! Lagrange.lagrange(points: points_arr);
         XCTAssertNotNil(lagrange_poly);
     }
 

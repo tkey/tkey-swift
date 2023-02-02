@@ -106,10 +106,8 @@ public final class ThresholdKey {
         return Polynomial(pointer: result!)
     }
     
-    public func get_all_share_stores_for_latest_polynomial() throws -> [ShareStore] {
+    public func get_all_share_stores_for_latest_polynomial() throws -> ShareStoreArray {
         var errorCode: Int32 = -1
-        
-        var shareStores: [ShareStore] = [];
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -118,16 +116,7 @@ public final class ThresholdKey {
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_all_share_stores_for_latest_polynomial")
         }
-        let shareStoreArray = try! ShareStoreArray.init(pointer: result!);
-        let length = try! shareStoreArray.getShareStoreArrayLength();
-        if length > 0 {
-            for index in 0...length-1 {
-                let share_store = try! shareStoreArray.getShareStoreOnIndex(index: index)
-                shareStores.append(share_store);
-            }
-        }
-        
-        return shareStores
+        return try! ShareStoreArray.init(pointer: result!);
     }
     
     public func generate_new_share() throws -> GenerateShareStoreResult {

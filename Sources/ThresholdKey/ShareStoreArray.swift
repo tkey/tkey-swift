@@ -18,11 +18,11 @@ public class ShareStoreArray {
         self.pointer = pointer
     }
     
-    public func getShareStoreOnIndex(index: Int32) throws -> ShareStore {
+    public func getShareStoreAtIndex(index: Int32) throws -> ShareStore {
         var errorCode: Int32 = -1
         
         let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_store_map_get_value_by_index(pointer, index, error)
+            share_store_array_get_value_by_index(pointer, index, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_value_by_index")

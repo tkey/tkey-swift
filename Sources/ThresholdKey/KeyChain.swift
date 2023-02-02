@@ -31,7 +31,7 @@ public class KeychainInterface {
 
          if  key_detail.required_shares > 0 {
          // get share from keychain
-             let share = try! readPassword(service: "tkey_ios", account: key_detail.pub_key.compressed)
+             let share = try! readPassword(service: "tkey_ios", account: key_detail.pub_key.getAsCompressedPublicKey(format: "elliptic-compressed"))
              let shareStore = try! ShareStore(json: String(data: share, encoding: .utf8)!)
              try! threshold_key.input_share_store(shareStore: shareStore)
 
@@ -49,9 +49,9 @@ public class KeychainInterface {
          let share_str = try! share.toJsonString()
 
          do {
-             try save( password: share_str.data(using: .utf8)!, service: "tkey_ios", account: key_detail.pub_key.compressed )
+             try save( password: share_str.data(using: .utf8)!, service: "tkey_ios", account: key_detail.pub_key.getAsCompressedPublicKey(format: "elliptic-compressed") )
          } catch KeychainError.duplicateItem {
-             try! update(password: share_str.data(using: .utf8)!, service: "tkey_ios", account: key_detail.pub_key.compressed )
+             try! update(password: share_str.data(using: .utf8)!, service: "tkey_ios", account: key_detail.pub_key.getAsCompressedPublicKey(format: "elliptic-compressed") )
          }
          }
      }
