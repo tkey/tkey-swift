@@ -118,20 +118,15 @@ public final class ThresholdKey {
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_all_share_stores_for_latest_polynomial")
         }
-        let length = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_stores_get_len(result,error)
-        })
+        let shareStoreArray = try! ShareStoreArray.init(pointer: result!);
+        let length = try! shareStoreArray.getShareStoreArrayLength();
         if length > 0 {
             for index in 0...length-1 {
-                let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_store_map_get_value_by_index(result, index, error)
-                       })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + index.formatted())
-                    }
-                shareStores.append(ShareStore.init(pointer: share_store!));
+                let share_store = try! shareStoreArray.getShareStoreOnIndex(index: index)
+                shareStores.append(share_store);
             }
         }
+        
         return shareStores
     }
     

@@ -45,20 +45,4 @@ public final class KeyPoint: Codable {
 
         point_free(pointer)
     }
-
-    public static func from_point(x: String, y: String) throws -> KeyPoint {
-        var errorCode: Int32 = -1
-
-        let x_ptr = UnsafeMutablePointer<Int8>(mutating: NSString(string: x).utf8String)
-        let y_ptr = UnsafeMutablePointer<Int8>(mutating: NSString(string: y).utf8String)
-        
-        let point_ptr = withUnsafeMutablePointer(to: &errorCode, { error in
-            point_new(x_ptr, y_ptr, error)
-        })
-       guard errorCode == 0 else {
-           throw RuntimeError("Error in KeyPoint, from_point")
-       }
-
-        return try! KeyPoint.init(pointer: point_ptr!);
-    }
 }
