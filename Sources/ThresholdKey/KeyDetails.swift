@@ -10,7 +10,7 @@ import Foundation
     import lib
 #endif
 
-public final class KeyDetails: Codable {
+public final class KeyDetails {
     public let pub_key: KeyPoint
     public let required_shares: Int32
     public let threshold: UInt32
@@ -25,7 +25,7 @@ public final class KeyDetails: Codable {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Point")
             }
-        pub_key = try! KeyPoint.init(pointer: point!)
+        pub_key = KeyPoint.init(pointer: point!)
 
         let theshold = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_threshold(pointer, error)

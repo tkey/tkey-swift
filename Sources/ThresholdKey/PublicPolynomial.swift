@@ -42,7 +42,7 @@ public final class PublicPolynomial {
         guard errorCode == 0 else {
             throw RuntimeError("Error in PublicPolynomial, polyCommitmentEval")
         }
-        return try! KeyPoint(pointer: result!);
+        return KeyPoint(pointer: result!);
     }
     deinit {
         public_polynomial_free(pointer);
