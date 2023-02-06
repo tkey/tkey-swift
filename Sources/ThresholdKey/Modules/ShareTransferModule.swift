@@ -65,6 +65,29 @@ public final class ShareTransferModule {
             throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
             }
     }
+    
+    public static func approveRequestAsync(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore, completion: @escaping (Result<Void, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_transfer_approve_request(threshold_key.pointer, encPointer, share_store.pointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
+                }
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
 
     public static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String) throws {
         var errorCode: Int32 = -1
@@ -77,6 +100,30 @@ public final class ShareTransferModule {
         guard errorCode == 0 else {
             throw RuntimeError("Error in ShareTransferModule, approve request with share index. Error Code: \(errorCode)")
             }
+    }
+    
+    public static func approveRequestWithShareIndexAsync(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
+                let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_transfer_approve_request_with_share_indexes(threshold_key.pointer, encPointer, indexesPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ShareTransferModule, approve request with share index. Error Code: \(errorCode)")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
     }
 
     public static func get_store(threshold_key: ThresholdKey) throws -> ShareTransferStore {
@@ -101,6 +148,28 @@ public final class ShareTransferModule {
             }
         return result
     }
+    
+    public static func setStoreAsync(threshold_key: ThresholdKey, store: ShareTransferStore, completion: @escaping (Result<Bool, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_transfer_set_store(threshold_key.pointer, store.pointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ShareTransferModule, set store. Error Code: \(errorCode)")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
 
     public static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String) throws -> Bool {
         var errorCode: Int32 = -1
@@ -113,6 +182,29 @@ public final class ShareTransferModule {
             throw RuntimeError("Error in ShareTransferModule, delete store. Error Code: \(errorCode)")
             }
         return result
+    }
+    
+    public static func deleteStoreAsync(threshold_key: ThresholdKey, enc_pub_key_x: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_transfer_delete_store(threshold_key.pointer, encPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ShareTransferModule, delete store. Error Code: \(errorCode)")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
     }
 
     public static func get_current_encryption_key(threshold_key: ThresholdKey) throws -> String {

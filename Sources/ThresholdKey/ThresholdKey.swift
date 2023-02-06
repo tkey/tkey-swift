@@ -154,6 +154,25 @@ public final class ThresholdKey {
         }
         return Polynomial(pointer: result!)
     }
+    
+    public func reconstructLastetPolyAsync(completion: @escaping (Result<Polynomial, Error>) -> Void) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    threshold_key_reconstruct_latest_poly(self.pointer, curvePointer,error)
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in getPublicPolynomial")
+                }
+                let poly = Polynomial(pointer: result!)
+                completion(.success(poly))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 
     public func generate_new_share() throws -> GenerateShareStoreResult {
         var errorCode: Int32  = -1
@@ -202,6 +221,29 @@ public final class ThresholdKey {
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in Threshold while Deleting share")
+        }
+    }
+    
+    public func deleteShareAsync(share_index: String, completion: @escaping(Result<Void, Error>) -> Void) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let shareIndexPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_delete_share(self.pointer, shareIndexPointer, curvePointer, error)
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in Threshold while Deleting share")
+                }
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
         }
     }
 
@@ -272,7 +314,7 @@ public final class ThresholdKey {
         return ShareStore.init(pointer: result!)
     }
 
-    public func input_share( share: String, shareType: String?) throws {
+    public func input_share(share: String, shareType: String?) throws {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let cShare = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -286,6 +328,34 @@ public final class ThresholdKey {
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey generate_new_share")
+        }
+    }
+    
+    public func inputShareAsync(share: String, shareType: String?, completion: @escaping (Result<Void, Error>) -> Void) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32  = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let cShare = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
+
+                var cShareType: UnsafeMutablePointer<Int8>?
+                if shareType != nil {
+                    cShareType = UnsafeMutablePointer<Int8>(mutating: (shareType! as NSString).utf8String)
+                }
+                withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_input_share(self.pointer, cShare, cShareType, curvePointer, error )
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey generate_new_share")
+                }
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
         }
     }
 
@@ -314,6 +384,28 @@ public final class ThresholdKey {
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey input share store")
+        }
+    }
+    
+    public func inputShareStoreAsync(shareStore: ShareStore, completion: @escaping (Result<Void, Error>) -> Void){
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32  = -1
+                withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_input_share_store(self.pointer, shareStore.pointer, error)
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey input share store")
+                }
+                
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
         }
     }
 
@@ -417,6 +509,30 @@ public final class ThresholdKey {
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey sync_local_metadata_transistions")
+        }
+    }
+    
+    public func syncLocalMetadataTransitionsAsync(completion: @escaping(Result<Void, Error>) -> Void){
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32  = -1
+                
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: self.curveN).utf8String)
+                
+                withUnsafeMutablePointer(to: &errorCode, {error in
+                    threshold_key_sync_local_metadata_transitions(self.pointer, curvePointer, error )
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey sync_local_metadata_transistions")
+                }
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
         }
     }
     

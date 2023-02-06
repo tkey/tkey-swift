@@ -64,6 +64,29 @@ public final class SecurityQuestionModule {
             }
         return result
     }
+    
+    public static func inputShareAsync(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    security_question_input_share(threshold_key.pointer, answerPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in SecurityQuestionModule, input_share")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
 
     public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
@@ -78,6 +101,30 @@ public final class SecurityQuestionModule {
             }
         return result
     }
+    
+    public static func changeQuestionAndAnswerAsync(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
+                let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    security_question_change_question_and_answer(threshold_key.pointer, questionsPointer, answerPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
 
     public static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
@@ -90,6 +137,29 @@ public final class SecurityQuestionModule {
             throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
             }
         return result
+    }
+    
+    public static func storeAnswerAsync(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    security_question_store_answer(threshold_key.pointer, answerPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
+                    }
+                DispatchQueue.main.async {
+                    completion(.success(result))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
     }
 
     public static func get_answer(threshold_key: ThresholdKey) throws -> String {
