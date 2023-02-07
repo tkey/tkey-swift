@@ -10,7 +10,17 @@ import XCTest
 
 
 final class ThresholdKey_asyncTest: XCTestCase {
-    func test_generate_and_delete_shares_async() {
+    
+    func test_generate_and_delete_shares_async_manual_sync_true() {
+        test_generate_and_delete_shares_async(mode: true)
+    }
+    
+    func test_generate_and_delete_shares_async_manual_sync_false() {
+        test_generate_and_delete_shares_async(mode: false)
+    }
+    
+    
+    func test_generate_and_delete_shares_async(mode: Bool) {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -18,7 +28,7 @@ final class ThresholdKey_asyncTest: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         var key_details = try! threshold_key.get_key_details()
@@ -69,7 +79,15 @@ final class ThresholdKey_asyncTest: XCTestCase {
         
     }
     
-    func test_input_shares_async() {
+    func test_input_shares_async_manual_sync_true() {
+        test_input_shares_async(mode: true)
+    }
+    
+    func test_input_shares_async_manual_sync_false() {
+        test_input_shares_async(mode: false)
+    }
+    
+    func test_input_shares_async(mode: Bool) {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -77,7 +95,7 @@ final class ThresholdKey_asyncTest: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         var key_details = try! threshold_key.get_key_details()
@@ -121,7 +139,15 @@ final class ThresholdKey_asyncTest: XCTestCase {
         XCTAssertEqual(key_details.total_shares, 5)
     }
     
-    func test_reconstruct_latest_poly_async() {
+    func test_reconstruct_latest_poly_async_manual_sync_true() {
+        test_reconstruct_latest_poly_async(mode: true)
+    }
+    
+    func test_reconstruct_latest_poly_async_manual_sync_false() {
+        test_reconstruct_latest_poly_async(mode: false)
+    }
+    
+    func test_reconstruct_latest_poly_async(mode: Bool) {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -129,7 +155,7 @@ final class ThresholdKey_asyncTest: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         var key_details = try! threshold_key.get_key_details()

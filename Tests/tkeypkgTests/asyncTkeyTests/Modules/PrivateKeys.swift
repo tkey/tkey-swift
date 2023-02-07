@@ -9,7 +9,16 @@ import XCTest
 @testable import tkey_pkg
 
 final class PrivateKey_asyncTest: XCTestCase {
-    func test_generate_multiple_private_key_async(){
+    
+    func test_generate_multiple_private_key_async_manual_sync_true() {
+        test_generate_multiple_private_key_async(manualSync: true)
+    }
+
+    func test_generate_multiple_private_key_async_manual_sync_false() {
+        test_generate_multiple_private_key_async(manualSync: false)
+    }
+    
+    func test_generate_multiple_private_key_async(manualSync: Bool){
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -17,7 +26,7 @@ final class PrivateKey_asyncTest: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: manualSync)
 
         _ = try! threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         var key_details = try! threshold_key.get_key_details()
@@ -55,3 +64,4 @@ final class PrivateKey_asyncTest: XCTestCase {
         XCTAssertEqual(pknum, 5)
     }
 }
+
