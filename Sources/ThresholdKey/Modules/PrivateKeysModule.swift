@@ -44,13 +44,9 @@ public final class PrivateKeysModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in PrivateKeysModule, private_keys_set_private_keys")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
