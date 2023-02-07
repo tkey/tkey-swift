@@ -41,13 +41,9 @@ public final class SecurityQuestionModule {
                     throw RuntimeError("Error in SecurityQuestionModule, generate_new_share")
                     }
                 let shareStoreResult = try! GenerateShareStoreResult(pointer: result!)
-                DispatchQueue.main.async {
-                    completion(.success(shareStoreResult))
-                }
+                completion(.success(shareStoreResult))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -77,13 +73,9 @@ public final class SecurityQuestionModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in SecurityQuestionModule, input_share")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -115,13 +107,9 @@ public final class SecurityQuestionModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -151,13 +139,9 @@ public final class SecurityQuestionModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
