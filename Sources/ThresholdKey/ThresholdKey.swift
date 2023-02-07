@@ -102,13 +102,9 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in ThresholdKey Initialize")
                 }
                 let keyDetails = try! KeyDetails(pointer: result!)
-                DispatchQueue.main.async {
-                    completion(.success(keyDetails))
-                }
+                completion(.success(keyDetails))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -199,16 +195,13 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in ThresholdKey generate_new_share")
                 }
                 let shareStoreResult = try! GenerateShareStoreResult( pointer: result!)
-                DispatchQueue.main.async {
-                    completion(.success(shareStoreResult))
-                }
+                completion(.success(shareStoreResult))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
+
 
 
 
@@ -236,13 +229,9 @@ public final class ThresholdKey {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in Threshold while Deleting share")
                 }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -270,13 +259,9 @@ public final class ThresholdKey {
                     throw RuntimeError("Error in Threshold while Getting Key Details")
                 }
                 let keyDetails = try! KeyDetails(pointer: result!)
-                DispatchQueue.main.async {
-                    completion(.success(keyDetails))
-                }
+                completion(.success(keyDetails))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     
@@ -342,19 +327,16 @@ public final class ThresholdKey {
                 if shareType != nil {
                     cShareType = UnsafeMutablePointer<Int8>(mutating: (shareType! as NSString).utf8String)
                 }
+                print("asdf?")
                 withUnsafeMutablePointer(to: &errorCode, {error in
                     threshold_key_input_share(self.pointer, cShare, cShareType, curvePointer, error )
                 })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey generate_new_share")
                 }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -397,14 +379,9 @@ public final class ThresholdKey {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey input share store")
                 }
-                
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -525,13 +502,9 @@ public final class ThresholdKey {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey sync_local_metadata_transistions")
                 }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }

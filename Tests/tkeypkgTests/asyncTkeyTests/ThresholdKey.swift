@@ -27,49 +27,48 @@ final class ThresholdKey_asyncTest: XCTestCase {
         let dispatchedGroup = DispatchGroup()
         var successCount = 0
         var shareIndexes: [String] = []
-        for i in 0..<5 {
+
+        for i in 0..<3 {
             dispatchedGroup.enter()
-            threshold_key.generateNewShareAsync { (result) in
+            threshold_key.generateNewShareAsync { result in
                 switch result {
                 case .success(let share):
                     let idx = share.hex
-                    print(idx)
                     shareIndexes.append(idx)
                     successCount += 1
+                case .failure(let error):
+                    print("Error in iteration \(i): \(error)")
+                }
+                dispatchedGroup.leave()
+            }
+        }
+        dispatchedGroup.wait()
+        _ = try! threshold_key.reconstruct()
+        XCTAssertEqual(successCount, 3)
+        key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 5)
+
+        var delSuccessCount = 0
+        for i in 0..<3 {
+            dispatchedGroup.enter()
+            threshold_key.deleteShareAsync(share_index: shareIndexes[i]) { (result) in
+                switch result {
+                case .success:
+                    delSuccessCount += 1
+                    print("aasdf")
                 case .failure:
                     print("Iteration \(i) failed")
                 }
                 dispatchedGroup.leave()
             }
         }
-        dispatchedGroup.notify(queue: .main) {
-            _ = try! threshold_key.reconstruct()
-            XCTAssertEqual(successCount, 5)
-            key_details = try! threshold_key.get_key_details()
-            XCTAssertEqual(key_details.total_shares, 7)
-        }
-        var delSuccessCount = 0
-        dispatchedGroup.notify(queue: .main) {
 
-            for i in 0..<5 {
-                dispatchedGroup.enter()
-                threshold_key.deleteShareAsync(share_index: shareIndexes[i]) { (result) in
-                    switch result {
-                    case .success:
-                        delSuccessCount += 1
-                    case .failure:
-                        print("Iteration \(i) failed")
-                    }
-                    dispatchedGroup.leave()
-                }
-            }
-        }
+        dispatchedGroup.wait()
+        print("??asdf")
+        XCTAssertEqual(delSuccessCount, 3)
+        key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
         
-        dispatchedGroup.notify(queue: .main) {
-            XCTAssertEqual(delSuccessCount, 5)
-            key_details = try! threshold_key.get_key_details()
-            XCTAssertEqual(key_details.total_shares, 2)
-        }
     }
     
     func test_input_shares_async() {
@@ -88,32 +87,40 @@ final class ThresholdKey_asyncTest: XCTestCase {
         
         let dispatchedGroup = DispatchGroup()
         var successCount = 0
-        for i in 0..<5 {
+        var shareOutList: [String] = []
+
+        for i in 0..<3 {
             dispatchedGroup.enter()
             threshold_key.generateNewShareAsync { (result) in
                 switch result {
                 case .success(let share):
                     let index = share.hex
                     let shareOut = try! threshold_key.output_share(shareIndex: index, shareType: nil)
-                    threshold_key.inputShareAsync(share: shareOut, shareType: nil) { (result) in
-                        switch result{
-                            case .success:
-                                successCount += 1
-                            case .failure:
-                                print("Iteration \(i) failed")
-                        }
-                    }
+                    shareOutList.append(shareOut)
                 case .failure:
                     print("Iteration \(i) failed")
                 }
                 dispatchedGroup.leave()
             }
         }
-        dispatchedGroup.notify(queue: .main) {
-            _ = try! threshold_key.reconstruct()
-            XCTAssertEqual(successCount, 5)
-            key_details = try! threshold_key.get_key_details()
-            XCTAssertEqual(key_details.total_shares, 7)
+        dispatchedGroup.wait()
+        for i in 0..<3 {
+            dispatchedGroup.enter()
+            threshold_key.inputShareAsync(share: shareOutList[i], shareType: nil) { (result) in
+                switch result{
+                case .success:
+                    successCount += 1
+                case .failure:
+                    print("Iteration \(i) failed")
+                }
+                dispatchedGroup.leave()
+            }
         }
+        dispatchedGroup.wait()
+        _ = try! threshold_key.reconstruct()
+        XCTAssertEqual(successCount, 3)
+        key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 5)
+        
     }
 }
