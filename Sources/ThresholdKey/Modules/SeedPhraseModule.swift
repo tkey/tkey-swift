@@ -50,13 +50,9 @@ public final class SeedPhraseModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error SeedPhraseModule, set_seed_phrase")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -87,13 +83,9 @@ public final class SeedPhraseModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in SeedPhraseModule, change_phrase")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -136,13 +128,9 @@ public final class SeedPhraseModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("PrivateKeyModule, set_key \(errorCode)")
                 }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
