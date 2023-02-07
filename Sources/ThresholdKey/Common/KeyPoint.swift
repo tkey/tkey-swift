@@ -10,39 +10,55 @@ import Foundation
     import lib
 #endif
 
-public final class KeyPoint: Codable {
-    public var x, y: String
-    public var compressed: String
-
-    public init(pointer: OpaquePointer) throws {
+public final class KeyPoint {
+    public var pointer: OpaquePointer?
+    
+    public init(pointer: OpaquePointer) {
+        self.pointer = pointer
+    }
+    
+    public func getX() throws -> String {
         var errorCode: Int32 = -1
-        var result = withUnsafeMutablePointer(to: &errorCode, { error in
-            point_get_x(pointer, error)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            key_point_get_x(pointer, error)
                 })
-        x = String.init(cString: result!)
-        string_free(result)
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, field X")
             }
-        result = withUnsafeMutablePointer(to: &errorCode, { error in
-            point_get_y(pointer, error)
+        let x = String.init(cString: result!)
+        string_free(result)
+        return x
+    }
+    
+    public func getY() throws -> String {
+        var errorCode: Int32 = -1
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            key_point_get_x(pointer, error)
                 })
-        y = String.init(cString: result!)
-        string_free(result)
         guard errorCode == 0 else {
-            throw RuntimeError("Error in KeyPoint, field Y")
+            throw RuntimeError("Error in KeyPoint, field X")
             }
-
+        let y = String.init(cString: result!)
+        string_free(result)
+        return y
+    }
+    
+    public func getAsCompressedPublicKey(format: String) throws -> String {
+        var errorCode: Int32 = -1
+        
         let encoder_format = UnsafeMutablePointer<Int8>(mutating: ("elliptic-compressed" as NSString).utf8String)
-        result = withUnsafeMutablePointer(to: &errorCode, { error in
-            point_encode(pointer, encoder_format, error)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            key_point_encode(pointer, encoder_format, error)
         })
-        compressed = String.init(cString: result!)
-        string_free(result)
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, field Y")
             }
-
-        point_free(pointer)
+        let compressed = String.init(cString: result!)
+        string_free(result)
+        return compressed
+    }
+    
+    deinit {
+        key_point_free(pointer)
     }
 }

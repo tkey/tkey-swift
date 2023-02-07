@@ -25,15 +25,19 @@
         struct Polynomial;
         struct PublicPolynomial;
         struct ShareMap;
+        struct ShareStoreArray;
+        struct KeyPointArray;
 
         //Methods
         char* get_version(int* error_code);
         void string_free(char *ptr);
         char* generate_private_key( char* curve_n, int* error_code);
-        char* point_get_x(struct KeyPoint* point, int* error_code);
-        char* point_get_y(struct KeyPoint* point, int* error_code);
-        char* point_encode(struct KeyPoint* point, char* enc, int* error_code);
-        void point_free(struct KeyPoint* point);
+        struct Polynomial* lagrange_interpolate_polynomial(struct KeyPointArray* points, char* curve_n, int* error_code);
+        char* key_point_get_x(struct KeyPoint* point, int* error_code);
+        struct KeyPoint* key_point_new(char* x, char* y, int* error_code);
+        char* key_point_get_y(struct KeyPoint* point, int* error_code);
+        char* key_point_encode(struct KeyPoint* point, char* enc, int* error_code);
+        void key_point_free(struct KeyPoint* point);
         char* key_reconstruction_get_private_key(struct KeyReconstructionDetails* key_details, int* error_code);
         int key_reconstruction_get_seed_phrase_len(struct KeyReconstructionDetails* key_details, int* error_code);
         char* key_reconstruction_get_seed_phrase_at(struct KeyReconstructionDetails* key_details, int at, int* error_code);
@@ -87,6 +91,7 @@
         struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
+        struct ShareStoreArray* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey*, char* curve_n, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
@@ -147,6 +152,18 @@
         //share serialization
         char* share_serialization_serialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
         char* share_serialization_deserialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
+        // share store array
+        int share_stores_get_len(struct ShareStoreArray* share_stores, int* error_code);
+        struct ShareStore* share_store_array_get_value_by_index(struct ShareStoreArray* share_stores, int index, int* error_code);
+        void share_store_array_free(struct ShareStoreArray* ptr);
+        // key point array
+        struct KeyPointArray* key_point_array_new(void);
+        void key_point_array_insert(struct KeyPointArray* key_point_array, struct KeyPoint* point, int* error_code);
+        void key_point_array_update_at_index(struct KeyPointArray* key_point_array, int index, struct KeyPoint* point, int* error_code);
+        void key_point_array_remove(struct KeyPointArray* key_point_array, int index, int* error_code);
+        int key_point_array_get_len(struct KeyPointArray* key_point_array, int* error_code);
+        struct KeyPoint* key_point_array_get_value_by_index(struct KeyPointArray* key_point_array, int index, int* error_code);
+        void key_point_array_free(struct KeyPointArray* ptr);
     #ifdef __cplusplus
     } // extern "C"
     #endif
