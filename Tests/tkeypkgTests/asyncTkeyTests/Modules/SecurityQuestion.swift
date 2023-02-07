@@ -9,7 +9,7 @@ import XCTest
 @testable import tkey_pkg
 
 final class SecurityQuestion_asyncTest: XCTestCase {
-    func test_generate_and_delete_shares_async() {
+    func test_generate_multiple_qna_async() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -53,7 +53,7 @@ final class SecurityQuestion_asyncTest: XCTestCase {
         XCTAssertEqual(get_answer, answer[0])
     }
     
-    func test_input_shares_async() {
+    func test_change_answers_async() {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
