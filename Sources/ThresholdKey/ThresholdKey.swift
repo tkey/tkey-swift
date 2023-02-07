@@ -151,7 +151,7 @@ public final class ThresholdKey {
         return Polynomial(pointer: result!)
     }
     
-    public func reconstructLastetPolyAsync(completion: @escaping (Result<Polynomial, Error>) -> Void) {
+    public func reconstructLatestPolyAsync(completion: @escaping (Result<Polynomial, Error>) -> Void) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
