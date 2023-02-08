@@ -11,16 +11,16 @@ import XCTest
 
 final class ShareTransfer_asyncTest: XCTestCase {
     
-    func test_generate_and_delete_shares_async_manual_sync_true() {
-        test_generate_and_delete_shares_async(mode: true)
+    func test_share_transfer_async_manual_sync_true() {
+        test_share_transfer_async(mode: true)
     }
     
-    func test_generate_and_delete_shares_async_manual_sync_false() {
-        test_generate_and_delete_shares_async(mode: false)
+    func test_share_transfer_async_manual_sync_false() {
+        test_share_transfer_async(mode: false)
     }
     
     
-    func test_generate_and_delete_shares_async(mode: Bool) {
+    func test_share_transfer_async(mode: Bool) {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
         let key1 = try! PrivateKey.generate()
