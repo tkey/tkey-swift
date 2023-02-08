@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class ShareTransferModule {
-    public static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String) throws -> String {
+    internal func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String) throws -> String {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let agentPointer = UnsafeMutablePointer<Int8>(mutating: (user_agent as NSString).utf8String)
@@ -76,7 +76,7 @@ public final class ShareTransferModule {
         return indicator_array
     }
 
-    public static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore) throws {
+    internal func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -107,7 +107,7 @@ public final class ShareTransferModule {
         }
     }
 
-    public static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String) throws {
+    internal func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -151,7 +151,7 @@ public final class ShareTransferModule {
         return ShareTransferStore.init(pointer: result!)
     }
 
-    public static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore) throws -> Bool {
+    internal func set_store(threshold_key: ThresholdKey, store: ShareTransferStore) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -181,7 +181,7 @@ public final class ShareTransferModule {
         }
     }
 
-    public static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String) throws -> Bool {
+    internal func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)

@@ -72,7 +72,7 @@ public final class ThresholdKey {
         return Metadata.init(pointer: result!)
     }
 
-    public func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) throws -> KeyDetails {
+    internal func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) throws -> KeyDetails {
         var errorCode: Int32 = -1
         var sharePointer: UnsafeMutablePointer<Int8>?
         if !import_share.isEmpty {
@@ -110,7 +110,7 @@ public final class ThresholdKey {
     }
 
 
-    public func reconstruct() throws -> KeyReconstructionDetails {
+    internal func reconstruct() throws -> KeyReconstructionDetails {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -139,7 +139,7 @@ public final class ThresholdKey {
         }
     }
 
-    public func reconstruct_latest_poly() throws -> Polynomial {
+    internal func reconstruct_latest_poly() throws -> Polynomial {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -183,7 +183,7 @@ public final class ThresholdKey {
         return try! ShareStoreArray.init(pointer: result!);
     }
     
-    public func generate_new_share() throws -> GenerateShareStoreResult {
+    internal func generate_new_share() throws -> GenerateShareStoreResult {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
@@ -215,10 +215,7 @@ public final class ThresholdKey {
         }
     }
 
-
-
-
-    public func delete_share(share_index: String) throws {
+    internal func delete_share(share_index: String) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let shareIndexPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
@@ -249,7 +246,7 @@ public final class ThresholdKey {
         }
     }
 
-    public func get_key_details() throws -> KeyDetails {
+    internal func get_key_details() throws -> KeyDetails {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
             threshold_key_get_key_details(pointer, error)
@@ -312,7 +309,7 @@ public final class ThresholdKey {
         return ShareStore.init(pointer: result!)
     }
 
-    public func input_share(share: String, shareType: String?) throws {
+    internal func input_share(share: String, shareType: String?) throws {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let cShare = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -371,7 +368,7 @@ public final class ThresholdKey {
         return ShareStore(pointer: result!)
     }
 
-    public func input_share_store(shareStore: ShareStore) throws {
+    internal func input_share_store(shareStore: ShareStore) throws {
         var errorCode: Int32  = -1
         withUnsafeMutablePointer(to: &errorCode, {error in
             threshold_key_input_share_store(pointer, shareStore.pointer, error)

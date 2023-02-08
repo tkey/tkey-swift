@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class ShareSerializationModule {
-    public static func serialize_share(threshold_key: ThresholdKey, share: String, format: String?) throws -> String {
+    internal func serialize_share(threshold_key: ThresholdKey, share: String, format: String?) throws -> String {
         var errorCode: Int32 = -1
         
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -63,7 +63,7 @@ public final class ShareSerializationModule {
         }
     }
 
-    public static func deserialize_share(threshold_key: ThresholdKey, share: String, format: String?) throws -> String {
+    internal func deserialize_share(threshold_key: ThresholdKey, share: String, format: String?) throws -> String {
         var errorCode: Int32 = -1
         
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)

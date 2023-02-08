@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class SecurityQuestionModule {
-    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
+    internal func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -48,7 +48,7 @@ public final class SecurityQuestionModule {
         }
     }
 
-    public static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    internal func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -80,7 +80,7 @@ public final class SecurityQuestionModule {
         }
     }
 
-    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
+    internal func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -114,7 +114,7 @@ public final class SecurityQuestionModule {
         }
     }
 
-    public static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    internal func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)

@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class PrivateKeysModule {
-    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
+    internal func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         var keyPointer: UnsafeMutablePointer<Int8>?
