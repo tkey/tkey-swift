@@ -340,7 +340,6 @@ public final class ThresholdKey {
                 if shareType != nil {
                     cShareType = UnsafeMutablePointer<Int8>(mutating: (shareType! as NSString).utf8String)
                 }
-                print("asdf?")
                 withUnsafeMutablePointer(to: &errorCode, {error in
                     threshold_key_input_share(self.pointer, cShare, cShareType, curvePointer, error )
                 })

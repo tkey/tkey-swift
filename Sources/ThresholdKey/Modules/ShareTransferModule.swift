@@ -26,6 +26,28 @@ public final class ShareTransferModule {
         string_free(result)
         return string
     }
+    
+    public static func requestNewShareAsync(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, completion: @escaping (Result<String, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async{
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let agentPointer = UnsafeMutablePointer<Int8>(mutating: (user_agent as NSString).utf8String)
+                let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (available_share_indexes as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    share_transfer_request_new_share(threshold_key.pointer, agentPointer, indexesPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ShareTransferModule, request share. Error Code: \(errorCode)")
+                    }
+                let string = String.init(cString: result!)
+                string_free(result)
+                completion(.success(string))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 
     public static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String) throws {
         var errorCode: Int32 = -1
@@ -78,13 +100,9 @@ public final class ShareTransferModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
                 }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -115,13 +133,9 @@ public final class ShareTransferModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, approve request with share index. Error Code: \(errorCode)")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(()))
-                }
+                completion(.success(()))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -160,13 +174,9 @@ public final class ShareTransferModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, set store. Error Code: \(errorCode)")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
@@ -196,13 +206,9 @@ public final class ShareTransferModule {
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, delete store. Error Code: \(errorCode)")
                     }
-                DispatchQueue.main.async {
-                    completion(.success(result))
-                }
+                completion(.success(result))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
             }
         }
     }
