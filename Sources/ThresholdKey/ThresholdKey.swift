@@ -275,7 +275,7 @@ public final class ThresholdKey {
     
     public func get_last_fetched_cloud_metadata() throws -> Metadata {
         var errorCode: Int32 = -1
-        let result = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_metadata(pointer, error)})
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_last_fetched_cloud_metadata(pointer, error)})
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_last_fetched_cloud_metadata")
         }

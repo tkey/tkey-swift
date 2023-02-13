@@ -68,8 +68,8 @@
         char* share_store_map_get_keys(struct ShareStoreMap* map, int* error_code);
         struct ShareStore* share_store_map_get_value_by_key(struct ShareStoreMap* map, char* key, int* error_code);
         void share_store_map_free(struct ShareStoreMap* ptr);
-        char* share_store_poly_id_index_map_get_keys(struct ShareStoreMap* map, int* error_code);
-        struct ShareStoreMap* share_store_poly_id_index_map_get_value_by_key(struct ShareStoreMap* map, char* key, int* error_code);
+        char* share_store_poly_id_index_map_get_keys(struct ShareStorePolyIDShareIndexMap* map, int* error_code);
+        struct ShareStoreMap* share_store_poly_id_index_map_get_value_by_key(struct ShareStorePolyIDShareIndexMap* map, char* key, int* error_code);
         void  share_store_map_free(struct ShareStoreMap* ptr);
         char* generate_new_share_store_result_get_shares_index(struct GenerateShareStoreResult* result,int* error_code);
         struct ShareStoreMap* generate_new_share_store_result_get_share_store_map(struct GenerateShareStoreResult* result,int* error_code);
@@ -89,7 +89,7 @@
         char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
         struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
         struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
-        struct Metadata* threshold_key_get_last_fetch_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
+        struct Metadata* threshold_key_get_last_fetched_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
         struct ShareStoreArray* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey*, char* curve_n, int* error_code);
         // share description
