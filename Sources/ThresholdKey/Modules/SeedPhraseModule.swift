@@ -16,7 +16,7 @@ public struct seedPhraseStruct: Codable {
 }
 
 public final class SeedPhraseModule {
-    internal func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
+    internal static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
@@ -33,31 +33,7 @@ public final class SeedPhraseModule {
             }
     }
     
-    public static func setSeedPhraseAsync(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, completion: @escaping (Result<Void, Error>) -> Void) {
-        ThresholdKey.moduleQueue.async {
-            do {
-                var errorCode: Int32 = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
-                let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
-                var phrasePointer: UnsafeMutablePointer<Int8>?
-                if phrase != nil {
-                    phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase! as NSString).utf8String)
-                }
-
-                withUnsafeMutablePointer(to: &errorCode, { error in
-                    seed_phrase_set_phrase(threshold_key.pointer, formatPointer, phrasePointer, number_of_wallets, curvePointer, error)
-                        })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error SeedPhraseModule, set_seed_phrase")
-                    }
-                completion(.success(()))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-
-    internal func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
+    internal static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
         var errorCode: Int32 = -1
         let oldPointer = UnsafeMutablePointer<Int8>(mutating: (old_phrase as NSString).utf8String)
         let newPointer = UnsafeMutablePointer<Int8>(mutating: (new_phrase as NSString).utf8String)
@@ -70,19 +46,22 @@ public final class SeedPhraseModule {
             }
     }
     
-    public static func changeSeedPhraseAsync(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    internal static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
+        let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
+
+        var errorCode: Int32 = -1
+        withUnsafeMutablePointer(to: &errorCode, { error in
+            seed_phrase_delete_seed_phrase(threshold_key.pointer, phrasePointer, error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("PrivateKeyModule, set_key \(errorCode)")
+        }
+    }
+    
+    public static func setSeedPhraseAsync(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, completion: @escaping (Result<Void, Error>) -> Void) {
         ThresholdKey.moduleQueue.async {
             do {
-                var errorCode: Int32 = -1
-                let oldPointer = UnsafeMutablePointer<Int8>(mutating: (old_phrase as NSString).utf8String)
-                let newPointer = UnsafeMutablePointer<Int8>(mutating: (new_phrase as NSString).utf8String)
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
-                withUnsafeMutablePointer(to: &errorCode, { error in
-                    seed_phrase_change_phrase(threshold_key.pointer, oldPointer, newPointer, curvePointer, error)
-                        })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in SeedPhraseModule, change_phrase")
-                    }
+                try set_seed_phrase(threshold_key: threshold_key, format: format, phrase: phrase, number_of_wallets: number_of_wallets)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
@@ -90,6 +69,30 @@ public final class SeedPhraseModule {
         }
     }
 
+    
+    public static func changeSeedPhraseAsync(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                try change_phrase(threshold_key: threshold_key, old_phrase: old_phrase, new_phrase: new_phrase)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
+    
+    public static func deleteSeedPhraseAsync(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        ThresholdKey.moduleQueue.async {
+            do {
+                try delete_seedphrase(threshold_key: threshold_key, phrase: phrase)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
     public static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [seedPhraseStruct] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -103,36 +106,6 @@ public final class SeedPhraseModule {
         let decoder = JSONDecoder()
         let seed_array = try! decoder.decode( [seedPhraseStruct].self, from: string.data(using: String.Encoding.utf8)! )
         return seed_array
-    }
-
-    internal func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
-        let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
-
-        var errorCode: Int32 = -1
-        withUnsafeMutablePointer(to: &errorCode, { error in
-            seed_phrase_delete_seed_phrase(threshold_key.pointer, phrasePointer, error)
-        })
-        guard errorCode == 0 else {
-            throw RuntimeError("PrivateKeyModule, set_key \(errorCode)")
-        }
-    }
-    
-    public static func deleteSeedPhraseAsync(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        ThresholdKey.moduleQueue.async {
-            do {
-                var errorCode: Int32 = -1
-                let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
-                withUnsafeMutablePointer(to: &errorCode, { error in
-                    seed_phrase_delete_seed_phrase(threshold_key.pointer, phrasePointer, error)
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("PrivateKeyModule, set_key \(errorCode)")
-                }
-                completion(.success(()))
-            } catch {
-                completion(.failure(error))
-            }
-        }
     }
 
     /*
