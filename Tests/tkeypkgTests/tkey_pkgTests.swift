@@ -99,14 +99,15 @@ final class tkey_pkgTests: XCTestCase {
         let security_input_share: Bool = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
         XCTAssertEqual(security_input_share, true)
 
-        try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
-
+        let result_1 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
+        XCTAssertTrue(result_1)
+        
         // change answer for already existing question
         let change_answer_result = try! await SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer_2)
         XCTAssertEqual(change_answer_result, true)
 
-        let result_1 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-        XCTAssertTrue(result_1)
+        let result_2 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertTrue(result_2)
         
         let security_input_share_2 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer_2)
         XCTAssertEqual(security_input_share_2, true)
@@ -120,8 +121,8 @@ final class tkey_pkgTests: XCTestCase {
         // delete newly security share
         try! await threshold_key.delete_share(share_index: share_index)
 
-        let result = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-        XCTAssertEqual( result, true)
+        let result_3 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertEqual( result_3, true)
     }
 
     func testThresholdShareTransfer () async {

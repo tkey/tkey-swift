@@ -28,8 +28,6 @@ public class ThresholdKey {
 
     public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool) throws {
         var errorCode: Int32 = -1
-        print("threshold", Thread.current, Thread.isMultiThreaded() )
-        
         var providerPointer: OpaquePointer?
         if case .some(let provider) = service_provider {
             providerPointer = provider.pointer
