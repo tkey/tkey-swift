@@ -10,6 +10,7 @@ import Foundation
     import lib
 #endif
 
+@ThresholdKeyActor
 public final class PrivateKeysModule {
     public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
         var errorCode: Int32 = -1

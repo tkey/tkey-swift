@@ -10,6 +10,7 @@ import Foundation
     import lib
 #endif
 
+@ThresholdKeyActor
 public final class ShareTransferModule {
     public static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String) throws -> String {
         var errorCode: Int32 = -1

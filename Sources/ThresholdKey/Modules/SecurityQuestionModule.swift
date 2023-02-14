@@ -10,6 +10,7 @@ import Foundation
     import lib
 #endif
 
+@ThresholdKeyActor
 public final class SecurityQuestionModule {
     public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1

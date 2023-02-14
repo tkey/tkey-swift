@@ -15,6 +15,7 @@ public struct seedPhraseStruct: Codable {
     public var type: String
 }
 
+@ThresholdKeyActor
 public final class SeedPhraseModule {
     public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
         var errorCode: Int32 = -1
