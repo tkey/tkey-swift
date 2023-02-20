@@ -10,9 +10,8 @@ import Foundation
     import lib
 #endif
 
-@ThresholdKeyActor
 public final class SecurityQuestionModule {
-    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
+    internal static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -25,8 +24,34 @@ public final class SecurityQuestionModule {
             }
         return try! GenerateShareStoreResult.init(pointer: result!)
     }
-
-    public static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    
+    internal static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                let result = try generate_new_share(threshold_key: threshold_key, questions: questions, answer: answer)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String ) async throws -> GenerateShareStoreResult {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            generate_new_share(threshold_key: threshold_key, questions: questions, answer: answer) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    internal static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -38,8 +63,34 @@ public final class SecurityQuestionModule {
             }
         return result
     }
+    
+    internal static func input_share(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                let result = try input_share(threshold_key: threshold_key, answer: answer)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func input_share(threshold_key: ThresholdKey, answer: String ) async throws -> Bool {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            input_share(threshold_key: threshold_key, answer: answer) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 
-    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
+    internal static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -52,8 +103,34 @@ public final class SecurityQuestionModule {
             }
         return result
     }
-
-    public static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    
+    internal static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                let result = try change_question_and_answer(threshold_key: threshold_key, questions: questions, answer: answer)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String ) async throws -> Bool {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            change_question_and_answer(threshold_key: threshold_key, questions: questions, answer: answer) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    internal static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -64,6 +141,32 @@ public final class SecurityQuestionModule {
             throw RuntimeError("Error in SecurityQuestionModule, change_question_and_answer")
             }
         return result
+    }
+    
+    internal static func store_answer(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                let result = try store_answer(threshold_key: threshold_key, answer: answer)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func store_answer(threshold_key: ThresholdKey, answer: String ) async throws -> Bool {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            store_answer(threshold_key: threshold_key, answer: answer) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     public static func get_answer(threshold_key: ThresholdKey) throws -> String {

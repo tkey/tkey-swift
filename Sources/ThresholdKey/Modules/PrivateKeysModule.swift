@@ -10,9 +10,8 @@ import Foundation
     import lib
 #endif
 
-@ThresholdKeyActor
 public final class PrivateKeysModule {
-    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
+    internal static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         var keyPointer: UnsafeMutablePointer<Int8>?
@@ -28,7 +27,33 @@ public final class PrivateKeysModule {
             }
         return result
     }
-
+    
+    internal static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                let result = try set_private_key(threshold_key: threshold_key, key: key, format: format)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String ) async throws -> Bool {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            set_private_key(threshold_key: threshold_key, key: key, format: format) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
     public static func get_private_keys(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
