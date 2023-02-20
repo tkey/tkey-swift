@@ -171,11 +171,13 @@ public class ThresholdKey {
     
     
     internal func generate_new_share(id: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
-        do {
-            let result = try self.generate_new_share(id: id)
-            completion(.success(result))
-        } catch {
-            completion(.failure(error))
+        tkeyQueue.async {
+            do {
+                let result = try self.generate_new_share(id: id)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
         }
     }
     
