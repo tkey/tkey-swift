@@ -13,15 +13,13 @@ import Foundation
 public class ThresholdKey {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-    public let tkeyQueue = DispatchQueue(label: "com.tkeyQueue")
-    
-    public var queueOrder = Array<String>()
+    internal let tkeyQueue = DispatchQueue(label: "thresholdkey.queue")
     
     init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
 
-    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool) async throws {
+    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool) throws {
         var errorCode: Int32 = -1
         var providerPointer: OpaquePointer?
         if case .some(let provider) = service_provider {

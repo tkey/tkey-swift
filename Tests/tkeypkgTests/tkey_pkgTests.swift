@@ -6,35 +6,12 @@ final class tkey_pkgTests: XCTestCase {
     func testLibraryVersion() {
         _ = try! library_version()
     }
-//
-//    func testGenerateShareFIFO() async {
-//        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-//        let key1 = try! PrivateKey.generate()
-//        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-//        let threshold_key = try! await ThresholdKey(
-//            storage_layer: storage_layer,
-//            service_provider: service_provider,
-//            enable_logging: true,
-//            manual_sync: false)
-//
-//        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
-//        let key_details = try! threshold_key.get_key_details()
-//        XCTAssertEqual(key_details.total_shares, 2)
-//
-//        for i in 0...10 {
-//            _ = try! await threshold_key.generate_new_share(id: String(i))
-//        }
-//
-//        for i in 0...10 {
-//            XCTAssertEqual(threshold_key.queueOrder[i],String(i))
-//        }
-//    }
     
     func testGenerateDeleteShare() async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -68,7 +45,7 @@ final class tkey_pkgTests: XCTestCase {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -81,7 +58,7 @@ final class tkey_pkgTests: XCTestCase {
 
         let shareOut = try! threshold_key.output_share(shareIndex: shareStore.hex, shareType: nil)
 
-        let threshold_key2 = try! await ThresholdKey(
+        let threshold_key2 = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -99,7 +76,7 @@ final class tkey_pkgTests: XCTestCase {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -116,7 +93,7 @@ final class tkey_pkgTests: XCTestCase {
         let new_share = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer)
         let share_index = new_share.hex
 
-        let sq_question = try! await SecurityQuestionModule.get_questions(threshold_key: threshold_key)
+        let sq_question = try! SecurityQuestionModule.get_questions(threshold_key: threshold_key)
         XCTAssertEqual(sq_question, question)
 
         let security_input_share: Bool = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
@@ -143,7 +120,7 @@ final class tkey_pkgTests: XCTestCase {
         let security_input_share_2 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer_2)
         XCTAssertEqual(security_input_share_2, true)
 
-        let get_answer = try! await SecurityQuestionModule.get_answer(threshold_key: threshold_key)
+        let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
         XCTAssertEqual(get_answer, answer_2)
 
         let key_reconstruction_details_2 = try! await threshold_key.reconstruct()
@@ -163,7 +140,7 @@ final class tkey_pkgTests: XCTestCase {
 
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -172,7 +149,7 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! await threshold_key.reconstruct()
 
-        let threshold_key2 = try! await ThresholdKey(
+        let threshold_key2 = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -199,7 +176,7 @@ final class tkey_pkgTests: XCTestCase {
         let key1 = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -209,7 +186,7 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! await threshold_key.reconstruct()
 
-        let result = try! await PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
+        let result = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result.count, 0)
 
         let key_module = try! PrivateKey.generate()
@@ -217,17 +194,17 @@ final class tkey_pkgTests: XCTestCase {
         // Done setup
         // Try set and get privatekey from privatekey module
         _ = try! await PrivateKeysModule.set_private_key(threshold_key: threshold_key, key:     key_module.hex, format: "secp256k1n")
-        let result_1 = try! await PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
+        let result_1 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result_1, [key_module.hex] )
 
         // Try set 2nd privatekey
         _ = try! await PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: key_module2.hex, format: "secp256k1n")
-        let result_2 = try! await PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
+        let result_2 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result_2, [key_module.hex, key_module2.hex])
 
         // Try set privateKey module with nil key
         _ = try! await PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: nil, format: "secp256k1n")
-        let result_3 = try! await PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
+        let result_3 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result_3.count, 3)
 
         // try PrivateKeysModule.remove_private_key()
@@ -239,7 +216,7 @@ final class tkey_pkgTests: XCTestCase {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -285,7 +262,7 @@ final class tkey_pkgTests: XCTestCase {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
@@ -298,12 +275,12 @@ final class tkey_pkgTests: XCTestCase {
         let seedPhraseToSet2 = "object brass success calm lizard science syrup planet exercise parade honey impulse"
 
 //        Check the seedphrase module is empty
-        let seedResult = try! await SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        let seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult.count, 0 )
 
 //        set and get seedphrases
         try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseToSet, number_of_wallets: 0)
-        let seedResult_2 = try! await SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        let seedResult_2 = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult_2[0].seedPhrase, seedPhraseToSet )
 
         do {
@@ -313,7 +290,7 @@ final class tkey_pkgTests: XCTestCase {
 
 //        Try to set and get 2nd seedphrases
         try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseToSet2, number_of_wallets: 0)
-        let seedResult_3 = try! await SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        let seedResult_3 = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult_3[0].seedPhrase, seedPhraseToSet )
         XCTAssertEqual(seedResult_3[1].seedPhrase, seedPhraseToSet2 )
 
@@ -324,7 +301,7 @@ final class tkey_pkgTests: XCTestCase {
         
 //        Try set seedphrase with nil
         try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: nil, number_of_wallets: 0)
-        let seedResult_4 = try! await SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        let seedResult_4 = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult_4.count, 3 )
 
 //        Try reconstruct 2nd Tkey instance to check if seed phrase is persistance
@@ -335,7 +312,7 @@ final class tkey_pkgTests: XCTestCase {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-        let threshold_key = try! await ThresholdKey(
+        let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
