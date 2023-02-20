@@ -21,6 +21,8 @@ public class ThresholdKey {
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
     public let tkeyQueue = DispatchQueue(label: "com.tkeyQueue")
     
+    public var queueOrder = Array<String>()
+    
     init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
@@ -166,12 +168,14 @@ public class ThresholdKey {
         }
 
         let resultShare = try GenerateShareStoreResult( pointer: result!)
+        queueOrder.append(id);
         return resultShare
     }
     
     
     internal func generate_new_share(id: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         tkeyQueue.async {
+            print("thread" , Thread.current, Thread.isMainThread, #function, "execution", id)
             do {
                 let result = try self.generate_new_share(id: id)
                 completion(.success(result))
@@ -182,7 +186,6 @@ public class ThresholdKey {
     }
     
     public func generate_new_share(id:String) async throws -> GenerateShareStoreResult {
-        print("thread" , Thread.current, Thread.isMainThread, #function, "before queue", id)
         return try await withCheckedThrowingContinuation {
             continuation in
             self.generate_new_share(id: id) {
