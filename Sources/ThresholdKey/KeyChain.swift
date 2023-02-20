@@ -9,7 +9,6 @@ import Foundation
 
 import Security
 
-@ThresholdKeyActor
 public class KeychainInterface {
 
     public enum KeychainError: Error {

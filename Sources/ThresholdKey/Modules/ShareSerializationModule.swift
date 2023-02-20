@@ -10,7 +10,6 @@ import Foundation
     import lib
 #endif
 
-@ThresholdKeyActor
 public final class ShareSerializationModule {
     public static func serialize_share(threshold_key: ThresholdKey, share: String, format: String?) throws -> String {
         var errorCode: Int32 = -1

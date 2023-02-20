@@ -10,12 +10,6 @@ import Foundation
     import lib
 #endif
 
-
-@globalActor
-public actor ThresholdKeyActor {
-    static public var shared: some Actor & AnyObject = ThresholdKeyActor()
-}
-
 public class ThresholdKey {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
