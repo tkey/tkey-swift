@@ -22,7 +22,12 @@ extension NSMutableData {
 
 public final class StorageLayer {
     private(set) var pointer: OpaquePointer?
-
+    
+    // This is a placeholder to satisfy the interface,
+    // tracking this object is not necessary in swift as it maintains context
+    // on entry for the callback
+    private var obj_ref: UnsafeMutableRawPointer?
+    
     public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
@@ -56,7 +61,7 @@ public final class StorageLayer {
         var errorCode: Int32 = -1
         let urlPointer = UnsafeMutablePointer<Int8>(mutating: (host_url as NSString).utf8String)
 
-        let network_interface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, error_code in
+        let network_interface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?, UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, obj_ref, error_code in
             let sem = DispatchSemaphore.init(value: 0)
             let urlString = String.init(cString: url!)
             let dataString = String.init(cString: data!)
@@ -121,7 +126,7 @@ public final class StorageLayer {
         }
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            storage_layer(enable_logging, urlPointer, server_time_offset, network_interface, error)
+            storage_layer(enable_logging, urlPointer, server_time_offset, network_interface, obj_ref,  error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error in StorageLayer")
@@ -130,6 +135,6 @@ public final class StorageLayer {
     }
 
     deinit {
-        storage_layer_free(pointer)
+        let _ = storage_layer_free(pointer)
     }
 }

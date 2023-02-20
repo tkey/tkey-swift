@@ -56,8 +56,8 @@
         char* share_store_get_share_index(struct ShareStore* store, int* error_code);
         char* share_store_get_polynomial_id(struct ShareStore* store, int* error_code);
         void share_store_free(struct ShareStore* ptr);
-        struct FFIStorageLayer* storage_layer(bool enable_logging, char* host_url, long long int server_time_offset, char* (*network_callback)(char*, char*, int*), int* error_code);
-        void storage_layer_free(struct FFIStorageLayer* ptr);
+        struct FFIStorageLayer* storage_layer(bool enable_logging, char* host_url, long long int server_time_offset, char* (*network_callback)(char*, char*, void*, int*), void* parent_instance_ref, int* error_code);
+        void* storage_layer_free(struct FFIStorageLayer* ptr);
         struct ServiceProvider* service_provider(bool enable_logging, char* postbox_key, char* curve_n, int* error_code);
         void service_provider_free(struct ServiceProvider* prt);
         struct FFIThresholdKey* threshold_key(struct Metadata* metadata, struct ShareStorePolyIDShareIndexMap* shares, struct FFIStorageLayer* storage_layer, struct ServiceProvider* service_provider, struct LocalMetadataTransitions* local_metadata_transitions, struct Metadata* last_fetch_cloud_metadata, bool enable_logging, bool manual_sync, int* error_code);
