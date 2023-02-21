@@ -16,7 +16,7 @@ public struct seedPhraseStruct: Codable {
 }
 
 public final class SeedPhraseModule {
-    public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
+    private static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
@@ -113,7 +113,7 @@ public final class SeedPhraseModule {
         return seed_array
     }
 
-    public static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
+    private static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
         let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
 
         var errorCode: Int32 = -1
