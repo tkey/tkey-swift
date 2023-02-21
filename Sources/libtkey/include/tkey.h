@@ -92,6 +92,7 @@
         struct Metadata* threshold_key_get_last_fetched_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
         struct ShareStoreArray* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey*, char* curve_n, int* error_code);
+        struct ShareStorePolyIDShareIndexMap* threshold_key_get_shares(struct FFIThresholdKey*, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);

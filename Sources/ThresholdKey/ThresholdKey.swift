@@ -321,6 +321,18 @@ public final class ThresholdKey {
         return String.init(cString: result!)
     }
     
+    public func get_shares() throws -> ShareStorePolyIdIndexMap {
+        var errorCode: Int32  = -1
+
+        let result = withUnsafeMutablePointer(to: &errorCode, {error in
+            threshold_key_get_shares(pointer, error )
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in ThresholdKey get_shares")
+        }
+        return try ShareStorePolyIdIndexMap.init(pointer: result!)
+    }
+    
     public func sync_local_metadata_transistions() throws {
         var errorCode: Int32  = -1
         
