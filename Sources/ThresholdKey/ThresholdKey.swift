@@ -69,7 +69,7 @@ public class ThresholdKey {
         return Metadata.init(pointer: result!)
     }
 
-    internal func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) throws -> KeyDetails {
+    private func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) throws -> KeyDetails {
         var errorCode: Int32 = -1
         var sharePointer: UnsafeMutablePointer<Int8>?
         if !import_share.isEmpty {
@@ -84,7 +84,7 @@ public class ThresholdKey {
         return try! KeyDetails(pointer: result!)
     }
     
-    internal func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
+    private func initialize(import_share: String = "", input: OpaquePointer? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 let result = try self.initialize(import_share: import_share, input: input, never_initialize_new_key: never_initialize_new_key, include_local_metadata_transitions: include_local_metadata_transitions)
@@ -110,7 +110,7 @@ public class ThresholdKey {
         }
     }
     
-    internal func reconstruct() throws -> KeyReconstructionDetails {
+    private func reconstruct() throws -> KeyReconstructionDetails {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -121,7 +121,7 @@ public class ThresholdKey {
         return try! KeyReconstructionDetails(pointer: result!)
     }
     
-    internal func reconstruct(completion: @escaping (Result<KeyReconstructionDetails, Error>) -> Void) {
+    private func reconstruct(completion: @escaping (Result<KeyReconstructionDetails, Error>) -> Void) {
         tkeyQueue.async {
             do {
                 let result = try self.reconstruct()
@@ -159,32 +159,6 @@ public class ThresholdKey {
         return Polynomial(pointer: result!)
     }
     
-    internal func reconstruct_latest_poly(completion: @escaping (Result<Polynomial, Error>) -> Void) {
-        tkeyQueue.async {
-            do {
-                let result = try self.reconstruct_latest_poly()
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    public func reconstruct_latest_poly() async throws -> Polynomial {
-        return try await withCheckedThrowingContinuation {
-            continuation in
-            self.reconstruct_latest_poly() {
-                result in
-                switch result {
-                case .success(let result):
-                    continuation.resume(returning: result)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-    
     public func get_all_share_stores_for_latest_polynomial() throws -> ShareStoreArray {
         var errorCode: Int32 = -1
         
@@ -198,7 +172,7 @@ public class ThresholdKey {
         return try! ShareStoreArray.init(pointer: result!);
     }
     
-    internal func generate_new_share() throws -> GenerateShareStoreResult {
+    private func generate_new_share() throws -> GenerateShareStoreResult {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
@@ -213,7 +187,7 @@ public class ThresholdKey {
     }
     
     
-    internal func generate_new_share(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+    private func generate_new_share(completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         tkeyQueue.async {
             do {
                 let result = try self.generate_new_share()
@@ -239,7 +213,7 @@ public class ThresholdKey {
         }
     }
 
-    public func delete_share(share_index: String) throws {
+    private func delete_share(share_index: String) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let shareIndexPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
@@ -251,7 +225,7 @@ public class ThresholdKey {
         }
     }
     
-    internal func delete_share(share_index: String, completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func delete_share(share_index: String, completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 try self.delete_share( share_index: share_index )
@@ -320,7 +294,7 @@ public class ThresholdKey {
         return ShareStore.init(pointer: result!)
     }
 
-    internal func input_share( share: String, shareType: String?) throws {
+    private func input_share( share: String, shareType: String?) throws {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let cShare = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -337,7 +311,7 @@ public class ThresholdKey {
         }
     }
     
-    internal func input_share( share: String, shareType: String?, completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func input_share( share: String, shareType: String?, completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 try self.input_share(share: share, shareType: shareType)
@@ -381,7 +355,7 @@ public class ThresholdKey {
         return ShareStore(pointer: result!)
     }
 
-    internal func input_share_store(shareStore: ShareStore) throws {
+    private func input_share_store(shareStore: ShareStore) throws {
         var errorCode: Int32  = -1
         withUnsafeMutablePointer(to: &errorCode, {error in
             threshold_key_input_share_store(pointer, shareStore.pointer, error)
@@ -390,7 +364,7 @@ public class ThresholdKey {
             throw RuntimeError("Error in ThresholdKey input share store")
         }
     }
-    internal func input_share_store(shareStore: ShareStore, completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func input_share_store(shareStore: ShareStore, completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 try self.input_share_store(shareStore: shareStore)
@@ -507,7 +481,7 @@ public class ThresholdKey {
         return String.init(cString: result!)
     }
     
-    internal func sync_local_metadata_transistions() throws {
+    private func sync_local_metadata_transistions() throws {
         var errorCode: Int32  = -1
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: curveN).utf8String)
@@ -520,7 +494,7 @@ public class ThresholdKey {
         }
     }
     
-    internal func sync_local_metadata_transistions(completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func sync_local_metadata_transistions(completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 try self.sync_local_metadata_transistions()

@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class SecurityQuestionModule {
-    internal static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
+    private static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String) throws -> GenerateShareStoreResult {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -25,7 +25,7 @@ public final class SecurityQuestionModule {
         return try! GenerateShareStoreResult.init(pointer: result!)
     }
     
-    internal static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
+    private static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try generate_new_share(threshold_key: threshold_key, questions: questions, answer: answer)
@@ -51,7 +51,7 @@ public final class SecurityQuestionModule {
         }
     }
     
-    internal static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    private static func input_share(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -64,7 +64,7 @@ public final class SecurityQuestionModule {
         return result
     }
     
-    internal static func input_share(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    private static func input_share(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try input_share(threshold_key: threshold_key, answer: answer)
@@ -90,7 +90,7 @@ public final class SecurityQuestionModule {
         }
     }
 
-    internal static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
+    private static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let questionsPointer = UnsafeMutablePointer<Int8>(mutating: (questions as NSString).utf8String)
@@ -104,7 +104,7 @@ public final class SecurityQuestionModule {
         return result
     }
     
-    internal static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    private static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try change_question_and_answer(threshold_key: threshold_key, questions: questions, answer: answer)
@@ -130,7 +130,7 @@ public final class SecurityQuestionModule {
         }
     }
     
-    internal static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
+    private static func store_answer(threshold_key: ThresholdKey, answer: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let answerPointer = UnsafeMutablePointer<Int8>(mutating: (answer as NSString).utf8String)
@@ -143,7 +143,7 @@ public final class SecurityQuestionModule {
         return result
     }
     
-    internal static func store_answer(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    private static func store_answer(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try store_answer(threshold_key: threshold_key, answer: answer)

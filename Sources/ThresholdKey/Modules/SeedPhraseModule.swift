@@ -33,7 +33,7 @@ public final class SeedPhraseModule {
             }
     }
     
-    internal static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try set_seed_phrase(threshold_key: threshold_key, format: format, phrase: phrase, number_of_wallets: number_of_wallets)
@@ -59,7 +59,7 @@ public final class SeedPhraseModule {
         }
     }
     
-    internal static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
+    private static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
         var errorCode: Int32 = -1
         let oldPointer = UnsafeMutablePointer<Int8>(mutating: (old_phrase as NSString).utf8String)
         let newPointer = UnsafeMutablePointer<Int8>(mutating: (new_phrase as NSString).utf8String)
@@ -72,7 +72,7 @@ public final class SeedPhraseModule {
             }
     }
     
-    internal static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try change_phrase(threshold_key: threshold_key, old_phrase: old_phrase, new_phrase: new_phrase)
@@ -125,7 +125,7 @@ public final class SeedPhraseModule {
         }
     }
     
-    internal static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try delete_seedphrase(threshold_key: threshold_key, phrase: phrase)

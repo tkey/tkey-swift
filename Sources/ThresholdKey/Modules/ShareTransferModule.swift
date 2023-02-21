@@ -11,7 +11,7 @@ import Foundation
 #endif
 
 public final class ShareTransferModule {
-    internal static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String) throws -> String {
+    private static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String) throws -> String {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let agentPointer = UnsafeMutablePointer<Int8>(mutating: (user_agent as NSString).utf8String)
@@ -27,7 +27,7 @@ public final class ShareTransferModule {
         return string
     }
     
-    internal static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, completion: @escaping (Result<String, Error>) -> Void) {
+    private static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, completion: @escaping (Result<String, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try request_new_share(threshold_key: threshold_key, user_agent: user_agent, available_share_indexes: available_share_indexes)
@@ -53,7 +53,7 @@ public final class ShareTransferModule {
         }
     }
     
-    internal static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String) throws {
+    private static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String) throws {
         var errorCode: Int32 = -1
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
         let customPointer = UnsafeMutablePointer<Int8>(mutating: (custom_info as NSString).utf8String)
@@ -66,7 +66,7 @@ public final class ShareTransferModule {
             }
     }
     
-    internal static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try add_custom_info_to_request(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, custom_info: custom_info)
@@ -92,7 +92,7 @@ public final class ShareTransferModule {
         }
     }
 
-    internal static func look_for_request(threshold_key: ThresholdKey) throws -> [String] {
+    private static func look_for_request(threshold_key: ThresholdKey) throws -> [String] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             share_transfer_look_for_request(threshold_key.pointer, error)
@@ -106,7 +106,7 @@ public final class ShareTransferModule {
         return indicator_array
     }
     
-    internal static func look_for_request(threshold_key: ThresholdKey, completion: @escaping (Result<[String], Error>) -> Void) {
+    private static func look_for_request(threshold_key: ThresholdKey, completion: @escaping (Result<[String], Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try look_for_request(threshold_key: threshold_key)
@@ -132,7 +132,7 @@ public final class ShareTransferModule {
         }
     }
     
-    internal static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore) throws {
+    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -144,7 +144,7 @@ public final class ShareTransferModule {
             }
     }
     
-    internal static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try approve_request(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, share_store: share_store )
@@ -170,7 +170,7 @@ public final class ShareTransferModule {
         }
     }
 
-    internal static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String) throws {
+    private static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -183,7 +183,7 @@ public final class ShareTransferModule {
             }
     }
 
-    internal static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 try approve_request_with_share_index(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, share_index: share_index )
@@ -209,7 +209,7 @@ public final class ShareTransferModule {
         }
     }
     
-    internal static func get_store(threshold_key: ThresholdKey) throws -> ShareTransferStore {
+    private static func get_store(threshold_key: ThresholdKey) throws -> ShareTransferStore {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             share_transfer_get_store(threshold_key.pointer, error)
@@ -221,7 +221,7 @@ public final class ShareTransferModule {
     }
     
     
-    internal static func get_store(threshold_key: ThresholdKey, completion: @escaping (Result<ShareTransferStore, Error>) -> Void) {
+    private static func get_store(threshold_key: ThresholdKey, completion: @escaping (Result<ShareTransferStore, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try get_store(threshold_key: threshold_key)
@@ -247,7 +247,7 @@ public final class ShareTransferModule {
         }
     }
 
-    internal static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore) throws -> Bool {
+    private static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -259,7 +259,7 @@ public final class ShareTransferModule {
         return result
     }
 
-    internal static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore, completion: @escaping (Result<Bool, Error>) -> Void) {
+    private static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try set_store(threshold_key: threshold_key, store: store)
@@ -285,7 +285,7 @@ public final class ShareTransferModule {
         }
     }
     
-    internal static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String) throws -> Bool {
+    private static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String) throws -> Bool {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -299,7 +299,7 @@ public final class ShareTransferModule {
     }
 
     
-    internal static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    private static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try delete_store(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x)
@@ -338,7 +338,7 @@ public final class ShareTransferModule {
         return string
     }
 
-    internal static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool) throws -> ShareStore {
+    private static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool) throws -> ShareStore {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
@@ -351,7 +351,7 @@ public final class ShareTransferModule {
         return ShareStore.init(pointer: result!)
     }
     
-    internal static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool, completion: @escaping (Result<ShareStore, Error>) -> Void) {
+    private static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool, completion: @escaping (Result<ShareStore, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let result = try request_status_check(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, delete_request_on_completion: delete_request_on_completion)

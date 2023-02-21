@@ -101,7 +101,7 @@ final class tkey_pkgTests: XCTestCase {
 
         do {
             let result_1 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
-            XCTAssertTrue(result_1)
+            XCTAssertTrue( false )
         } catch {
             
         }
@@ -113,7 +113,7 @@ final class tkey_pkgTests: XCTestCase {
 
         do {
             let result_2 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertTrue(result_2)
+            XCTAssertTrue( false )
         }catch {
         }
         
@@ -131,7 +131,7 @@ final class tkey_pkgTests: XCTestCase {
 
         do {
             let result_3 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertEqual( result_3, true)
+            XCTAssertTrue( false )
         }catch{}
     }
 
@@ -285,6 +285,7 @@ final class tkey_pkgTests: XCTestCase {
 
         do {
             try await SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseToSet2)
+            XCTAssertTrue( false )
         }catch{}
 //        Try delete unknown seedphrase - expect fail
 
@@ -296,6 +297,7 @@ final class tkey_pkgTests: XCTestCase {
 
         do {
             try await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseToSet2, number_of_wallets: 0)
+            XCTAssertTrue( false )
             //        Try set seedphrase with existing seed phrase
         } catch {}
         
