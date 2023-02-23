@@ -20,24 +20,40 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
-
+            
+        // Push 4 generate new shares to queue
+        async let create4share = Task {
+                async let new_share = try! SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: "hello", answer: "bye");
+                async let new_share2 = try! threshold_key.generate_new_share()
+                async let new_share3 = try! threshold_key.generate_new_share()
+                async let new_share4 = try! threshold_key.generate_new_share()
+                let key_details_2 = try! threshold_key.get_key_details()
+                return key_details_2.total_shares
+        }.value
+        
+            
+        // create one more new shares
         let new_share = try! await threshold_key.generate_new_share()
-        let share_index = new_share.hex
-
         let key_details_2 = try! threshold_key.get_key_details()
-        XCTAssertEqual(key_details_2.total_shares, 3)
+        let share_index = new_share.hex;
+            
+        // await for previous promise to resolve
+        let numberofshares = await create4share;
+        
+        // create4share was executed before shares were generated
+        // Its possible that the following line will fail randomly. if it does, please inform CW
+        XCTAssertEqual(numberofshares, 2)
 
         _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
-
         try! await threshold_key.delete_share(share_index: share_index)
         let key_details_3 = try! threshold_key.get_key_details()
-        XCTAssertEqual(key_details_3.total_shares, 2)
-         
+        
+        XCTAssertEqual(key_details_3.total_shares, 6)
         do {
             let _ = try threshold_key.output_share(shareIndex: share_index, shareType: nil)
             XCTAssertTrue( false )
         }catch {
-//          Should throw error
+         // Should throw error
         }
     }
 
@@ -90,6 +106,7 @@ final class tkey_pkgTests: XCTestCase {
         let answer_2 = "captain america"
 
         // generate new security share
+        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
         let new_share = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer)
         let share_index = new_share.hex
 
@@ -156,7 +173,9 @@ final class tkey_pkgTests: XCTestCase {
             manual_sync: false)
 
         _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
-
+        
+        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
+        // Application would want to request a new share and wait for it as a task (potentially)
         let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
 
         let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
@@ -212,7 +231,7 @@ final class tkey_pkgTests: XCTestCase {
 
     }
 
-    func testPolyModule() async {
+    func testPolynomialModule() async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -273,7 +292,10 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.reconstruct()
         let seedPhraseToSet = "seed sock milk update focus rotate barely fade car face mechanic mercy"
         let seedPhraseToSet2 = "object brass success calm lizard science syrup planet exercise parade honey impulse"
+        
+        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
 
+        
 //        Check the seedphrase module is empty
         let seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult.count, 0 )

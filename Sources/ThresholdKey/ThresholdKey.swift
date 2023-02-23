@@ -203,6 +203,7 @@ public class ThresholdKey {
             continuation in
             self.generate_new_share() {
                 result in
+                let key_details_2 = try! self.get_key_details()
                 switch result {
                 case .success(let result):
                     continuation.resume(returning: result)
