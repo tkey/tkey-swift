@@ -56,8 +56,8 @@
         char* share_store_get_share_index(struct ShareStore* store, int* error_code);
         char* share_store_get_polynomial_id(struct ShareStore* store, int* error_code);
         void share_store_free(struct ShareStore* ptr);
-        struct FFIStorageLayer* storage_layer(bool enable_logging, char* host_url, long long int server_time_offset, char* (*network_callback)(char*, char*, int*), int* error_code);
-        void storage_layer_free(struct FFIStorageLayer* ptr);
+        struct FFIStorageLayer* storage_layer(bool enable_logging, char* host_url, long long int server_time_offset, char* (*network_callback)(char*, char*, void*, int*), void* parent_instance_ref, int* error_code);
+        void* storage_layer_free(struct FFIStorageLayer* ptr);
         struct ServiceProvider* service_provider(bool enable_logging, char* postbox_key, char* curve_n, int* error_code);
         void service_provider_free(struct ServiceProvider* prt);
         struct FFIThresholdKey* threshold_key(struct Metadata* metadata, struct ShareStorePolyIDShareIndexMap* shares, struct FFIStorageLayer* storage_layer, struct ServiceProvider* service_provider, struct LocalMetadataTransitions* local_metadata_transitions, struct Metadata* last_fetch_cloud_metadata, bool enable_logging, bool manual_sync, int* error_code);
@@ -88,10 +88,11 @@
         char* threshold_key_encrypt(struct FFIThresholdKey* threshold_key, char* data, char* curve_n, int* error_code);
         char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
         struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
-        struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
+        struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey *threshold_key, char* curve_n, int* error_code);
         struct Metadata* threshold_key_get_last_fetched_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
-        void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey*, char* curve_n, int* error_code);
-        struct ShareStoreArray* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey*, char* curve_n, int* error_code);
+        void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey *threshold_key, char* curve_n, int* error_code);
+        struct ShareStoreArray* threshold_key_get_all_share_stores_for_latest_polynomial(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
+        struct ShareStorePolyIDShareIndexMap* threshold_key_get_shares(struct FFIThresholdKey* threshold_key, int* error_code);
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
