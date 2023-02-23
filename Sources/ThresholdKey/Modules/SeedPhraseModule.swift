@@ -16,7 +16,7 @@ public struct seedPhraseStruct: Codable {
 }
 
 public final class SeedPhraseModule {
-    public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
+    private static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32) throws {
         var errorCode: Int32 = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
@@ -32,8 +32,34 @@ public final class SeedPhraseModule {
             throw RuntimeError("Error SeedPhraseModule, set_seed_phrase")
             }
     }
-
-    public static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
+    
+    private static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32, completion: @escaping (Result<Void, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                try set_seed_phrase(threshold_key: threshold_key, format: format, phrase: phrase, number_of_wallets: number_of_wallets)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32 ) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            set_seed_phrase(threshold_key: threshold_key, format: format, phrase: phrase, number_of_wallets: number_of_wallets) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    private static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String) throws {
         var errorCode: Int32 = -1
         let oldPointer = UnsafeMutablePointer<Int8>(mutating: (old_phrase as NSString).utf8String)
         let newPointer = UnsafeMutablePointer<Int8>(mutating: (new_phrase as NSString).utf8String)
@@ -44,6 +70,32 @@ public final class SeedPhraseModule {
         guard errorCode == 0 else {
             throw RuntimeError("Error in SeedPhraseModule, change_phrase")
             }
+    }
+    
+    private static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                try change_phrase(threshold_key: threshold_key, old_phrase: old_phrase, new_phrase: new_phrase)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String ) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            change_phrase(threshold_key: threshold_key, old_phrase: old_phrase, new_phrase: new_phrase) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     public static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [seedPhraseStruct] {
@@ -61,7 +113,7 @@ public final class SeedPhraseModule {
         return seed_array
     }
 
-    public static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
+    private static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String) throws {
         let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
 
         var errorCode: Int32 = -1
@@ -72,7 +124,32 @@ public final class SeedPhraseModule {
             throw RuntimeError("PrivateKeyModule, set_key \(errorCode)")
         }
     }
-
+    
+    private static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                try delete_seedphrase(threshold_key: threshold_key, phrase: phrase)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String ) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            delete_seedphrase(threshold_key: threshold_key, phrase: phrase) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
     /*
     static func get_seed_phrases_with_accounts(threshold_key: ThresholdKey, derivation_format: String) throws -> String
     {
