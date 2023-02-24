@@ -34,7 +34,7 @@ public class ShareStoreArray {
         var errorCode: Int32 = -1
         
         let share_stores_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_stores_get_len(pointer, error)
+            share_store_array_get_len(pointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_len")

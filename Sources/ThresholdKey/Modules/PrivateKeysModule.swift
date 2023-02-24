@@ -11,27 +11,23 @@ import Foundation
 #endif
 
 public final class PrivateKeysModule {
-    private static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String) throws -> Bool {
-        var errorCode: Int32 = -1
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
-        var keyPointer: UnsafeMutablePointer<Int8>?
-        if key != nil {
-            keyPointer = UnsafeMutablePointer<Int8>(mutating: (key! as NSString).utf8String)
-        }
-        let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
-        let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            private_keys_set_private_key(threshold_key.pointer, keyPointer, formatPointer, curvePointer, error)
-                })
-        guard errorCode == 0 else {
-            throw RuntimeError("Error in PrivateKeysModule, private_keys_set_private_keys")
-            }
-        return result
-    }
     
     private static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
-                let result = try set_private_key(threshold_key: threshold_key, key: key, format: format)
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                var keyPointer: UnsafeMutablePointer<Int8>?
+                if key != nil {
+                    keyPointer = UnsafeMutablePointer<Int8>(mutating: (key! as NSString).utf8String)
+                }
+                let formatPointer = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
+                let result = withUnsafeMutablePointer(to: &errorCode, { error in
+                    private_keys_set_private_key(threshold_key.pointer, keyPointer, formatPointer, curvePointer, error)
+                        })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in PrivateKeysModule, private_keys_set_private_keys")
+                    }
                 completion(.success(result))
             } catch {
                 completion(.failure(error))
