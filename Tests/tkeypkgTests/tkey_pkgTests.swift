@@ -18,51 +18,49 @@ final class tkey_pkgTests: XCTestCase {
     
     func generateDeleteShare(_ manual_sync: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let key = try! PrivateKey.generate()
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key.hex)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: manual_sync)
 
-        let _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
             
         // Push 4 generate new shares to queue
-        async let task = Task {
-            async let order1 = SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: "hello", answer: "bye");
-            async let order2 = threshold_key.generate_new_share()
-            async let order3 = threshold_key.generate_new_share()
-            async let order4 = threshold_key.generate_new_share()
-            return try await [order1, order2, order3, order4]
-        }
-
-        // create one more new shares
+        async let create4share = Task {
+                async let new_share = try! SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: "hello", answer: "bye");
+                async let new_share2 = try! threshold_key.generate_new_share()
+                async let new_share3 = try! threshold_key.generate_new_share()
+                async let new_share4 = try! threshold_key.generate_new_share()
+                return await [new_share,new_share2,new_share3,new_share4]
+        }.value
+        
+        XCTAssertEqual(try! threshold_key.get_key_details().total_shares, 2)
+        
         let new_share = try! await threshold_key.generate_new_share()
-        
-        var details = try! threshold_key.get_key_details()
-        let totalShares = details.total_shares
         let share_index = new_share.hex;
-        XCTAssertEqual(totalShares, 3)
+
+        _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
         
-        let _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        let _ = await create4share;
         
         try! await threshold_key.delete_share(share_index: share_index)
+        let key_details_3 = try! threshold_key.get_key_details()
         
-        let _ = await task;
-        
-        details = try! threshold_key.get_key_details()
-        
-        //Share total = (2 + 1 + 4) - 1 = 6
-        XCTAssertEqual(details.total_shares, 6)
-        
-        // should not be able to output a deleted share
+        XCTAssertEqual(key_details_3.total_shares, 6)
         XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
     }
-
+    
     func testThresholdInputOutputShare() async {
+        await thresholdInputOutputShare(false);
+        await thresholdInputOutputShare(true);
+    }
+
+    func thresholdInputOutputShare(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -70,7 +68,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! await threshold_key.reconstruct()
@@ -79,11 +77,16 @@ final class tkey_pkgTests: XCTestCase {
 
         let shareOut = try! threshold_key.output_share(shareIndex: shareStore.hex, shareType: nil)
 
+        // we initialize new thresholdkey with existing storage layer, so we sync here if manual sync is false
+        if mode {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         let threshold_key2 = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -92,8 +95,13 @@ final class tkey_pkgTests: XCTestCase {
         let key2_reconstruction_details = try! await threshold_key2.reconstruct()
         XCTAssertEqual( key_reconstruction_details.key, key2_reconstruction_details.key)
     }
-
+    
     func testSecurityQuestionModule() async {
+        await securityQuestionModule(true)
+        await securityQuestionModule(false)
+    }
+
+    func securityQuestionModule(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -101,7 +109,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! await threshold_key.reconstruct()
@@ -120,23 +128,16 @@ final class tkey_pkgTests: XCTestCase {
         let security_input_share: Bool = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
         XCTAssertEqual(security_input_share, true)
 
-        do {
-            let _ = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
-            XCTAssertTrue( false )
-        } catch {
-            
-        }
+        var input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
+        XCTAssertNil(input)
             
         
         // change answer for already existing question
         let change_answer_result = try! await SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer_2)
         XCTAssertEqual(change_answer_result, true)
 
-        do {
-            let _ = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertTrue( false )
-        }catch {
-        }
+        input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertNil(input)
         
         let security_input_share_2 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer_2)
         XCTAssertEqual(security_input_share_2, true)
@@ -150,13 +151,120 @@ final class tkey_pkgTests: XCTestCase {
         // delete newly security share
         try! await threshold_key.delete_share(share_index: share_index)
 
-        do {
-            let _ = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertTrue( false )
-        }catch{}
+        input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertNil(input)
+
+    }
+    
+    func testGenerateMultipleQnA() async {
+        await generateMultipleQnA(true);
+        await generateMultipleQnA(false);
+    }
+    
+    func generateMultipleQnA (_ mode: Bool) async {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        var key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+
+        let question = ["q1","q2","q3"]
+        let answer : [String] = ["test1","test2","test3"]
+
+        // only one share should be created
+        async let create3share = Task {
+            async let new_share = try! SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question[0], answer: answer[0]);
+            async let new_share2 = try? SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question[1], answer: answer[1]);
+            async let new_share3 = try? SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question[2], answer: answer[2]);
+            return await [new_share, new_share2, new_share3];
+        }.value
+        
+        _ = try! await threshold_key.reconstruct()
+        key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+        
+        // await here for the all resolved results
+        let shares = await create3share;
+        XCTAssertNil(shares[1]);
+        XCTAssertNil(shares[2]);
+        XCTAssertNotNil(shares[0]);
+
+        // now here it should be assured that only one share is created
+        let key_details_3 = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details_3.total_shares, 3)
+        let get_question = try! SecurityQuestionModule.get_questions(threshold_key: threshold_key)
+        XCTAssertEqual(get_question, question[0])
+        let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
+        XCTAssertEqual(get_answer, answer[0])
+    }
+    
+    func testChangeAnswers() async {
+        await changeAnswers(true);
+        await changeAnswers(false);
+    }
+    
+    func changeAnswers(_ mode: Bool) async {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+
+        let key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+
+        let question = "test question"
+        let original_answer = "test answer"
+        let answer : [String] = ["test1","test2","test3"]
+
+        // generate new security share
+        let _ = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: original_answer)
+        async let change3answers = Task {
+            async let new_share = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[0]);
+            async let new_share2 = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[1]);
+            async let new_share3 = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[2]);
+            
+            return await [new_share, new_share2, new_share3];
+        }.value
+        
+        _ = try! await threshold_key.reconstruct()
+        let key_details2 = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details2.total_shares, 3)
+        
+        // await here for the all resolved results
+        let shares = await change3answers;
+        XCTAssertNotNil(shares[1]);
+        XCTAssertNotNil(shares[2]);
+        XCTAssertNotNil(shares[0]);
+
+        
+        // now here it should be assured that only one share is created
+        let key_details_3 = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details_3.total_shares, 3)
+        let get_question = try! SecurityQuestionModule.get_questions(threshold_key: threshold_key)
+        XCTAssertEqual(get_question, question)
+        let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
+        XCTAssertEqual(get_answer, answer[2])
+        }
+    
+    func testThresholdShareTransfer() async {
+        await thresholdShareTransfer(true)
+        await thresholdShareTransfer(false)
     }
 
-    func testThresholdShareTransfer () async {
+    func thresholdShareTransfer (_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
         let key1 = try! PrivateKey.generate()
@@ -165,7 +273,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_reconstruction_details = try! await threshold_key.reconstruct()
@@ -176,24 +284,39 @@ final class tkey_pkgTests: XCTestCase {
             enable_logging: true,
             manual_sync: false)
 
-        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+        if mode
+        {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
         
-        let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
+        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
+        let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
+        
         let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
         let encPubKey = lookup[0]
         let newShare = try! await threshold_key.generate_new_share()
 
         try! await ShareTransferModule.approve_request_with_share_index(threshold_key: threshold_key, enc_pub_key_x: encPubKey, share_index: newShare.hex)
-
+        
+        if mode
+        {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         _ = try! await ShareTransferModule.request_status_check(threshold_key: threshold_key2, enc_pub_key_x: request_enc, delete_request_on_completion: true)
-
+        
         let key_reconstruction_details_2 = try! await threshold_key2.reconstruct()
 
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details_2.key)
     }
-
+    
     func testPrivateKeyModule() async {
+        await privateKeyModule(true);
+        await privateKeyModule(false);
+    }
+
+    func privateKeyModule(_ mode: Bool) async {
         let key1 = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -201,7 +324,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false
+            manual_sync: mode
         )
 
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
@@ -232,8 +355,13 @@ final class tkey_pkgTests: XCTestCase {
         // Reconstruct on second instance and check value ?
 
     }
-
-    func testPolynomialModule() async {
+    
+    func testSetMultiPrivateKeys() async {
+        await setMultiPrivateKeys(true);
+        await setMultiPrivateKeys(false);
+    }
+    
+    func setMultiPrivateKeys(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -241,7 +369,51 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        var key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+
+        //prepare the private key list
+        var pklist: [String] = []
+        for _ in 0..<5 {
+            let pk = try! PrivateKey.generate().hex
+            pklist.append(pk)
+        }
+        let a = pklist
+
+        //set private keys asynchronously
+        async let set5keys = Task {
+            async let new_share1 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[0], format: "secp256k1n")
+            async let new_share2 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[1], format: "secp256k1n")
+            async let new_share3 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[2], format: "secp256k1n")
+            async let new_share4 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[3], format: "secp256k1n")
+            async let new_share5 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[4], format: "secp256k1n")
+            return await [new_share1,new_share2,new_share3,new_share4, new_share5]
+        }.value
+        
+        let _ = await set5keys
+        key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+        let pknum = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key).count
+        XCTAssertEqual(pknum, 5)
+    }
+    
+    func testPolynomial() async {
+        await polynomial(true);
+        await polynomial(false);
+    }
+
+    func polynomial(_ mode: Bool) async {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
         
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         
@@ -278,8 +450,13 @@ final class tkey_pkgTests: XCTestCase {
         let lagrange_poly = try! Lagrange.lagrange(points: points_arr);
         XCTAssertNotNil(lagrange_poly);
     }
-
+    
     func testSeedPhraseModule() async {
+        await seedPhraseModule(true);
+        await seedPhraseModule(false);
+    }
+
+    func seedPhraseModule(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
@@ -287,7 +464,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false
+            manual_sync: mode
             )
 
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
@@ -329,8 +506,113 @@ final class tkey_pkgTests: XCTestCase {
 
 //        Try reconstruct 2nd Tkey instance to check if seed phrase is persistance
     }
+    
+    func testsetAndGetMultipleSeedPhrases() async {
+        await setAndGetMultipleSeedPhrases(true)
+        await setAndGetMultipleSeedPhrases(false)
+    }
+    
+    func setAndGetMultipleSeedPhrases(_ mode: Bool) async {
+        let seedPhraseList : [String] = ["climb crisp rare radio dress brother dolphin bless chase disagree force razor",
+                                             "giggle razor salon blouse result blouse urge burst urban rain blade decide",
+                                             "direct powder wasp shed lift machine feed lab range intact dish rigid",
+                                             "seed sock milk update focus rotate barely fade car face mechanic mercy",
+                                             "object brass success calm lizard science syrup planet exercise parade honey impulse"]
+        
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
 
-    func test_get_metadata() async {
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        let key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+
+        async let set5phrase = Task {
+            async let set1: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[0], number_of_wallets: 0);
+            async let set2: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[1], number_of_wallets: 0);
+            async let set3: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[2], number_of_wallets: 0);
+            async let set4: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[3], number_of_wallets: 0);
+            async let set5: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[4], number_of_wallets: 0);
+
+            return await [set1,set2,set3,set4,set5]
+        }.value
+        
+        //Check the seedphrase module is empty
+        let seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        XCTAssertEqual(seedResult.count, 0)
+        
+        let _ = await set5phrase;
+        
+
+        
+        XCTAssertEqual(try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key).count, 5)
+
+        // now try delete seed phrases
+        async let del5phrase = Task {
+            async let del1: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[0]);
+            async let del2: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[1]);
+            async let del3: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[2]);
+            async let del4: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[3]);
+            async let del5: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[4]);
+
+            return await [del1,del2,del3,del4,del5]
+        }.value
+
+        let _ = await del5phrase;
+        
+        XCTAssertEqual(try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key).count, 0)
+    }
+    
+    func testChangeSeedPhrases() async {
+        await changeSeedPhrases(true);
+        await changeSeedPhrases(false);
+    }
+    
+    func changeSeedPhrases(_ mode: Bool) async {
+        let seedPhraseList : [String] = ["climb crisp rare radio dress brother dolphin bless chase disagree force razor",
+                                             "giggle razor salon blouse result blouse urge burst urban rain blade decide",
+                                             "direct powder wasp shed lift machine feed lab range intact dish rigid",
+                                             "seed sock milk update focus rotate barely fade car face mechanic mercy",
+                                             "object brass success calm lizard science syrup planet exercise parade honey impulse"]
+        
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        let key_details = try! threshold_key.get_key_details()
+        XCTAssertEqual(key_details.total_shares, 2)
+        try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[0], number_of_wallets: 0)
+        var seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        XCTAssertEqual(seedResult.count, 1)
+
+        //change seed phrase 4 times sequentially, as the order needs to be ensured
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[0], new_phrase: seedPhraseList[1]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[1], new_phrase: seedPhraseList[2]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[2], new_phrase: seedPhraseList[3]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[3], new_phrase: seedPhraseList[4]);
+
+        
+        seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+        XCTAssertEqual(seedResult[0].seedPhrase, seedPhraseList[4])
+    }
+    
+    func testGetMetadata() async {
+        await get_metadata(true);
+        await get_metadata(false);
+    }
+
+    func get_metadata(_ mode: Bool) async {
         let key1 = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
