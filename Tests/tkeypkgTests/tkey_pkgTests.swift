@@ -255,22 +255,10 @@ final class tkey_pkgTests: XCTestCase {
         // generate new security share
         let _ = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: original_answer)
         async let change3answers = Task {
-            do {
-                async let new_share = try SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[0]);
-            } catch {
-                print("task 1 failed")
-            }
-            do {
-                async let new_share2 = try SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer[1]);
-            } catch {
-                print("task 2 failed")
-            }
-            
-            do {
-                async let new_share3 = try SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer[2]);
-            } catch {
-                print("task 3 failed")
-            }
+            async let new_share = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[0]);
+            async let new_share2 = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[1]);
+            async let new_share3 = try! SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer[2]);
+
 
             let key_details_2 = try! threshold_key.get_key_details()
             return key_details_2.total_shares
