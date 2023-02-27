@@ -18,48 +18,48 @@ final class tkey_pkgTests: XCTestCase {
     
     func generateDeleteShare(_ manual_sync: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let key1 = try! PrivateKey.generate()
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let key = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key.hex)
         let threshold_key = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: manual_sync)
 
-        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        let _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
             
         // Push 4 generate new shares to queue
-        let _ = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: "hello", answer: "bye");
-        let _ = try! await threshold_key.generate_new_share()
-        let _ = try! await threshold_key.generate_new_share()
-        let _ = try! await threshold_key.generate_new_share()
+        async let task = Task {
+            async let order1 = SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: "hello", answer: "bye");
+            async let order2 = threshold_key.generate_new_share()
+            async let order3 = threshold_key.generate_new_share()
+            async let order4 = threshold_key.generate_new_share()
+            return try await [order1, order2, order3, order4]
+        }
 
         // create one more new shares
         let new_share = try! await threshold_key.generate_new_share()
         
-        let key_details_2 = try! threshold_key.get_key_details()
-        let create4share = key_details_2.total_shares
-        
+        var details = try! threshold_key.get_key_details()
+        let totalShares = details.total_shares
         let share_index = new_share.hex;
-            
-        let numberofshares = create4share;
+        XCTAssertEqual(totalShares, 3)
         
-        XCTAssertEqual(numberofshares, 7)
-
-        _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        let _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        
         try! await threshold_key.delete_share(share_index: share_index)
-        let key_details_3 = try! threshold_key.get_key_details()
         
-        XCTAssertEqual(key_details_3.total_shares, 6)
-        do {
-            let _ = try threshold_key.output_share(shareIndex: share_index, shareType: nil)
-            XCTAssertTrue( false )
-        }catch {
-         // Should throw error
-        }
+        let _ = await task;
         
+        details = try! threshold_key.get_key_details()
+        
+        //Share total = (2 + 1 + 4) - 1 = 6
+        XCTAssertEqual(details.total_shares, 6)
+        
+        // should not be able to output a deleted share
+        XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
     }
 
     func testThresholdInputOutputShare() async {
