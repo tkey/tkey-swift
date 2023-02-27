@@ -43,12 +43,13 @@ final class tkey_pkgTests: XCTestCase {
         
         let new_share = try! await threshold_key.generate_new_share()
         let share_index = new_share.hex;
-
+        
         _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        
+        try! await threshold_key.delete_share(share_index: share_index)
         
         let _ = await create4share;
         
-        try! await threshold_key.delete_share(share_index: share_index)
         let key_details_3 = try! threshold_key.get_key_details()
         
         XCTAssertEqual(key_details_3.total_shares, 6)
