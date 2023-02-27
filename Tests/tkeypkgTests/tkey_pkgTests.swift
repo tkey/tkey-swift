@@ -48,10 +48,6 @@ final class tkey_pkgTests: XCTestCase {
         
         let _ = await create4share;
         
-        if manual_sync {
-            try! await threshold_key.sync_local_metadata_transistions()
-        }
-        
         try! await threshold_key.delete_share(share_index: share_index)
         let key_details_3 = try! threshold_key.get_key_details()
         
