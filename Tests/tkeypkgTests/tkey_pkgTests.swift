@@ -36,36 +36,30 @@ final class tkey_pkgTests: XCTestCase {
                 async let new_share2 = try! threshold_key.generate_new_share()
                 async let new_share3 = try! threshold_key.generate_new_share()
                 async let new_share4 = try! threshold_key.generate_new_share()
-                let key_details_2 = try! threshold_key.get_key_details()
-                return key_details_2.total_shares
+                return await [new_share,new_share2,new_share3,new_share4]
         }.value
         
-            
-        // create one more new shares
-        let new_share = try! await threshold_key.generate_new_share()
-//        let key_details_2 = try! threshold_key.get_key_details()
-        let share_index = new_share.hex;
-            
-        // await for previous promise to resolve
-        let numberofshares = await create4share;
+        XCTAssertEqual(try! threshold_key.get_key_details().total_shares, 2)
         
-        // create4share was executed before shares were generated
-        // Its possible that the following line will fail randomly. if it does, please inform CW
-        XCTAssertEqual(numberofshares, 2)
+        let new_share = try! await threshold_key.generate_new_share()
+        let share_index = new_share.hex;
 
         _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        
+        let _ = await create4share;
+        
+        if manual_sync {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         try! await threshold_key.delete_share(share_index: share_index)
         let key_details_3 = try! threshold_key.get_key_details()
         
         XCTAssertEqual(key_details_3.total_shares, 6)
-        do {
-            let _ = try threshold_key.output_share(shareIndex: share_index, shareType: nil)
-            XCTAssertTrue( false )
-        }catch {
-         // Should throw error
-        }
+        XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
         
     }
+    
     func testThresholdInputOutputShare() async {
         await thresholdInputOutputShare(false);
         await thresholdInputOutputShare(true);
@@ -88,6 +82,10 @@ final class tkey_pkgTests: XCTestCase {
 
         let shareOut = try! threshold_key.output_share(shareIndex: shareStore.hex, shareType: nil)
 
+        if mode {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         let threshold_key2 = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
@@ -135,23 +133,16 @@ final class tkey_pkgTests: XCTestCase {
         let security_input_share: Bool = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
         XCTAssertEqual(security_input_share, true)
 
-        do {
-            let result_1 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
-            XCTAssertTrue( false )
-        } catch {
-            
-        }
+        var input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: "ant man")
+        XCTAssertNil(input)
             
         
         // change answer for already existing question
         let change_answer_result = try! await SecurityQuestionModule.change_question_and_answer(threshold_key: threshold_key, questions: question, answer: answer_2)
         XCTAssertEqual(change_answer_result, true)
 
-        do {
-            let result_2 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertTrue( false )
-        }catch {
-        }
+        input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertNil(input)
         
         let security_input_share_2 = try! await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer_2)
         XCTAssertEqual(security_input_share_2, true)
@@ -165,10 +156,9 @@ final class tkey_pkgTests: XCTestCase {
         // delete newly security share
         try! await threshold_key.delete_share(share_index: share_index)
 
-        do {
-            let result_3 = try await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
-            XCTAssertTrue( false )
-        }catch{}
+        input = try? await SecurityQuestionModule.input_share(threshold_key: threshold_key, answer: answer)
+        XCTAssertNil(input)
+
     }
     
     func testGenerateMultipleQnA() async {
@@ -271,7 +261,6 @@ final class tkey_pkgTests: XCTestCase {
         let get_question = try! SecurityQuestionModule.get_questions(threshold_key: threshold_key)
         XCTAssertEqual(get_question, question)
         let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
-        // test failes?
         XCTAssertEqual(get_answer, answer[2])
         }
     
@@ -300,20 +289,28 @@ final class tkey_pkgTests: XCTestCase {
             enable_logging: true,
             manual_sync: false)
 
-        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+        if mode
+        {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
         
-        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
-        // Application would want to request a new share and wait for it as a task (potentially)
-        let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
+        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
+        let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
+        
         let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
         let encPubKey = lookup[0]
         let newShare = try! await threshold_key.generate_new_share()
 
         try! await ShareTransferModule.approve_request_with_share_index(threshold_key: threshold_key, enc_pub_key_x: encPubKey, share_index: newShare.hex)
-
+        
+        if mode
+        {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         _ = try! await ShareTransferModule.request_status_check(threshold_key: threshold_key2, enc_pub_key_x: request_enc, delete_request_on_completion: true)
-
+        
         let key_reconstruction_details_2 = try! await threshold_key2.reconstruct()
 
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details_2.key)
@@ -392,18 +389,16 @@ final class tkey_pkgTests: XCTestCase {
         let a = pklist
 
         //set private keys asynchronously
-
         async let set5keys = Task {
-            async let new_share1 = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[0], format: "secp256k1n")
-            async let new_share2 = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[1], format: "secp256k1n")
-            async let new_share3 = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[2], format: "secp256k1n")
-            async let new_share4 = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[3], format: "secp256k1n")
-            async let new_share5 = try! PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[4], format: "secp256k1n")
-
-        }
+            async let new_share1 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[0], format: "secp256k1n")
+            async let new_share2 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[1], format: "secp256k1n")
+            async let new_share3 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[2], format: "secp256k1n")
+            async let new_share4 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[3], format: "secp256k1n")
+            async let new_share5 = try? PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: a[4], format: "secp256k1n")
+            return await [new_share1,new_share2,new_share3,new_share4, new_share5]
+        }.value
         
         let _ = await set5keys
-        _ = try! await threshold_key.reconstruct()
         key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
         let pknum = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key).count
@@ -427,7 +422,7 @@ final class tkey_pkgTests: XCTestCase {
         
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         
-        let poly = try! await threshold_key.reconstruct_latest_poly()
+        let poly = try! threshold_key.reconstruct_latest_poly()
         
         let pub_poly = try! poly.getPublicPolynomial();
         let threshold_count = try! pub_poly.getThreshold();
@@ -546,38 +541,41 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(key_details.total_shares, 2)
 
         async let set5phrase = Task {
-            async let set1 = try! SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[0], number_of_wallets: 0);
-            async let set2 = try! SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[1], number_of_wallets: 0);
-            async let set3 = try! SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[2], number_of_wallets: 0);
-            async let set4 = try! SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[3], number_of_wallets: 0);
-            async let set5 = try! SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[4], number_of_wallets: 0);
+            async let set1: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[0], number_of_wallets: 0);
+            async let set2: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[1], number_of_wallets: 0);
+            async let set3: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[2], number_of_wallets: 0);
+            async let set4: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[3], number_of_wallets: 0);
+            async let set5: ()? = try? SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: seedPhraseList[4], number_of_wallets: 0);
 
-                let key_details_2 = try! threshold_key.get_key_details()
-                return key_details_2.total_shares
-        }
-//        Check the seedphrase module is empty
-        var seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
+            return await [set1,set2,set3,set4,set5]
+        }.value
+        
+        //Check the seedphrase module is empty
+        let seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult.count, 0)
         
         let _ = await set5phrase;
-        seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
-        XCTAssertEqual(seedResult.count, 5)
+        
+        if mode {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
+        XCTAssertEqual(try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key).count, 5)
 
         // now try delete seed phrases
         async let del5phrase = Task {
-            async let del1 = try! SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[0]);
-            async let del2 = try! SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[1]);
-            async let del3 = try! SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[2]);
-            async let del4 = try! SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[3]);
-            async let del5 = try! SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[4]);
+            async let del1: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[0]);
+            async let del2: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[1]);
+            async let del3: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[2]);
+            async let del4: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[3]);
+            async let del5: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[4]);
 
-            let key_details_2 = try! threshold_key.get_key_details()
-            return key_details_2.total_shares
-        }
+            return await [del1,del2,del3,del4,del5]
+        }.value
 
         let _ = await del5phrase;
-        seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
-        XCTAssertEqual(seedResult.count, 0)
+        
+        XCTAssertEqual(try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key).count, 0)
     }
     
     func testChangeSeedPhrases() async {
@@ -609,10 +607,10 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(seedResult.count, 1)
 
         //change seed phrase 4 times sequentially, as the order needs to be ensured
-        let change1 = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[0], new_phrase: seedPhraseList[1]);
-        let change2 = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[1], new_phrase: seedPhraseList[2]);
-        let change3 = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[2], new_phrase: seedPhraseList[3]);
-        let change4 = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[3], new_phrase: seedPhraseList[4]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[0], new_phrase: seedPhraseList[1]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[1], new_phrase: seedPhraseList[2]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[2], new_phrase: seedPhraseList[3]);
+        let _ = try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseList[3], new_phrase: seedPhraseList[4]);
 
         
         seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
