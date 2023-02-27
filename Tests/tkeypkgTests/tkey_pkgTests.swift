@@ -405,12 +405,12 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(pknum, 5)
     }
     
-    func testPolynomialModule() async {
-        await polynomialModule(true);
-        await polynomialModule(false);
+    func testPolynomial() async {
+        await polynomial(true);
+        await polynomial(false);
     }
 
-    func polynomialModule(_ mode: Bool) async {
+    func polynomial(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
