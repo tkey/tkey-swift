@@ -82,6 +82,7 @@ final class tkey_pkgTests: XCTestCase {
 
         let shareOut = try! threshold_key.output_share(shareIndex: shareStore.hex, shareType: nil)
 
+        // we initialize new thresholdkey with existing storage layer, so we sync here if manual sync is false
         if mode {
             try! await threshold_key.sync_local_metadata_transistions()
         }
@@ -90,7 +91,7 @@ final class tkey_pkgTests: XCTestCase {
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false)
+            manual_sync: mode)
 
         _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
@@ -556,9 +557,7 @@ final class tkey_pkgTests: XCTestCase {
         
         let _ = await set5phrase;
         
-        if mode {
-            try! await threshold_key.sync_local_metadata_transistions()
-        }
+
         
         XCTAssertEqual(try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key).count, 5)
 
