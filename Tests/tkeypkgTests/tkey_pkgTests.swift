@@ -43,17 +43,17 @@ final class tkey_pkgTests: XCTestCase {
         
         let new_share = try! await threshold_key.generate_new_share()
         let share_index = new_share.hex;
-
+        
         _ = try! threshold_key.output_share(shareIndex: share_index, shareType: nil)
+        
+        try! await threshold_key.delete_share(share_index: share_index)
         
         let _ = await create4share;
         
-        try! await threshold_key.delete_share(share_index: share_index)
         let key_details_3 = try! threshold_key.get_key_details()
         
         XCTAssertEqual(key_details_3.total_shares, 6)
         XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
-        
     }
     
     func testThresholdInputOutputShare() async {
@@ -120,7 +120,6 @@ final class tkey_pkgTests: XCTestCase {
         let answer_2 = "captain america"
 
         // generate new security share
-        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
         let new_share = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer)
         let share_index = new_share.hex
 
@@ -474,10 +473,7 @@ final class tkey_pkgTests: XCTestCase {
         let seedPhraseToSet = "seed sock milk update focus rotate barely fade car face mechanic mercy"
         let seedPhraseToSet2 = "object brass success calm lizard science syrup planet exercise parade honey impulse"
         
-        // TODO: convert the following into a task. This will guarantee that async fns are executed in order using tkeyQueue.
-
-        
-//        Check the seedphrase module is empty
+//      Check the seedphrase module is empty
         let seedResult = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult.count, 0 )
 

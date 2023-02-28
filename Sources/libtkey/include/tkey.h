@@ -70,7 +70,6 @@
         void share_store_map_free(struct ShareStoreMap* ptr);
         char* share_store_poly_id_index_map_get_keys(struct ShareStorePolyIDShareIndexMap* map, int* error_code);
         struct ShareStoreMap* share_store_poly_id_index_map_get_value_by_key(struct ShareStorePolyIDShareIndexMap* map, char* key, int* error_code);
-        void  share_store_map_free(struct ShareStoreMap* ptr);
         char* generate_new_share_store_result_get_shares_index(struct GenerateShareStoreResult* result,int* error_code);
         struct ShareStoreMap* generate_new_share_store_result_get_share_store_map(struct GenerateShareStoreResult* result,int* error_code);
         void generate_share_store_result_free(struct GenerateShareStoreResult* ptr);
@@ -154,7 +153,7 @@
         char* share_serialization_serialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
         char* share_serialization_deserialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
         // share store array
-        int share_stores_get_len(struct ShareStoreArray* share_stores, int* error_code);
+        int share_store_array_get_len(struct ShareStoreArray* share_stores, int* error_code);
         struct ShareStore* share_store_array_get_value_by_index(struct ShareStoreArray* share_stores, int index, int* error_code);
         void share_store_array_free(struct ShareStoreArray* ptr);
         // key point array

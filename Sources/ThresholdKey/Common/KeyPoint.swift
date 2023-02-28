@@ -17,6 +17,19 @@ public final class KeyPoint {
         self.pointer = pointer
     }
     
+    public init(x: String, y: String) throws {
+        var errorCode: Int32 = -1
+        let xPtr = UnsafeMutablePointer<Int8>(mutating: (x as NSString).utf8String)
+        let yPtr = UnsafeMutablePointer<Int8>(mutating: (y as NSString).utf8String)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            key_point_new(xPtr, yPtr, error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in KeyPoint, new")
+            }
+        pointer = result;
+    }
+    
     public func getX() throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -33,10 +46,10 @@ public final class KeyPoint {
     public func getY() throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            key_point_get_x(pointer, error)
+            key_point_get_y(pointer, error)
                 })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in KeyPoint, field X")
+            throw RuntimeError("Error in KeyPoint, field Y")
             }
         let y = String.init(cString: result!)
         string_free(result)
