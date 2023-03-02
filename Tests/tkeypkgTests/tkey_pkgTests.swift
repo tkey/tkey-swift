@@ -88,7 +88,26 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(key_detail_2.total_shares, 3)
         
     }
-    
+    //    func testDeleteTkey() async {
+    //        await shareDescription(false);
+    //        await shareDescription(true);
+    //    }
+    //
+    //    func deleteTkey(_ mode: Bool) async {
+    //        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+    //        let key1 = try! PrivateKey.generate()
+    //        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+    //        let threshold_key = try! ThresholdKey(
+    //            storage_layer: storage_layer,
+    //            service_provider: service_provider,
+    //            enable_logging: true,
+    //            manual_sync: mode)
+    //
+    //        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+    //        let key_reconstruction_details = try! await threshold_key.reconstruct()
+    //
+    //
+    //    }
     
     func testThresholdInputOutputShare() async {
         await thresholdInputOutputShare(false);
@@ -472,11 +491,56 @@ final class tkey_pkgTests: XCTestCase {
             try! await threshold_key.sync_local_metadata_transistions()
         }
         
+        // adding custom info should work
+        _ = try! await ShareTransferModule.add_custom_info_to_request(threshold_key: threshold_key2, enc_pub_key_x: request_enc, custom_info: "test info")
+        
         _ = try! await ShareTransferModule.request_status_check(threshold_key: threshold_key2, enc_pub_key_x: request_enc, delete_request_on_completion: true)
         
         let key_reconstruction_details_2 = try! await threshold_key2.reconstruct()
 
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details_2.key)
+    }
+    
+    func testdeleteShare() async {
+        await deleteShare(true)
+        await deleteShare(false)
+    }
+
+    func deleteShare(_ mode: Bool) async {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+
+        let threshold_key2 = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: false)
+
+        if mode{
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
+        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+
+        _ = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key, user_agent: "user_agent", available_share_indexes: "[]")
+        let request = try! await ShareTransferModule.get_store(threshold_key: threshold_key)
+        
+        //set store to other tkey with no error
+        _ = try! await ShareTransferModule.set_store(threshold_key: threshold_key2, store: request)
+        let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
+        
+        // should be able to delete share request created from device 1
+        _ = try! await ShareTransferModule.delete_store(threshold_key: threshold_key, enc_pub_key_x: lookup[0])
+        _ = try! await ShareTransferModule.get_store(threshold_key: threshold_key)
     }
     
     func testPrivateKeyModule() async {
@@ -593,6 +657,9 @@ final class tkey_pkgTests: XCTestCase {
         
         // get all share store
         let share_store = try! threshold_key.get_all_share_stores_for_latest_polynomial();
+        let store = try! share_store.getShareStoreAtIndex(index: 0)
+        print(try! store.polynomial_id())
+        
         let length = try! share_store.getShareStoreArrayLength()
         XCTAssertEqual( length, 2 );
         
