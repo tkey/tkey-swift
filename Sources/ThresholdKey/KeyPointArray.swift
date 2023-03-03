@@ -43,7 +43,7 @@ public class KeyPointArray {
         }
     }
     
-    public func udpateKeyPoint(point: KeyPoint, index: Int32) throws {
+    public func updateKeyPoint(point: KeyPoint, index: Int32) throws {
         var errorCode: Int32 = -1
         
         withUnsafeMutablePointer(to: &errorCode, { error in

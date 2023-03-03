@@ -57,8 +57,8 @@ final class tkey_pkgTests: XCTestCase {
     }
     
     func testDeleteTkey() async {
-        await shareDescription(false);
-        await shareDescription(true);
+        await deleteTkey(false);
+        await deleteTkey(true);
     }
 
     func deleteTkey(_ mode: Bool) async {
@@ -74,6 +74,10 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! await threshold_key.reconstruct()
         
+        if mode {
+            try! await threshold_key.sync_local_metadata_transistions()
+        }
+        
         try! await threshold_key.delete_tkey()
         
         let threshold_key2 = try! ThresholdKey(
@@ -86,28 +90,7 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key2.generate_new_share()
         let key_detail_2 = try! threshold_key2.get_key_details()
         XCTAssertEqual(key_detail_2.total_shares, 3)
-        
     }
-    //    func testDeleteTkey() async {
-    //        await shareDescription(false);
-    //        await shareDescription(true);
-    //    }
-    //
-    //    func deleteTkey(_ mode: Bool) async {
-    //        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-    //        let key1 = try! PrivateKey.generate()
-    //        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
-    //        let threshold_key = try! ThresholdKey(
-    //            storage_layer: storage_layer,
-    //            service_provider: service_provider,
-    //            enable_logging: true,
-    //            manual_sync: mode)
-    //
-    //        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
-    //        let key_reconstruction_details = try! await threshold_key.reconstruct()
-    //
-    //
-    //    }
     
     func testThresholdInputOutputShare() async {
         await thresholdInputOutputShare(false);
@@ -206,6 +189,19 @@ final class tkey_pkgTests: XCTestCase {
         let new_share = try! await threshold_key.generate_new_share();
 
         let store = try! threshold_key.output_share_store(shareIndex: new_share.hex, polyId: nil)
+        
+        // do basic sharestore test here
+        do {
+            XCTAssertNotNil(store.pointer)
+            let jsonString = try store.toJsonString()
+            XCTAssertNotNil(jsonString)
+            let shareValue = try store.share()
+            XCTAssertNotNil(shareValue)
+            let idx = try store.share_index()
+            XCTAssertEqual(idx, new_share.hex)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
 
         if mode {
             try! await threshold_key.sync_local_metadata_transistions()
@@ -221,6 +217,33 @@ final class tkey_pkgTests: XCTestCase {
         let key_reconstruction_details2 = try! await threshold_key2.reconstruct()
         
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details2.key)
+    }
+    
+    func testShareToShareStore() async {
+        await shareToShareStore(true)
+        await shareToShareStore(false)
+    }
+    func shareToShareStore(_ mode: Bool) async {
+        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let key1 = try! PrivateKey.generate()
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let threshold_key = try! ThresholdKey(
+            storage_layer: storage_layer,
+            service_provider: service_provider,
+            enable_logging: true,
+            manual_sync: mode)
+
+        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        let share = try! await threshold_key.generate_new_share()
+        let shareOut = try! threshold_key.output_share(shareIndex: share.hex, shareType: nil)
+        let shareStore = try! threshold_key.share_to_share_store(share: shareOut)
+        
+        // check reconstruction works
+        
+        try! await threshold_key.input_share_store(shareStore: shareStore)
+        try! await threshold_key.reconstruct()
+        let keyDetail = try! threshold_key.get_key_details()
+        XCTAssertEqual(keyDetail.total_shares, 3)
     }
     
     func testTkeyStoreMethods() async {
@@ -444,6 +467,11 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(get_question, question)
         let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
         XCTAssertEqual(get_answer, answer[2])
+        
+        _ = try! await SecurityQuestionModule.store_answer(threshold_key: threshold_key, answer: "test")
+        let answer2 = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
+        XCTAssertEqual("test", answer2)
+
         }
     
     func testThresholdShareTransfer() async {
@@ -479,7 +507,6 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
 
         let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
-        
         let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
         let encPubKey = lookup[0]
         let newShare = try! await threshold_key.generate_new_share()
@@ -538,6 +565,11 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await ShareTransferModule.set_store(threshold_key: threshold_key2, store: request)
         let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
         
+        let encPubKey = lookup[0]
+        let newShare = try! await threshold_key.generate_new_share()
+        let store = try! threshold_key.output_share_store(shareIndex: newShare.hex, polyId: nil)
+
+        try! await ShareTransferModule.approve_request(threshold_key: threshold_key, enc_pub_key_x: encPubKey, share_store: store)
         // should be able to delete share request created from device 1
         _ = try! await ShareTransferModule.delete_store(threshold_key: threshold_key, enc_pub_key_x: lookup[0])
         _ = try! await ShareTransferModule.get_store(threshold_key: threshold_key)
@@ -681,6 +713,26 @@ final class tkey_pkgTests: XCTestCase {
             XCTAssertNotNil(try! point.getY());
             try! points_arr.insertKeyPoint(point: point);
         }
+        
+        let len = try! points_arr.getKeyPointArrayLength()
+        XCTAssertEqual(len, 3)
+        
+        // simple update test
+        for item in share_map.share_map {
+            let share_index = item.key;
+            
+            let pub_poly = try! poly.getPublicPolynomial();
+            let point = try! pub_poly.polyCommitmentEval(index: share_index);
+            XCTAssertNotNil(try! point.getX());
+            XCTAssertNotNil(try! point.getY());
+            try! points_arr.updateKeyPoint(point: point, index: 0)
+        }
+        
+        // remove test
+        _ = try! points_arr.removeKeyPoint(index: 2)
+        let len2 = try! points_arr.getKeyPointArrayLength()
+        XCTAssertEqual(len2, 2)
+        
         
         let lagrange_poly = try! Lagrange.lagrange(points: points_arr);
         XCTAssertNotNil(lagrange_poly);

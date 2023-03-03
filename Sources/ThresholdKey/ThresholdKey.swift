@@ -413,7 +413,7 @@ public class ThresholdKey {
             threshold_key_get_shares_indexes(pointer, error )
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ThresholdKey generate_new_share")
+            throw RuntimeError("Error in ThresholdKey get_share_indexes")
         }
 
         let string = String.init(cString: result!)
