@@ -53,6 +53,11 @@ final class tkey_pkgTests: XCTestCase {
         let key_details_3 = try! threshold_key.get_key_details()
         
         XCTAssertEqual(key_details_3.total_shares, 6)
+        let getShareResult = try! threshold_key.get_shares()
+        for item in getShareResult.share_maps {
+            print(item)
+        }
+        
         XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
     }
     
