@@ -54,9 +54,6 @@ final class tkey_pkgTests: XCTestCase {
         
         XCTAssertEqual(key_details_3.total_shares, 6)
         let getShareResult = try! threshold_key.get_shares()
-        for item in getShareResult.share_maps {
-            print(item)
-        }
         
         XCTAssertNil(try? threshold_key.output_share(shareIndex: share_index, shareType: nil))
     }
@@ -274,16 +271,12 @@ final class tkey_pkgTests: XCTestCase {
         
         let tkeyStore = try! threshold_key.get_tkey_store(moduleName: "seedPhraseModule")
         if let data = tkeyStore.data(using: .utf8) {
-          do {
-            if let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]],
-               let firstObject = jsonArray.first,
-               let id = firstObject["id"] as? String {
+            if let jsonArray = try! JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]],
+                let firstObject = jsonArray.first,
+                let id = firstObject["id"] as? String {
                 let tkey_store_item = try? threshold_key.get_tkey_store_item(moduleName: "seedPhraseModule", id: id)
                 XCTAssertNotEqual(tkey_store_item, nil)
             }
-          } catch {
-            print(error.localizedDescription)
-          }
         }
     }
     
@@ -533,12 +526,12 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details_2.key)
     }
     
-    func testdeleteShare() async {
-        await deleteShare(true)
-        await deleteShare(false)
+    func tesshareTransferModuleDeleteStore() async {
+        await shareTransferModuleDeleteStore(true)
+        await shareTransferModuleDeleteStore(false)
     }
 
-    func deleteShare(_ mode: Bool) async {
+    func shareTransferModuleDeleteStore(_ mode: Bool) async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
 
         let key1 = try! PrivateKey.generate()
@@ -695,7 +688,6 @@ final class tkey_pkgTests: XCTestCase {
         // get all share store
         let share_store = try! threshold_key.get_all_share_stores_for_latest_polynomial();
         let store = try! share_store.getShareStoreAtIndex(index: 0)
-        print(try! store.polynomial_id())
         
         let length = try! share_store.getShareStoreArrayLength()
         XCTAssertEqual( length, 2 );
