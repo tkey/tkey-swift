@@ -149,6 +149,8 @@
         char* share_map_get_share_by_key(struct ShareMap* share_map, char* key, int* error_code);
         //LocalMetadataTransitions
         void local_metadata_transitions_free(struct LocalMetadataTransitions* transitions);
+        struct LocalMetadataTransitions* local_metadata_transitions_from_json(char* json, int* error_code);
+        char* local_metadata_transitions_to_json(struct LocalMetadataTransitions* local_metadata_transitions, int* error_code);
         //share serialization
         char* share_serialization_serialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
         char* share_serialization_deserialize_share(struct FFIThresholdKey* threshold_key, char* share, char* format, int* error_code);
