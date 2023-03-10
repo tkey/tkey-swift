@@ -471,7 +471,7 @@ public class ThresholdKey {
         return LocalMetadataTransitions.init(pointer: result!)
     }
     
-    public func get_tkey_store(moduleName: String) throws -> String  {
+    public func get_tkey_store(moduleName: String) throws -> [[String:Any]]  {
         var errorCode: Int32  = -1
         
         let modulePointer = UnsafeMutablePointer<Int8>(mutating: (moduleName as NSString).utf8String)
@@ -485,7 +485,19 @@ public class ThresholdKey {
 
         let string = String.init(cString: result!)
         string_free(result)
-        return string
+        guard let data = string.data(using: .utf8) else {
+            throw RuntimeError("Error in converting string to data")
+        }
+
+        do {
+            if let jsonArray = try! JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]] {
+                return jsonArray
+            } else {
+                throw RuntimeError("Error in converting JSON to dictionary")
+            }
+        } catch {
+            throw RuntimeError("Error in JSONSerialization: \(error.localizedDescription)")
+        }
     }
     
     public func get_tkey_store_item(moduleName: String, id: String) throws -> String {

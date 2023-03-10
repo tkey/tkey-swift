@@ -266,14 +266,9 @@ final class tkey_pkgTests: XCTestCase {
         let _ = try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: "seed sock milk update focus rotate barely fade car face mechanic mercy", number_of_wallets: 0)
         
         let tkeyStore = try! threshold_key.get_tkey_store(moduleName: "seedPhraseModule")
-        if let data = tkeyStore.data(using: .utf8) {
-            if let jsonArray = try! JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]],
-                let firstObject = jsonArray.first,
-                let id = firstObject["id"] as? String {
-                let tkey_store_item = try? threshold_key.get_tkey_store_item(moduleName: "seedPhraseModule", id: id)
-                XCTAssertNotEqual(tkey_store_item, nil)
-            }
-        }
+        let id = tkeyStore[0]["id"] as? String ?? ""
+        let tkey_store_item = try? threshold_key.get_tkey_store_item(moduleName: "seedPhraseModule", id: id)
+        XCTAssertNotEqual(tkey_store_item, nil)
     }
     
     func testTkeyEncryptDecrypt() async {
