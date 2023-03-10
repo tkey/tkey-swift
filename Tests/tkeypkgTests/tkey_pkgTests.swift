@@ -906,8 +906,15 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         let key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
+        // share serialization with private key, test with mnemonic format
         let phrase = try! ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: key1.hex, format: "mnemonic")
         let key2 = try! ShareSerializationModule.deserialize_share(threshold_key: threshold_key, share: phrase, format: "mnemonic")
         XCTAssertEqual(key1.hex, key2)
+        
+        // share serialization with share, test with nil type format
+        let share = try! await threshold_key.generate_new_share()
+        let phrase2 = try! ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: share.hex, format: nil)
+        let key3 = try! ShareSerializationModule.deserialize_share(threshold_key: threshold_key, share: phrase2, format: nil)
+        XCTAssertEqual(share.hex, key3)
     }
 }
