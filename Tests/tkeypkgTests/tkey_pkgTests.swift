@@ -193,17 +193,10 @@ final class tkey_pkgTests: XCTestCase {
         let store = try! threshold_key.output_share_store(shareIndex: new_share.hex, polyId: nil)
         
         // do basic sharestore test here
-        do {
-            XCTAssertNotNil(store.pointer)
-            let jsonString = try store.toJsonString()
-            XCTAssertNotNil(jsonString)
-            let shareValue = try store.share()
-            XCTAssertNotNil(shareValue)
-            let idx = try store.share_index()
+            let jsonString = try! store.toJsonString()
+            let shareValue = try! store.share()
+            let idx = try! store.share_index()
             XCTAssertEqual(idx, new_share.hex)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
 
         if mode {
             try! await threshold_key.sync_local_metadata_transistions()
