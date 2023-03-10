@@ -553,19 +553,32 @@ public class ThresholdKey {
         }
     }
 
-    public func get_share_descriptions() throws -> String  {
-        var errorCode: Int32  = -1
-        
-        let result = withUnsafeMutablePointer(to: &errorCode, {error in
+    public func get_share_descriptions() throws -> [String: [String]] {
+        var errorCode: Int32 = -1
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_share_descriptions(pointer, error)
         })
+
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_share_descriptions")
         }
 
         let string = String.init(cString: result!)
         string_free(result)
-        return string
+
+        guard let data = string.data(using: .utf8) else {
+            throw RuntimeError("Error in converting string to data")
+        }
+
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String]] {
+                return json
+            } else {
+                throw RuntimeError("Error in converting JSON to dictionary")
+            }
+        } catch {
+            throw RuntimeError("Error in JSONSerialization: \(error.localizedDescription)")
+        }
     }
     
     private func add_share_description(key: String, description: String, update_metadata: Bool, completion: @escaping (Result<(), Error>) -> Void) {

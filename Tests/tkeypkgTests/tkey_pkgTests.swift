@@ -158,15 +158,15 @@ final class tkey_pkgTests: XCTestCase {
         let new_description = "new test share description"
         _ = try! await threshold_key.add_share_description(key: key, description: old_description)
         let share_description_1 = try! threshold_key.get_share_descriptions()
-        XCTAssertEqual(share_description_1, "{\"test share\":[\"test share description\"]}")
+        XCTAssertEqual(share_description_1["test share"], ["test share description"])
 
         _ = try! await threshold_key.update_share_description(key: key, oldDescription: old_description, newDescription: new_description)
         let share_description_2 = try! threshold_key.get_share_descriptions()
-        XCTAssertEqual(share_description_2, "{\"test share\":[\"new test share description\"]}")
-        
+        XCTAssertEqual(share_description_2["test share"], ["new test share description"])
+
         _ = try! await threshold_key.delete_share_description(key: key, description: new_description)
         let share_description_3 = try! threshold_key.get_share_descriptions()
-        XCTAssertEqual(share_description_3, "{\"test share\":[]}")
+        XCTAssertEqual(share_description_3["test share"], [])
     }
     
     func testShareStore() async {
