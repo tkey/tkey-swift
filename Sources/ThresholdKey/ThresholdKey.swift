@@ -485,19 +485,9 @@ public class ThresholdKey {
 
         let string = String.init(cString: result!)
         string_free(result)
-        guard let data = string.data(using: .utf8) else {
-            throw RuntimeError("Error in converting string to data")
-        }
-
-        do {
-            if let jsonArray = try! JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]] {
-                return jsonArray
-            } else {
-                throw RuntimeError("Error in converting JSON to dictionary")
-            }
-        } catch {
-            throw RuntimeError("Error in JSONSerialization: \(error.localizedDescription)")
-        }
+        
+        let jsonArray = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!, options: .allowFragments) as! [[String:Any]]
+        return jsonArray
     }
     
     public func get_tkey_store_item(moduleName: String, id: String) throws -> String {
@@ -577,20 +567,9 @@ public class ThresholdKey {
 
         let string = String.init(cString: result!)
         string_free(result)
-
-        guard let data = string.data(using: .utf8) else {
-            throw RuntimeError("Error in converting string to data")
-        }
-
-        do {
-            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String]] {
-                return json
-            } else {
-                throw RuntimeError("Error in converting JSON to dictionary")
-            }
-        } catch {
-            throw RuntimeError("Error in JSONSerialization: \(error.localizedDescription)")
-        }
+        
+        let json = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!, options: .allowFragments) as! [String: [String]]
+        return json
     }
     
     private func add_share_description(key: String, description: String, update_metadata: Bool, completion: @escaping (Result<(), Error>) -> Void) {
