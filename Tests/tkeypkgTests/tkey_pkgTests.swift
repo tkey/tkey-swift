@@ -604,9 +604,6 @@ final class tkey_pkgTests: XCTestCase {
         let result = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result.count, 0)
         
-        var pknum = try! PrivateKeysModule.get_private_keys(threshold_key: threshold_key).count
-        XCTAssertEqual(pknum, 2)
-
         let key_module = try! PrivateKey.generate()
         let key_module2 = try! PrivateKey.generate()
         // Done setup
@@ -619,7 +616,9 @@ final class tkey_pkgTests: XCTestCase {
         _ = try! await PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: key_module2.hex, format: "secp256k1n")
         let result_2 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
         XCTAssertEqual(result_2, [key_module.hex, key_module2.hex])
-
+        var pknum = try! PrivateKeysModule.get_private_keys(threshold_key: threshold_key)
+        print(pknum)
+        XCTAssertEqual(pknum.count, 2)
         // Try set privateKey module with nil key
         _ = try! await PrivateKeysModule.set_private_key(threshold_key: threshold_key, key: nil, format: "secp256k1n")
         let result_3 = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key)
