@@ -788,7 +788,7 @@ final class tkey_pkgTests: XCTestCase {
         XCTAssertEqual(seedResult_2[0].seedPhrase, seedPhraseToSet )
 
         do {
-            try await SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseToSet2)
+            try await SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseToSet2)
             XCTAssertTrue( false )
         }catch{}
 //        Try delete unknown seedphrase - expect fail
@@ -860,11 +860,11 @@ final class tkey_pkgTests: XCTestCase {
 
         // now try delete seed phrases
         async let del5phrase = Task {
-            async let del1: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[0]);
-            async let del2: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[1]);
-            async let del3: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[2]);
-            async let del4: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[3]);
-            async let del5: ()? = try? SeedPhraseModule.delete_seedphrase(threshold_key: threshold_key, phrase: seedPhraseList[4]);
+            async let del1: ()? = try? SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseList[0]);
+            async let del2: ()? = try? SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseList[1]);
+            async let del3: ()? = try? SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseList[2]);
+            async let del4: ()? = try? SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseList[3]);
+            async let del5: ()? = try? SeedPhraseModule.delete_seed_phrase(threshold_key: threshold_key, phrase: seedPhraseList[4]);
 
             return await [del1,del2,del3,del4,del5]
         }.value

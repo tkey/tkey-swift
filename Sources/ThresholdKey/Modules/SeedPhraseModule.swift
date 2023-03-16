@@ -106,7 +106,7 @@ public final class SeedPhraseModule {
     }
 
     
-    private static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func delete_seed_phrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
@@ -125,10 +125,10 @@ public final class SeedPhraseModule {
         }
     }
     
-    public static func delete_seedphrase(threshold_key: ThresholdKey, phrase: String ) async throws {
+    public static func delete_seed_phrase(threshold_key: ThresholdKey, phrase: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            delete_seedphrase(threshold_key: threshold_key, phrase: phrase) {
+            delete_seed_phrase(threshold_key: threshold_key, phrase: phrase) {
                 result in
                 switch result {
                 case .success(let result):
