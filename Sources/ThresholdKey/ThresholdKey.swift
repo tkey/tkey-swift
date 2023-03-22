@@ -413,7 +413,7 @@ public class ThresholdKey {
             threshold_key_get_shares_indexes(pointer, error )
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ThresholdKey generate_new_share")
+            throw RuntimeError("Error in ThresholdKey get_share_indexes")
         }
 
         let string = String.init(cString: result!)
@@ -471,7 +471,7 @@ public class ThresholdKey {
         return LocalMetadataTransitions.init(pointer: result!)
     }
     
-    public func get_tkey_store(moduleName: String) throws -> String  {
+    public func get_tkey_store(moduleName: String) throws -> [[String:Any]]  {
         var errorCode: Int32  = -1
         
         let modulePointer = UnsafeMutablePointer<Int8>(mutating: (moduleName as NSString).utf8String)
@@ -485,7 +485,9 @@ public class ThresholdKey {
 
         let string = String.init(cString: result!)
         string_free(result)
-        return string
+        
+        let jsonArray = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!, options: .allowFragments) as! [[String:Any]]
+        return jsonArray
     }
     
     public func get_tkey_store_item(moduleName: String, id: String) throws -> String {
@@ -553,19 +555,21 @@ public class ThresholdKey {
         }
     }
 
-    public func get_share_descriptions() throws -> String  {
-        var errorCode: Int32  = -1
-        
-        let result = withUnsafeMutablePointer(to: &errorCode, {error in
+    public func get_share_descriptions() throws -> [String: [String]] {
+        var errorCode: Int32 = -1
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_share_descriptions(pointer, error)
         })
+
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_share_descriptions")
         }
 
         let string = String.init(cString: result!)
         string_free(result)
-        return string
+        
+        let json = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!, options: .allowFragments) as! [String: [String]]
+        return json
     }
     
     private func add_share_description(key: String, description: String, update_metadata: Bool, completion: @escaping (Result<(), Error>) -> Void) {
