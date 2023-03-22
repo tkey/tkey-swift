@@ -50,7 +50,7 @@ public final class PrivateKeysModule {
         }
     }
     
-    public static func get_private_keys(threshold_key: ThresholdKey) throws -> [[String:String]] {
+    public static func get_private_keys(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             private_keys_get_private_keys(threshold_key.pointer, error)
@@ -59,9 +59,8 @@ public final class PrivateKeysModule {
             throw RuntimeError("Error in PrivateKeysModule, private_keys_get_private_keys")
             }
         let json = String.init(cString: result!)
-        let keys = try! JSONSerialization.jsonObject(with: json.data(using: String.Encoding.utf8)!, options: .allowFragments) as! [[String:String]]
         string_free(result)
-        return keys
+        return json
     }
 
     public static func get_private_key_accounts(threshold_key: ThresholdKey) throws -> [String] {
