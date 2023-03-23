@@ -10,6 +10,12 @@ import Foundation
     import lib
 #endif
 
+public struct KeyData: Decodable {
+    let id: String
+    let privateKey: String
+    let type: String
+}
+
 public final class PrivateKeysModule {
     
     private static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, completion: @escaping (Result<Bool, Error>) -> Void) {
@@ -50,7 +56,7 @@ public final class PrivateKeysModule {
         }
     }
     
-    public static func get_private_keys(threshold_key: ThresholdKey) throws -> [[String:String]] {
+    public static func get_private_keys(threshold_key: ThresholdKey) throws -> [KeyData] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             private_keys_get_private_keys(threshold_key.pointer, error)
@@ -59,7 +65,8 @@ public final class PrivateKeysModule {
             throw RuntimeError("Error in PrivateKeysModule, private_keys_get_private_keys")
             }
         let json = String.init(cString: result!)
-        let keys = try! JSONSerialization.jsonObject(with: json.data(using: String.Encoding.utf8)!, options: .allowFragments) as! [[String:String]]
+        let jsonData = json.data(using: String.Encoding.utf8)!
+        let keys: [KeyData] = try! JSONDecoder().decode([KeyData].self, from: jsonData)
         string_free(result)
         return keys
     }
