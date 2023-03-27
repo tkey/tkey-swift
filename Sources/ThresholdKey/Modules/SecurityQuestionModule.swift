@@ -58,6 +58,9 @@ public final class SecurityQuestionModule {
                     security_question_input_share(threshold_key.pointer, answerPointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
+                    if errorCode == 2103 || errorCode == 2101 {
+                        return completion(.success(result))
+                    }
                     throw RuntimeError("Error in SecurityQuestionModule, input_share")
                     }
                 completion(.success(result))

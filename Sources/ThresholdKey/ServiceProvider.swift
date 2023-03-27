@@ -14,10 +14,6 @@ public final class ServiceProvider {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
-    public init(pointer: OpaquePointer) {
-        self.pointer = pointer
-    }
-
     public init(enable_logging: Bool, postbox_key: String) throws {
         var errorCode: Int32 = -1
         let postboxPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: postbox_key).utf8String)
