@@ -133,7 +133,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
         XCTAssertNotEqual(reconstruct1.key, reconstruct2.key)
     }
     
-    func test_encrypt_decrupt() async {
+    func test_encrypt_decrypt() async {
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let key1 = try! PrivateKey.generate()
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
