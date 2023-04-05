@@ -18,7 +18,7 @@ public class ShareStoreArray {
         self.pointer = pointer
     }
     
-    public func getShareStoreAtIndex(index: Int32) throws -> ShareStore {
+    public func getAt(index: Int32) throws -> ShareStore {
         var errorCode: Int32 = -1
         
         let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -30,7 +30,7 @@ public class ShareStoreArray {
         return ShareStore.init(pointer: share_store!);
     }
     
-    public func getShareStoreArrayLength() throws -> Int32{
+    public func length() throws -> Int32{
         var errorCode: Int32 = -1
         
         let share_stores_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
