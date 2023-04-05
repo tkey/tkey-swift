@@ -18,6 +18,10 @@ public final class PrivateKey {
         hex = String.init(cString: pointer)
         string_free(pointer)
     }
+    
+    public init(hex: String) {
+        self.hex = hex
+    }
 
     public static func generate() throws -> PrivateKey {
         var errorCode: Int32 = -1

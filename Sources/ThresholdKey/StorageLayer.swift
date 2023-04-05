@@ -27,10 +27,6 @@ public final class StorageLayer {
     // tracking this object is not necessary in swift as it maintains context
     // on entry for the callback
     private var obj_ref: UnsafeMutableRawPointer?
-    
-    public init(pointer: OpaquePointer) {
-        self.pointer = pointer
-    }
 
     /* for multipart form data
     static func createMultipartBody(data: Data, boundary: String, file: String) -> Data {

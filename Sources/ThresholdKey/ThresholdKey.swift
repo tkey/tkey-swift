@@ -14,10 +14,6 @@ public class ThresholdKey {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
     internal let tkeyQueue = DispatchQueue(label: "thresholdkey.queue")
-    
-    init(pointer: OpaquePointer) {
-        self.pointer = pointer
-    }
 
     public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool) throws {
         var errorCode: Int32 = -1
@@ -490,7 +486,7 @@ public class ThresholdKey {
         return jsonArray
     }
     
-    public func get_tkey_store_item(moduleName: String, id: String) throws -> String {
+    public func get_tkey_store_item(moduleName: String, id: String) throws -> [String:Any] {
         var errorCode: Int32  = -1
         let modulePointer = UnsafeMutablePointer<Int8>(mutating: (moduleName as NSString).utf8String)
         
@@ -504,7 +500,9 @@ public class ThresholdKey {
         }
         let string = String.init(cString: result!)
         string_free(result)
-        return string
+        
+        let json = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!, options: .allowFragments) as! [String:Any]
+        return json
     }
     
 

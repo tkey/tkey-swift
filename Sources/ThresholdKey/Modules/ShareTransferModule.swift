@@ -296,6 +296,9 @@ public final class ShareTransferModule {
             share_transfer_get_current_encryption_key(threshold_key.pointer, error)
                 })
         guard errorCode == 0 else {
+            if errorCode == 6 {
+                return ""
+            }
             throw RuntimeError("Error in ShareTransferModule, get current encryption key. Error Code: \(errorCode)")
             }
         let string = String.init(cString: result!)

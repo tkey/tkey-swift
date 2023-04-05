@@ -10,7 +10,24 @@ import Foundation
     import lib
 #endif
 
-public final class KeyPoint {
+public final class KeyPoint: Equatable {
+    public static func == (lhs: KeyPoint, rhs: KeyPoint) -> Bool {
+        do {
+            let lhsx = try lhs.getX()
+            let lhsy = try lhs.getY()
+            let rhsx = try rhs.getX()
+            let rhsy = try rhs.getY()
+            if  lhsx == rhsx && lhsy == rhsy
+            {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            return false
+        }
+    }
+    
     public var pointer: OpaquePointer?
     
     public init(pointer: OpaquePointer) {

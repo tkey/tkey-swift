@@ -22,7 +22,7 @@ public class KeyPointArray {
         self.pointer = pointer;
     }
 
-    public func removeKeyPoint(index: Int32) throws {
+    public func removeAt(index: Int32) throws {
         var errorCode: Int32  = -1
         
         withUnsafeMutablePointer(to: &errorCode, { error in
@@ -33,7 +33,7 @@ public class KeyPointArray {
         }
     }
     
-    public func insertKeyPoint(point: KeyPoint) throws {
+    public func insert(point: KeyPoint) throws {
         var errorCode: Int32 = -1
         withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_insert(pointer, point.pointer, error)
@@ -43,7 +43,7 @@ public class KeyPointArray {
         }
     }
     
-    public func updateKeyPoint(point: KeyPoint, index: Int32) throws {
+    public func update(point: KeyPoint, index: Int32) throws {
         var errorCode: Int32 = -1
         
         withUnsafeMutablePointer(to: &errorCode, { error in
@@ -54,7 +54,7 @@ public class KeyPointArray {
         }
     }
     
-    public func getKeyPointAtIndex(index: Int32) throws -> KeyPoint
+    public func getAt(index: Int32) throws -> KeyPoint
     {
         var errorCode: Int32 = -1
         
@@ -66,7 +66,7 @@ public class KeyPointArray {
         return KeyPoint.init(pointer: key_point!);
                                                  }
     
-    public func getKeyPointArrayLength() throws -> Int32 {
+    public func length() throws -> Int32 {
         var errorCode: Int32 = -1
         
         let key_point_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -77,6 +77,23 @@ public class KeyPointArray {
         }
         return key_point_array_length;
 
+    }
+    
+    public func lagrange() throws -> Polynomial {
+        var errorCode: Int32 = -1
+
+
+        let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
+
+        let poly_result = withUnsafeMutablePointer(to: &errorCode, { error in
+            lagrange_interpolate_polynomial(pointer, curvePointer, error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in lagrange, lagrange_interpolate_polynomial method")
+        }
+        
+        return Polynomial.init(pointer: poly_result!);
     }
     
     deinit {
