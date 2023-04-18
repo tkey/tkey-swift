@@ -91,7 +91,18 @@ public class ThresholdKey {
             }
         }
     }
-    
+    /**
+    Initializes a KeyDetails object with the given parameters.
+
+    Parameters:
+
+    import_share: An optional string representing the import share.
+    input: An optional ShareStore object representing the input.
+    never_initialize_new_key: A boolean value indicating whether or not to initialize a new key.
+    include_local_metadata_transitions: A boolean value indicating whether or not to include local metadata transitions.
+    Returns: A KeyDetails object.
+    Throws: An error if the function encounters an issue during execution.
+     */
     public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) async throws -> KeyDetails {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -124,6 +135,9 @@ public class ThresholdKey {
             }
         }
     }
+    /**
+     Reconstructs the user private key. Minimum threshold number of shares required
+     */
     
     public func reconstruct() async throws -> KeyReconstructionDetails {
         return try await withCheckedThrowingContinuation {
@@ -139,6 +153,10 @@ public class ThresholdKey {
             }
         }
     }
+    
+    /**
+     This function returns the latest polynomial that was used in the reconstruction process as a Polynomial object. It throws an error if an error occurs while retrieving the polynomial.
+     */
 
     public func reconstruct_latest_poly() throws -> Polynomial {
         var errorCode: Int32 = -1
@@ -151,6 +169,10 @@ public class ThresholdKey {
         }
         return Polynomial(pointer: result!)
     }
+    
+    /**
+     This function returns all of the share stores that were used to generate the latest polynomial as a ShareStoreArray object. It throws an error if an error occurs while retrieving the share stores.
+     */
     
     public func get_all_share_stores_for_latest_polynomial() throws -> ShareStoreArray {
         var errorCode: Int32 = -1
@@ -186,6 +208,9 @@ public class ThresholdKey {
         }
     }
     
+    /**
+     This is an asynchronous function that generates new share for given tkey.  It throws an error if an error occurs during share generation or if the function is cancelled.
+     */
     public func generate_new_share() async throws -> GenerateShareStoreResult {
         return try await withCheckedThrowingContinuation {
             continuation in self.generate_new_share() {
@@ -219,6 +244,9 @@ public class ThresholdKey {
         }
     }
     
+    /**
+     This is an async function deletes a specific share store using its index.
+     */
     public func delete_share(share_index: String) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -252,6 +280,9 @@ public class ThresholdKey {
         }
     }
     
+    /**
+     This function deletes the threshold key. Be careful to use this function since this operation can't be roll backed.
+     */
     public func delete_tkey() async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -267,7 +298,11 @@ public class ThresholdKey {
         }
     }
     
-    
+    /**
+     Returns the details of the threshold key.
+    - Throws: `RuntimeError` if there was an error in Threshold while getting key details.
+    - Returns: A `KeyDetails` object containing key details.
+     */
     public func get_key_details() throws -> KeyDetails {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
@@ -278,7 +313,13 @@ public class ThresholdKey {
         }
         return try! KeyDetails(pointer: result!)
     }
-
+    
+    /// Outputs a share for the given share index and share type.
+    /// - Parameters:
+    ///   - shareIndex: The index of the share to output.
+    ///   - shareType: The type of the share to output, or `nil` to output all shares.
+    /// - Throws: `RuntimeError` if there was an error in ThresholdKey output_share.
+    /// - Returns: The output share as a string.
     public func output_share( shareIndex: String, shareType: String?) throws -> String {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
