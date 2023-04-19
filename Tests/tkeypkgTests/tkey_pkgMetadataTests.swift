@@ -19,7 +19,7 @@ final class tkey_pkgMetadataTests: XCTestCase {
 
         _ = try! await threshold.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
         _ = try! await threshold.reconstruct()
-        data = try! threshold.get_metadata()
+        data = try! threshold.get_current_metadata()
     }
     
     override func tearDown() {
