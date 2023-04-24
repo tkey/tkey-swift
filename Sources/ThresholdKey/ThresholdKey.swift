@@ -56,11 +56,11 @@ public class ThresholdKey {
        
     }
 
-    public func get_current_metadata() throws -> Metadata {
+    public func get_metadata() throws -> Metadata {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_current_metadata(pointer, error)})
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ThresholdKey get_current_metadata")
+            throw RuntimeError("Error in ThresholdKey get_metadata")
         }
         return Metadata.init(pointer: result!)
     }
@@ -714,7 +714,7 @@ public class ThresholdKey {
         }
     }
     
-    private func get_metadata(private_key: String?, completion: @escaping (Result<String, Error>) -> Void ) {
+    private func storage_layer_get_metadata(private_key: String?, completion: @escaping (Result<String, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -735,10 +735,10 @@ public class ThresholdKey {
         }
     }
     
-    public func get_metadata(private_key: String?) async throws -> String {
+    public func storage_layer_get_metadata(private_key: String?) async throws -> String {
         return try await withCheckedThrowingContinuation {
             continuation in
-            self.get_metadata(private_key: private_key) {
+            self.storage_layer_get_metadata(private_key: private_key) {
                 result in
                 switch result {
                 case .success(let result):
@@ -750,7 +750,7 @@ public class ThresholdKey {
         }
     }
     
-    private func set_metadata(private_key: String?, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
+    private func storage_layer_set_metadata(private_key: String?, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -771,10 +771,10 @@ public class ThresholdKey {
         }
     }
     
-    public func set_metadata(private_key: String?, json: String) async throws {
+    public func storage_layer_set_metadata(private_key: String?, json: String) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            self.set_metadata(private_key: private_key, json: json) {
+            self.storage_layer_set_metadata(private_key: private_key, json: json) {
                 result in
                 switch result {
                 case .success(let result):
@@ -786,7 +786,7 @@ public class ThresholdKey {
         }
     }
     
-    private func set_metadata_stream(private_keys: String, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
+    private func storage_layer_set_metadata_stream(private_keys: String, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -804,10 +804,10 @@ public class ThresholdKey {
         }
     }
     
-    public func set_metadata_stream(private_keys: String, json: String) async throws {
+    public func storage_layer_set_metadata_stream(private_keys: String, json: String) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            self.set_metadata_stream(private_keys: private_keys, json: json) {
+            self.storage_layer_set_metadata_stream(private_keys: private_keys, json: json) {
                 result in
                 switch result {
                 case .success(let result):
