@@ -48,7 +48,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
         _ = try! await threshold_key3.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
         try! await threshold_key3.input_share_store(shareStore: input_store)
         _ = try! await threshold_key3.reconstruct()
-        _ = try! await threshold_key3.delete_tkey()
+        _ = try! await threshold_key3.CRITICAL_delete_tkey()
     }
     
     func test_threshold_key_manual_sync() async {
