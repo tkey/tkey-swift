@@ -140,6 +140,25 @@ Natively, the instance of tKey, (ie. ThresholdKey) returns many functions, howev
 `update_share_description` | Update a description to a share | `key: String, oldDescription: String, newDescription: String, update_metadata: Bool` | Yes | `void` |
 `delete_share_description` | Delete a description to a share | `key: String, description: String, update_metadata: Bool` | Yes | `void` |
 
+### Making Tkey object
+After setting stroage_layer and service_provider, you are ready to make the tkey object. 
+You can call the functions described above with the tkey object created in this way.
+```swift
+threshold_key = try! ThresholdKey(
+    storage_layer: storage_layer,
+    service_provider: service_provider,
+    enable_logging: true,
+    manual_sync: false 
+)
+```
+
+| Parameter | Type | Description | Mandatory |
+| --------- | ---- | ----------- | --------- |
+| storage_layer | StorageLayer | your storage layer object | No |
+| service_provider | ServiceProvider | your service provider object | Yes |
+| enable_logging | Bool | Client ID from your login service provider | Yes |
+| manual_sync | Bool | manual sync provides atomicity to your tkey share. If manual_sync is true, you should sync your local metadata transitions manually to your storage_layer, which means your storage layer doesn't know the local changes of your tkey unless you manually sync, gives atomicity. Otherwise, If manual_sync is false, then your local metadata changes will be synced automatically to your storage layer.| Yes |
+
 
 ### Getting User Information
 
@@ -204,7 +223,7 @@ tdsdk.triggerLogin().done { userdata in
 Once you have triggered the login process, you're ready to initialize the tKey. This will generate a Threshold Key corresponding to your login provider.
 
 ```js
-let key_details = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+let key_details = try! await threshold_key.initialize(never_initialize_new_key: false)
 ```
 
 
@@ -212,8 +231,8 @@ let key_details = try! await threshold_key.initialize(never_initialize_new_key: 
 | --------- | ---- | ----------- | --------- |
 | import_share | String | Initialise tkey with an existing share store. This allows you to directly initialise tKey without using the service provider login. | No |
 | input | OpaquePointer? | Import a key into tkey for initialisation. | No |
-| never_initialize_new_key | Bool | Never initialise using a new key if account not found| Yes |
-| include_local_metadata_transitions | Bool | Pass the previous transition metadata| Yes |
+| never_initialize_new_key | Bool | If it's true, it should be able to not create new key when initialize is called| Yes |
+| include_local_metadata_transitions | Bool | Catch up to latest Share| No |
 
 ### Getting tKey Details
 
@@ -288,6 +307,21 @@ let shareStore = try! await threshold_key.delete_share(share_index: idx)
 ### Using Modules for Further Operations
 
 For making advanced operations on tKey and to manipulate the keys, you can use the modules provided by tKey. As mentioned in the initialization section, you need to configure the modules beforehand to make it work with tKey. Once that is done, the instance of the respective module is available within your tKey instance and can be used for further operations.
+
+### Consider multiple device environment
+
+Imagine a situation where a user wants to use the same private key on multiple devices using the Tkey SDK.
+
+If you want to get the same tkey on device B as the tkey created on device A, you need a minimum tkey setting of 2 out of 3. If you initialize a tkey on another device with 2 out of 2, without creating a separate share after initialization, you cannot reconstruct it because it requires the existing device share.
+
+There are several ways to solve this problem. Below is an example guide, 
+
+1. Initialize the tkey on Device A. (2/2 shares are needed)
+2.  Create an extra share using the Security question module and reconstruct it. (2/3)
+3. Recover the final key from Device A' with the social login share and security question share.
+4. Create a new share and save it as device share. If you set up the device share like this, you don't need to ask the security question every time you log in.
+
+In addition to this, there is also a way to serialize a share created on device A and import it from device A' to reconstruct it.
 
 ### Making Blockchain Calls
 
