@@ -262,7 +262,7 @@ public class ThresholdKey {
         }
     }
     
-    private func delete_tkey(completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func CRITICAL_delete_tkey(completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -283,10 +283,10 @@ public class ThresholdKey {
     /**
      This function deletes the threshold key. Be careful to use this function since this operation can't be roll backed.
      */
-    public func delete_tkey() async throws {
+    public func CRITICAL_delete_tkey() async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            self.delete_tkey() {
+            self.CRITICAL_delete_tkey() {
                 result in
                 switch result {
                 case .success(let result):
