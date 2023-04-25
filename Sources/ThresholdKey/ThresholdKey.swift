@@ -65,7 +65,7 @@ public class ThresholdKey {
         return Metadata.init(pointer: result!)
     }
     
-    private func initialize(import_share: String, input: ShareStore?, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
+    private func initialize(import_share: String, input: ShareStore?, never_initialize_new_key: Bool?, include_local_metadata_transitions: Bool?, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -79,18 +79,22 @@ public class ThresholdKey {
                     storePtr = input!.pointer
                 }
                 
+                let neverInitializeNewKey = never_initialize_new_key ?? false
+                let includeLocalMetadataTransitions = include_local_metadata_transitions ?? false
+                
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: self.curveN).utf8String)
-                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, never_initialize_new_key, include_local_metadata_transitions, curvePointer, error)})
+                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, neverInitializeNewKey, includeLocalMetadataTransitions, curvePointer, error)})
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey Initialize")
                 }
                 let result = try! KeyDetails(pointer: ptr!)
                 completion(.success(result))
-            }catch {
+            } catch {
                 completion(.failure(error))
             }
         }
     }
+
     /**
     Initializes a KeyDetails object with the given parameters.
 
@@ -103,7 +107,7 @@ public class ThresholdKey {
     Returns: A KeyDetails object.
     Throws: An error if the function encounters an issue during execution.
      */
-    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) async throws -> KeyDetails {
+    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool? = nil, include_local_metadata_transitions: Bool? = nil) async throws -> KeyDetails {
         return try await withCheckedThrowingContinuation {
             continuation in
             self.initialize(import_share: import_share, input: input, never_initialize_new_key: never_initialize_new_key, include_local_metadata_transitions: include_local_metadata_transitions) {
