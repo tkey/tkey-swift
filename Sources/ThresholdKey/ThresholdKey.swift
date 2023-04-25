@@ -81,10 +81,9 @@ public class ThresholdKey {
                 
                 let neverInitializeNewKey = never_initialize_new_key ?? false
                 let includeLocalMetadataTransitions = include_local_metadata_transitions ?? false
-                let neverInitializeNewKeyPtr = UnsafePointer<Bool>(bitPattern: UInt(bitPattern: neverInitializeNewKey ? 1 : 0))
-                let includeLocalMetadataTransitionsPtr = UnsafePointer<Bool>(bitPattern: UInt(bitPattern: includeLocalMetadataTransitions ? 1 : 0))
+                
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: self.curveN).utf8String)
-                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, neverInitializeNewKeyPtr, includeLocalMetadataTransitionsPtr, curvePointer, error)})
+                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, neverInitializeNewKey, includeLocalMetadataTransitions, curvePointer, error)})
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey Initialize")
                 }
