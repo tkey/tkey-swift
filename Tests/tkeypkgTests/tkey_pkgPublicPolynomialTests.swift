@@ -18,7 +18,7 @@ final class tkey_pkgPublicPolynomialTests: XCTestCase {
             manual_sync: false
         )
 
-        _ = try! await threshold.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold.initialize()
         _ = try! await threshold.reconstruct()
         data = try! threshold.reconstruct_latest_poly().getPublicPolynomial()
         share_indexes = try! threshold.get_shares_indexes()

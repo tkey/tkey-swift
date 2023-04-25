@@ -108,7 +108,7 @@ public class ThresholdKey {
     Returns: A KeyDetails object.
     Throws: An error if the function encounters an issue during execution.
      */
-    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool?, include_local_metadata_transitions: Bool?) async throws -> KeyDetails {
+    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool? = nil, include_local_metadata_transitions: Bool? = nil) async throws -> KeyDetails {
         return try await withCheckedThrowingContinuation {
             continuation in
             self.initialize(import_share: import_share, input: input, never_initialize_new_key: never_initialize_new_key, include_local_metadata_transitions: include_local_metadata_transitions) {

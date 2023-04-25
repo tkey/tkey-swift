@@ -17,7 +17,7 @@ final class tkey_pkgKeyPointTests: XCTestCase {
             manual_sync: false
         )
 
-        let key_details = try! await threshold.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        let key_details = try! await threshold.initialize()
         data = key_details.pub_key
     }
     

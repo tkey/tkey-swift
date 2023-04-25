@@ -19,11 +19,11 @@ final class tkey_pkgShareTransferModuleTests: XCTestCase {
             manual_sync: false
         )
         
-        _ = try! await threshold.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold.initialize()
         k1 = try! await threshold.reconstruct()
         threshold_key = threshold
         let threshold2 = try! ThresholdKey(storage_layer: storage_layer, service_provider: service_provider, enable_logging: false, manual_sync: false)
-        _ = try! await threshold2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+        _ = try! await threshold2.initialize()
         threshold_key2 = threshold2
         
     }
