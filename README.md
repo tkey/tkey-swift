@@ -157,7 +157,7 @@ threshold_key = try! ThresholdKey(
 | storage_layer | StorageLayer | your storage layer object | No |
 | service_provider | ServiceProvider | your service provider object | Yes |
 | enable_logging | Bool | Client ID from your login service provider | Yes |
-| manual_sync | Bool | manual sync provides atomicity to your tkey share. If manual_sync is true, you should sync your local metadata transitions manually to your storage_layer, which means your storage layer doesn't know the local changes of your tkey unless you manually sync, gives atomicity. Otherwise, If manual_sync is false, then your local metadata changes will be synced automatically to your storage layer.| Yes |
+| manual_sync | Bool | manual sync provides atomicity to your tkey share. If `manual_sync` is true, you should sync your local metadata transitions manually to your storage_layer, which means your storage layer doesn't know the local changes of your tkey unless you manually sync, gives atomicity. Otherwise, If `manual_sync` is false, then your local metadata changes will be synced automatically to your storage layer. If `manual_sync = true` and want to synchronize manually, you need to call `sync_local_metadata_transitions()` manually. | Yes |
 
 
 ### Getting User Information
@@ -222,7 +222,7 @@ tdsdk.triggerLogin().done { userdata in
 ### Initializing tKey
 Once you have triggered the login process, you're ready to initialize the tKey. This will generate a Threshold Key corresponding to your login provider.
 
-```js
+```swift
 let key_details = try! await threshold_key.initialize(never_initialize_new_key: false)
 ```
 
@@ -317,9 +317,9 @@ If you want to get the same tkey on device B as the tkey created on device A, yo
 There are several ways to solve this problem. Below is an example guide, 
 
 1. Initialize the tkey on Device A. (2/2 shares are needed)
-2.  Create an extra share using the Security question module and reconstruct it. (2/3)
+2. Create an extra share using the Security question module and reconstruct it. (2/3)
 3. Recover the final key from Device A' with the social login share and security question share.
-4. Create a new share and save it as device share. If you set up the device share like this, you don't need to ask the security question every time you log in.
+4. Save the security question share locally. If you set up the device share like this, you don't need to ask the security question every time you log in.
 
 In addition to this, there is also a way to serialize a share created on device A and import it from device A' to reconstruct it.
 
