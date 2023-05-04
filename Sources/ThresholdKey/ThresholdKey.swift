@@ -58,14 +58,14 @@ public class ThresholdKey {
 
     public func get_metadata() throws -> Metadata {
         var errorCode: Int32 = -1
-        let result = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_metadata(pointer, error)})
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_current_metadata(pointer, error)})
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_metadata")
         }
         return Metadata.init(pointer: result!)
     }
     
-    private func initialize(import_share: String, input: ShareStore?, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
+    private func initialize(import_share: String, input: ShareStore?, never_initialize_new_key: Bool?, include_local_metadata_transitions: Bool?, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -79,18 +79,22 @@ public class ThresholdKey {
                     storePtr = input!.pointer
                 }
                 
+                let neverInitializeNewKey = never_initialize_new_key ?? false
+                let includeLocalMetadataTransitions = include_local_metadata_transitions ?? false
+                
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: self.curveN).utf8String)
-                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, never_initialize_new_key, include_local_metadata_transitions, curvePointer, error)})
+                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_initialize(self.pointer, sharePointer, storePtr, neverInitializeNewKey, includeLocalMetadataTransitions, curvePointer, error)})
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey Initialize")
                 }
                 let result = try! KeyDetails(pointer: ptr!)
                 completion(.success(result))
-            }catch {
+            } catch {
                 completion(.failure(error))
             }
         }
     }
+
     /**
     Initializes a KeyDetails object with the given parameters.
 
@@ -103,7 +107,7 @@ public class ThresholdKey {
     Returns: A KeyDetails object.
     Throws: An error if the function encounters an issue during execution.
      */
-    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool, include_local_metadata_transitions: Bool) async throws -> KeyDetails {
+    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool? = nil, include_local_metadata_transitions: Bool? = nil) async throws -> KeyDetails {
         return try await withCheckedThrowingContinuation {
             continuation in
             self.initialize(import_share: import_share, input: input, never_initialize_new_key: never_initialize_new_key, include_local_metadata_transitions: include_local_metadata_transitions) {
@@ -262,7 +266,7 @@ public class ThresholdKey {
         }
     }
     
-    private func delete_tkey(completion: @escaping (Result<Void,Error>) -> Void)  {
+    private func CRITICAL_delete_tkey(completion: @escaping (Result<Void,Error>) -> Void)  {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
@@ -283,10 +287,10 @@ public class ThresholdKey {
     /**
      This function deletes the threshold key. Be careful to use this function since this operation can't be roll backed.
      */
-    public func delete_tkey() async throws {
+    public func CRITICAL_delete_tkey() async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            self.delete_tkey() {
+            self.CRITICAL_delete_tkey() {
                 result in
                 switch result {
                 case .success(let result):
@@ -713,6 +717,112 @@ public class ThresholdKey {
             }
         }
     }
+    
+    private func storage_layer_get_metadata(private_key: String?, completion: @escaping (Result<String, Error>) -> Void ) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                var privateKeyPointer: UnsafeMutablePointer<Int8>?;
+                if private_key != nil {
+                    privateKeyPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: private_key!).utf8String)
+                }
+                let ptr = withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_get_metadata(self.pointer, privateKeyPointer, error)})
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey get_metadata")
+                }
+                let string = String.init(cString: ptr!)
+                string_free(ptr)
+                completion(.success(string))
+            }catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func storage_layer_get_metadata(private_key: String?) async throws -> String {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            self.storage_layer_get_metadata(private_key: private_key) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    private func storage_layer_set_metadata(private_key: String?, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                var privateKeyPointer: UnsafeMutablePointer<Int8>?;
+                if private_key != nil {
+                    privateKeyPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: private_key!).utf8String)
+                }
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let valuePointer = UnsafeMutablePointer<Int8>(mutating: (json as NSString).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_set_metadata(self.pointer, privateKeyPointer,valuePointer,curvePointer,error)})
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey set_metadata")
+                }
+                completion(.success(()))
+            }catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func storage_layer_set_metadata(private_key: String?, json: String) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            self.storage_layer_set_metadata(private_key: private_key, json: json) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    private func storage_layer_set_metadata_stream(private_keys: String, json: String, completion: @escaping (Result<Void, Error>) -> Void ) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let privateKeysPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: private_keys).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (self.curveN as NSString).utf8String)
+                let valuesPointer = UnsafeMutablePointer<Int8>(mutating: (json as NSString).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_set_metadata_stream(self.pointer, privateKeysPointer,valuesPointer,curvePointer,error)})
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey set_metadata_stream")
+                }
+                completion(.success(()))
+            }catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func storage_layer_set_metadata_stream(private_keys: String, json: String) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            self.storage_layer_set_metadata_stream(private_keys: private_keys, json: json) {
+                result in
+                switch result {
+                case .success(let result):
+                    continuation.resume(returning: result)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
     
     deinit {
         threshold_key_free(pointer)

@@ -17,7 +17,7 @@ final class tkey_pkgShareStoreArrayTests: XCTestCase {
             manual_sync: false
         )
 
-        _ = try! await threshold.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold.initialize()
         _ = try! await threshold.reconstruct()
         data = try! threshold.get_all_share_stores_for_latest_polynomial()
     }

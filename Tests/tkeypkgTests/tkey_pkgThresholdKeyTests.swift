@@ -13,7 +13,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: false)
         let key = try! PrivateKey.generate()
-        _ = try! await threshold_key.initialize(import_share: key.hex,never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
     }
     
@@ -27,7 +27,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: false)
         let key = try! PrivateKey.generate()
-        _ = try! await threshold_key.initialize(import_share: key.hex,never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! threshold_key.get_key_details()
         _ = try! threshold_key.get_last_fetched_cloud_metadata()
@@ -41,14 +41,14 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
         let input = try! threshold_key.output_share(shareIndex: share2.hex, shareType: nil)
         let input_store = try! threshold_key.output_share_store(shareIndex: share2.hex, polyId: nil)
         let threshold_key2 = try! ThresholdKey.init(storage_layer: storage_layer, service_provider: service_provider, enable_logging: true, manual_sync: false)
-        _ = try! await threshold_key2.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+        _ = try! await threshold_key2.initialize()
         try! await threshold_key2.input_share(share: input, shareType: nil)
         _ = try! await threshold_key2.reconstruct()
         let threshold_key3 = try! ThresholdKey.init(storage_layer: storage_layer, service_provider: service_provider, enable_logging: true, manual_sync: false)
-        _ = try! await threshold_key3.initialize(never_initialize_new_key: true, include_local_metadata_transitions: false)
+        _ = try! await threshold_key3.initialize()
         try! await threshold_key3.input_share_store(shareStore: input_store)
         _ = try! await threshold_key3.reconstruct()
-        _ = try! await threshold_key3.delete_tkey()
+        _ = try! await threshold_key3.CRITICAL_delete_tkey()
     }
     
     func test_threshold_key_manual_sync() async {
@@ -61,7 +61,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: true)
         let key = try! PrivateKey.generate()
-        _ = try! await threshold_key.initialize(import_share: key.hex,never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! await threshold_key.generate_new_share()
         _ = try! await threshold_key.sync_local_metadata_transistions()
@@ -78,7 +78,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: true)
 
-        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         var key_details = try! threshold_key.get_key_details()
         XCTAssertEqual(key_details.total_shares, 2)
 
@@ -125,10 +125,10 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: false)
         let key = try! PrivateKey.generate()
-        _ = try! await threshold_key.initialize(import_share: key.hex,never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         let reconstruct1 = try! await threshold_key.reconstruct()
         let key2 = try! PrivateKey.generate()
-        _ = try! await threshold_key2.initialize(import_share: key2.hex,never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key2.initialize()
         let reconstruct2 = try! await threshold_key2.reconstruct()
         XCTAssertNotEqual(reconstruct1.key, reconstruct2.key)
     }
@@ -143,7 +143,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: true)
 
-        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         
         let msg = "this is the test msg"
@@ -162,7 +162,7 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             enable_logging: true,
             manual_sync: true)
 
-        _ = try! await threshold_key.initialize(never_initialize_new_key: false, include_local_metadata_transitions: false)
+        _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         
         let key = "test share"
