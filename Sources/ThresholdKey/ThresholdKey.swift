@@ -324,7 +324,7 @@ public class ThresholdKey {
     ///   - shareType: The type of the share to output, or `nil` to output all shares.
     /// - Throws: `RuntimeError` if there was an error in ThresholdKey output_share.
     /// - Returns: The output share as a string.
-    public func output_share( shareIndex: String, shareType: String?) throws -> String {
+    public func output_share( shareIndex: String, shareType: String? = nil) throws -> String {
         var errorCode: Int32  = -1
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let cShareIndex = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
