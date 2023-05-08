@@ -35,9 +35,9 @@ final class tkey_pkgShareSerializationModuleTests: XCTestCase {
         
         // share serialization with share, test with nil type format
         let share_index2 = try! await threshold_key.generate_new_share()
-        let shareOut = try! threshold_key.output_share(shareIndex: share_index2.hex, shareType: nil)
-        let phrase2 = try! ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: shareOut, format: nil)
-        let deserializedShare = try! ShareSerializationModule.deserialize_share(threshold_key: threshold_key, share: phrase2, format: nil)
+        let shareOut = try! threshold_key.output_share(shareIndex: share_index2.hex)
+        let phrase2 = try! ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: shareOut)
+        let deserializedShare = try! ShareSerializationModule.deserialize_share(threshold_key: threshold_key, share: phrase2)
         XCTAssertEqual(shareOut, deserializedShare)
     }
 }
