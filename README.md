@@ -321,14 +321,21 @@ In addition to this, there are also another ways. You can try
 
 Here's an example of transfering a share using shareTransfer module.
 ``` swift
-// assume that threshold_key, threshold_key2 are both initialized from same service provider and storage layer
+// assume that threshold_key, threshold_key2 are independent tkeys initialized on each device
+// initialized with the same value of service provider and storage layer
+
+// 1. request new share from second device
 let request_enc = try! await ShareTransferModule.request_new_share(threshold_key: threshold_key2, user_agent: "agent", available_share_indexes: "[]")
+
+// 2. generate new share and approve the request from existing device
 let lookup = try! await ShareTransferModule.look_for_request(threshold_key: threshold_key)
 let encPubKey = lookup[0]
 // generate a new share
 let newShare = try! await threshold_key.generate_new_share()
 // approve the corresponding share 
 try! await ShareTransferModule.approve_request_with_share_index(threshold_key: threshold_key, enc_pub_key_x: encPubKey, share_index: newShare.hex)
+
+// 3. check the request status and reconstruct when it succeeds
 _ = try! await ShareTransferModule.add_custom_info_to_request(threshold_key: threshold_key2, enc_pub_key_x: request_enc, custom_info: "test info")
 _ = try! await ShareTransferModule.request_status_check(threshold_key: threshold_key2, enc_pub_key_x: request_enc, delete_request_on_completion: true)
 
