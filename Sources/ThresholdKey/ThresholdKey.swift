@@ -841,6 +841,16 @@ public class ThresholdKey {
         }
     }
     
+    public func service_provider_assign_public_key(tag: String, json: String, nonce: String, public_key: String) throws {
+                var errorCode: Int32 = -1
+                let tagPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: tag).utf8String)
+                let noncePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: nonce).utf8String)
+                let publicPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: public_key).utf8String)
+                withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_service_provider_assign_tss_public_key(self.pointer, tagPointer,noncePointer,publicPointer,error)})
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey, service_provider_assign_public_key")
+                }
+        }
     
     deinit {
         threshold_key_free(pointer)
