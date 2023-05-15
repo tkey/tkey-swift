@@ -1,10 +1,3 @@
-//
-//  Version.swift
-//  tkey_ios
-//
-//  Created by CW Lee on 17/11/2022.
-//
-
 import Foundation
 #if canImport(lib)
     import lib

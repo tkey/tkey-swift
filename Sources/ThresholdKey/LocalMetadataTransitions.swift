@@ -1,10 +1,3 @@
-//
-//  LocalMetadataTransitions.swift
-//  
-//
-//  Created by David Main on 2023/01/11.
-//
-
 import Foundation
 
 #if canImport(lib)

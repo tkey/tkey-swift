@@ -1,11 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by guru ramu on 13/01/23.
-//
-
-
 import Foundation
 #if canImport(lib)
     import lib

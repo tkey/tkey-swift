@@ -1,10 +1,3 @@
-//
-//  Point.swift
-//  tkey_ios
-//
-//  Created by David Main on 2022/11/01.
-//
-
 import Foundation
 #if canImport(lib)
     import lib

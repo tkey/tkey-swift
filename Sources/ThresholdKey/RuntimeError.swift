@@ -1,10 +1,3 @@
-//
-//  RuntimeError.swift
-//  tkey_ios
-//
-//  Created by David Main on 2022/10/25.
-//
-
 import Foundation
 
 public struct RuntimeError: Error {

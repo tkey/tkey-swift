@@ -1,10 +1,3 @@
-//
-//  ShareStorePolyIdIndexMap.swift
-//  tkey_ios
-//
-//  Created by David Main on 2022/12/13.
-//
-
 import Foundation
 #if canImport(lib)
     import lib

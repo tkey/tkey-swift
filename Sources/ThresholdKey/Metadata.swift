@@ -1,10 +1,3 @@
-//
-//  Metadata.swift
-//  tkey_ios
-//
-//  Created by David Main on 2022/12/06.
-//
-
 import Foundation
 #if canImport(lib)
     import lib

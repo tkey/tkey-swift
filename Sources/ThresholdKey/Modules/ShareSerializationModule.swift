@@ -1,10 +1,3 @@
-//
-//  ShareSerializationModule.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
