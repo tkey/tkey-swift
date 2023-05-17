@@ -6,10 +6,6 @@ import lib
 public final class NodeDetails {
     private(set) var pointer: OpaquePointer?
     
-    public init(pointer: OpaquePointer?) {
-        self.pointer = pointer
-    }
-    
     public init(server_endpoints: String, server_public_keys: String, serverThreshold: Int32) throws {
         var errorCode: Int32 = -1
         let endpointPointer = UnsafeMutablePointer<Int8>(mutating: (server_endpoints as NSString).utf8String)
