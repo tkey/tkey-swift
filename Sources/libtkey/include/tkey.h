@@ -183,7 +183,7 @@
         void node_details_free(struct NodeDetails* ptr);
         //RssComm
         struct FFIRSSComm* rss_comm(char* (*network_callback)(char*, char*, void*, int*), void* parent_instance_ref, int* error_code);
-        void rss_comm_free(struct FFIRssComm* ptr);
+        void* rss_comm_free(struct FFIRssComm* ptr);
     #ifdef __cplusplus
     } // extern "C"
     #endif
