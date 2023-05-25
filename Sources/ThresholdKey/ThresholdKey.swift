@@ -65,13 +65,13 @@ public class ThresholdKey {
         return Metadata.init(pointer: result!)
     }
     
-    private func initialize(import_share: String, input: ShareStore?, never_initialize_new_key: Bool?, include_local_metadata_transitions: Bool?, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
+    private func initialize(import_share: String?, input: ShareStore?, never_initialize_new_key: Bool?, include_local_metadata_transitions: Bool?, completion: @escaping (Result<KeyDetails, Error>) -> Void ) {
         tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 var sharePointer: UnsafeMutablePointer<Int8>?
-                if !import_share.isEmpty {
-                    sharePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: import_share).utf8String)
+                if import_share != nil {
+                    sharePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: import_share!).utf8String)
                 }
 
                 var storePtr: OpaquePointer?
@@ -107,7 +107,7 @@ public class ThresholdKey {
     Returns: A KeyDetails object.
     Throws: An error if the function encounters an issue during execution.
      */
-    public func initialize(import_share: String = "", input: ShareStore? = nil, never_initialize_new_key: Bool? = nil, include_local_metadata_transitions: Bool? = nil) async throws -> KeyDetails {
+    public func initialize(import_share: String? = nil, input: ShareStore? = nil, never_initialize_new_key: Bool? = nil, include_local_metadata_transitions: Bool? = nil) async throws -> KeyDetails {
         return try await withCheckedThrowingContinuation {
             continuation in
             self.initialize(import_share: import_share, input: input, never_initialize_new_key: never_initialize_new_key, include_local_metadata_transitions: include_local_metadata_transitions) {
