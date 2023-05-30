@@ -1,10 +1,3 @@
-//
-//  KeyResult.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -17,6 +10,14 @@ public final class KeyDetails {
     public let total_shares: UInt32
     public let share_descriptions: String
 
+    /// Instantiate a `KeyDetails` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `KeyDetails`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let point = withUnsafeMutablePointer(to: &errorCode, { error in

@@ -1,16 +1,18 @@
-//
-//  ShareSerializationModule.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
 #endif
 
 public final class ShareSerializationModule {
+    /// Serializes a share on a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - format: Optional, can either be nil or `"mnemonic"`.
+    ///   - share: Share to be serialized.
+    ///
+    /// - Returns: `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func serialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
         
@@ -32,6 +34,15 @@ public final class ShareSerializationModule {
         return value
     }
 
+    /// Deserialize a share on a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - format: Optional, can either be nil or `"mnemonic"`.
+    ///   - share: Share to be serialized.
+    ///
+    /// - Returns: `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func deserialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
         

@@ -1,10 +1,3 @@
-//
-//  ServiceProvider.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -14,6 +7,15 @@ public final class ServiceProvider {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
+    /// Instantiate a `ServiceProvider` object.
+    ///
+    /// - Parameters:
+    ///   - enable_logging: Deermines if logging is enabled or not.
+    ///   - postbox_key: The private key to be used for the ServiceProvider.
+    ///
+    /// - Returns: `ServiceProvider`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid paramters were used.
     public init(enable_logging: Bool, postbox_key: String) throws {
         var errorCode: Int32 = -1
         let postboxPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: postbox_key).utf8String)

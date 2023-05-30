@@ -1,10 +1,3 @@
-//
-//  PrivateKeysModule.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -41,6 +34,15 @@ public final class PrivateKeysModule {
         }
     }
     
+    /// Sets an extra private key on an existing `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - key: The private key to set in hexadecimal format. Optional, will be generated on the Secp256k1 curve if not supplied.
+    ///   - format: "secp256k1n" is currently the only cupported format.
+    ///
+    /// - Returns: `true` if key was set, `false` otherwise.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -56,6 +58,13 @@ public final class PrivateKeysModule {
         }
     }
     
+    /// Returns stored extra private keys on an existing `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Returns: Array of `KeyData`.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func get_private_keys(threshold_key: ThresholdKey) throws -> [KeyData] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -71,6 +80,13 @@ public final class PrivateKeysModule {
         return keys
     }
 
+    /// Returns accounts of stored extra private keys on an existing `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Returns: Array of `String`.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func get_private_key_accounts(threshold_key: ThresholdKey) throws -> [String] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in

@@ -1,10 +1,3 @@
-//
-//  ShareStorePolyIdIndexMap.swift
-//  tkey_ios
-//
-//  Created by David Main on 2022/12/13.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -14,6 +7,14 @@ public final class ShareStorePolyIdIndexMap {
     private(set) var pointer: OpaquePointer;
     public var share_maps = [String: ShareStoreMap]()
 
+    /// Instantiate a `ShareStorePolyIdIndexMap` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `ShareStorePolyIdIndexMap`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -43,4 +44,6 @@ public final class ShareStorePolyIdIndexMap {
     deinit {
         share_store_poly_id_index_map_free(pointer)
     }
+    
+    //TODO: Class requires a init(json: String) throws method and an export() throws -> String method.
 }
