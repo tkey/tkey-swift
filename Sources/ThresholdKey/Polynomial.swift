@@ -19,7 +19,7 @@ public final class Polynomial {
         self.pointer = pointer
     }
 
-    /// Retrieves the corresponding `PublickPolynomial`
+    /// Retrieves the corresponding `PublicPolynomial`
     ///
     ///
     /// - Returns: `PublicPolynomial`
