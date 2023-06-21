@@ -4,7 +4,7 @@ import Foundation
 #endif
 
 public final class ShareTransferModule {
-    /// This module faciltates the transfer of shares between devices, this ensure that both devies can share the same private key. The service provider configuration will need to be the same for both instances of the `ThresholdKey`. This is particularly useful where a user would want to share a login between multiple devices that they control without ending up with a common share between them after the process is complete.
+    /// This module facilitates the transfer of shares between devices, this ensure that both devies can share the same private key. The service provider configuration will need to be the same for both instances of the `ThresholdKey`. This is particularly useful where a user would want to share a login between multiple devices that they control without ending up with a common share between them after the process is complete.
     /// Device A will fully reconstruct the `ThresholdKey`.
     /// Device B will be initialized in the same way as Device A.
     /// Device B will request a share from Device A.
