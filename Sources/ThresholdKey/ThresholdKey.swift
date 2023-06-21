@@ -870,7 +870,7 @@ public class ThresholdKey {
     /// Function to retrieve the metadata directly form the network, only used in very specific instances.
     ///
     /// - Parameters:
-    ///   - private_key: The reconstructed key.
+    ///   - private_key: The reconstructed key, optional.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func storage_layer_get_metadata(private_key: String?) async throws -> String {
