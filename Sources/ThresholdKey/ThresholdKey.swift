@@ -113,7 +113,7 @@ public class ThresholdKey {
     /// - Parameters:
     ///   - import_share: Share to be imported, optional.
     ///   - input: `ShareStore` to be used, optional.
-    ///   - never_initialize_new_key: Do no't initialize a new tKey if an existing one is found.
+    ///   - never_initialize_new_key: Do not initialize a new tKey if an existing one is found.
     ///   - include_local_matadata_transitions: Proritize existing metadata transitions over cloud fetched transitions.
     ///
     /// - Returns: `KeyDetails`
