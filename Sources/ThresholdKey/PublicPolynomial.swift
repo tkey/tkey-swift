@@ -37,6 +37,8 @@ public final class PublicPolynomial {
     }
 
     /// Returns the `KeyPoint` at the respective share index.
+    /// - Parameters:
+    ///   - index: Share index to be used.
     ///
     /// - Returns: `KeyPoint`
     ///
