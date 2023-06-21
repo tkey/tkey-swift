@@ -823,7 +823,7 @@ public class ThresholdKey {
         }
     }
     
-    /// Updates a share description.
+    /// Deletes a share description.
     ///
     /// - Parameters:
     ///   - key: The relevant key.
