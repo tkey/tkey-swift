@@ -10,7 +10,7 @@ public final class ServiceProvider {
     /// Instantiate a `ServiceProvider` object.
     ///
     /// - Parameters:
-    ///   - enable_logging: Deermines if logging is enabled or not.
+    ///   - enable_logging: Determines if logging is enabled or not.
     ///   - postbox_key: The private key to be used for the ServiceProvider.
     ///
     /// - Returns: `ServiceProvider`
