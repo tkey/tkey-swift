@@ -144,14 +144,19 @@ public final class ShareTransferModule {
     }
     
     
-    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
+                var storePointer: OpaquePointer?
+                
+                if share_store != nil {
+                    storePointer = share_store!.pointer
+                }
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
                 let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_approve_request(threshold_key.pointer, encPointer, share_store.pointer, curvePointer, error)
+                    share_transfer_approve_request(threshold_key.pointer, encPointer, storePointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
@@ -167,10 +172,10 @@ public final class ShareTransferModule {
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
     ///   - enc_pub_key_x: The encryption key for the share transfer request.
-    ///   - share_store: The `ShareStore` for the share transfer request.
+    ///   - share_store: The `ShareStore` for the share transfer request, optional.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore ) async throws {
+    public static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore? = nil ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
             approve_request(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, share_store: share_store) {
