@@ -952,7 +952,7 @@ public class ThresholdKey {
     /// Function to set the metadata directly to the network, only used for specific instances.
     ///
     /// - Parameters:
-    ///   - private_key: The reconstructed key.
+    ///   - private_keys: The relevant private keys.
     ///   - json: Relevant json to be set
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
