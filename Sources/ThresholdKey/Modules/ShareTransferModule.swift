@@ -292,6 +292,7 @@ public final class ShareTransferModule {
     /// Sets the share transfer store for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
+    ///   - store: The share transfer store.
     ///
     /// - Returns: `true` on success, `false` otherwise.
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
