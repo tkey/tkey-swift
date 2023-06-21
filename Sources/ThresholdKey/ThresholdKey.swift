@@ -558,7 +558,7 @@ public class ThresholdKey {
         return string
     }
     
-    /// Returns last metadata fetched form the cloud.
+    /// Returns last metadata fetched from the cloud.
     ///
     /// - Returns: `Metadata`
     ///
