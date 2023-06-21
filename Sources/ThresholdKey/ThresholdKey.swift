@@ -413,7 +413,7 @@ public class ThresholdKey {
     /// Inserts a share into `ThresholdKey`, this is used prior to reconstruction in order to ensure the number of shares meet the threshold.
     ///
     /// - Parameters:
-    ///   - share: Representation of a share as `String`.
+    ///   - share: Hex representation of a share as `String`.
     ///   - shareType: The format of the share, can be `"mnemonic"`, optional.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameter of invalid `ThresholdKey`.
