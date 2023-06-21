@@ -867,7 +867,7 @@ public class ThresholdKey {
         }
     }
     
-    /// Function to retrieve the metadata directly form the network, only used in very specific instances.
+    /// Function to retrieve the metadata directly from the network, only used in very specific instances.
     ///
     /// - Parameters:
     ///   - private_key: The reconstructed key, optional.
