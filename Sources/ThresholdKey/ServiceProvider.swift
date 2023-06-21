@@ -15,7 +15,7 @@ public final class ServiceProvider {
     ///
     /// - Returns: `ServiceProvider`
     ///
-    /// - Throws: `RuntimeError`, indicates invalid paramters were used.
+    /// - Throws: `RuntimeError`, indicates invalid parameters were used.
     public init(enable_logging: Bool, postbox_key: String) throws {
         var errorCode: Int32 = -1
         let postboxPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: postbox_key).utf8String)
