@@ -1,10 +1,3 @@
-////
-////  File.swift
-////
-////
-////  Created by guru ramu on 11/01/23.
-////
-//
 import Foundation
 #if canImport(lib)
 import lib
@@ -14,10 +7,23 @@ public final class PublicPolynomial {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
+    /// Instantiate a `PublicPolynomial` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `Polynomial`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) {
         self.pointer = pointer;
     }
 
+    /// Threshold for the `PublicPolynomial`.
+    ///
+    /// - Returns: `UInt32`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public func getThreshold() throws -> UInt32  {
         var errorCode: Int32  = -1
         
@@ -30,6 +36,13 @@ public final class PublicPolynomial {
         return result;
     }
 
+    /// Returns the `KeyPoint` at the respective share index.
+    /// - Parameters:
+    ///   - index: Share index to be used.
+    ///
+    /// - Returns: `KeyPoint`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public func polyCommitmentEval(index: String) throws -> KeyPoint {
         var errorCode: Int32  = -1
         
@@ -44,6 +57,7 @@ public final class PublicPolynomial {
         }
         return KeyPoint(pointer: result!);
     }
+    
     deinit {
         public_polynomial_free(pointer);
     }

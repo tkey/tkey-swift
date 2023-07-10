@@ -12,7 +12,6 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: false)
-        let key = try! PrivateKey.generate()
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
     }
@@ -26,7 +25,6 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: false)
-        let key = try! PrivateKey.generate()
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! threshold_key.get_key_details()
@@ -60,7 +58,6 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: true)
-        let key = try! PrivateKey.generate()
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! await threshold_key.generate_new_share()
@@ -124,10 +121,8 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
             service_provider: service_provider2,
             enable_logging: true,
             manual_sync: false)
-        let key = try! PrivateKey.generate()
         _ = try! await threshold_key.initialize()
         let reconstruct1 = try! await threshold_key.reconstruct()
-        let key2 = try! PrivateKey.generate()
         _ = try! await threshold_key2.initialize()
         let reconstruct2 = try! await threshold_key2.reconstruct()
         XCTAssertNotEqual(reconstruct1.key, reconstruct2.key)
