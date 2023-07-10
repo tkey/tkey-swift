@@ -8,6 +8,14 @@ public final class GenerateShareStoreResult {
     public var hex: String
     public var share_store: ShareStoreMap
 
+    /// Instantiate a `GenerateShareStoreResult` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `GenerateShareStoreResult`
+    ///
+    ///   - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         self.pointer = pointer
         var errorCode: Int32 = -1

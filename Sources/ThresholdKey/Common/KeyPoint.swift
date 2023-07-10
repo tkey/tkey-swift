@@ -4,6 +4,14 @@ import Foundation
 #endif
 
 public final class KeyPoint: Equatable {
+    
+    /// Compares two KeyPoint objects
+    ///
+    /// - Parameters:
+    ///   - lhs: First `KeyPoint` to compare.
+    ///   - rhs: Second `Keypoint` to compare.
+    ///
+    /// - Returns: `true` if they are equal, `false` otherwise
     public static func == (lhs: KeyPoint, rhs: KeyPoint) -> Bool {
         do {
             let lhsx = try lhs.getX()
@@ -23,10 +31,25 @@ public final class KeyPoint: Equatable {
     
     public var pointer: OpaquePointer?
     
+    /// Instantiate a `KeyPoint` object using the underlying pointer.
+    ///
+    /// - Returns: `KeyPoint`
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
     public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
     
+    /// Instantiates a `KeyPoint` object using X and Y co-ordinates in hexadecimal format.
+    ///
+    /// - Parameters:
+    ///   - x: X value of co-ordinate pair.
+    ///   - y: Y value of co-ordinate pair.
+    ///
+    /// - Returns: `KeyPoint` object.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used.
     public init(x: String, y: String) throws {
         var errorCode: Int32 = -1
         let xPtr = UnsafeMutablePointer<Int8>(mutating: (x as NSString).utf8String)
@@ -40,6 +63,11 @@ public final class KeyPoint: Equatable {
         pointer = result;
     }
     
+    /// Retrieves the X value of the co-ordinate pair.
+    ///
+    /// - Returns: X value in hexadecimal format as `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public func getX() throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -53,6 +81,11 @@ public final class KeyPoint: Equatable {
         return x
     }
     
+    /// Retrieves the Y value of the co-ordinate pair.
+    ///
+    /// - Returns: Y value in hexadecimal format as `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public func getY() throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -66,15 +99,23 @@ public final class KeyPoint: Equatable {
         return y
     }
     
+    /// Gets the serialized form of a `KeyPoint`, should it be a valid PublicKey.
+    ///
+    /// - Parameters:
+    ///   - format: `"elliptic-compressed"` for the compressed form, otherwise the uncompressed form will be returned.
+    ///
+    /// - Returns: Serialized form of `KeyPoint` as `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates either the underlying pointer is invalid or the co-ordinate pair is not a valid PublicKey.
     public func getAsCompressedPublicKey(format: String) throws -> String {
         var errorCode: Int32 = -1
         
-        let encoder_format = UnsafeMutablePointer<Int8>(mutating: ("elliptic-compressed" as NSString).utf8String)
+        let encoder_format = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_encode(pointer, encoder_format, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in KeyPoint, field Y")
+            throw RuntimeError("Error in KeyPoint, getAsCompressedPublicKey")
             }
         let compressed = String.init(cString: result!)
         string_free(result)

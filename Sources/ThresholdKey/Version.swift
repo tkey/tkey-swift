@@ -3,6 +3,11 @@ import Foundation
     import lib
 #endif
 
+/// Returns the library version.
+///
+/// - Returns: `String`.
+///
+/// - Throws: `RuntimeError`, underlying library problem.
 public func library_version() throws -> String {
     var errorCode: Int32 = -1
     let result = withUnsafeMutablePointer(to: &errorCode, { error in

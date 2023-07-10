@@ -36,7 +36,7 @@ public final class StorageLayer {
       }
      */
 
-    public static func percentEscapeString( string: String ) -> String {
+    private static func percentEscapeString( string: String ) -> String {
       var characterSet = CharacterSet.alphanumerics
       characterSet.insert(charactersIn: "-.* ")
 
@@ -46,6 +46,16 @@ public final class StorageLayer {
         .replacingOccurrences(of: " ", with: "+", options: [], range: nil)
     }
 
+    /// Instantiate a `StorageLayer` object,
+    ///
+    /// - Parameters:
+    ///   - enable_logging: Determines whether logging is enabled or not (pending).
+    ///   - host_url: Url for the metadata server.
+    ///   - server_time_offset: Timezone offset for the metadata server.
+    ///
+    /// - Returns: `StorageLayer`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters.
     public init(enable_logging: Bool, host_url: String, server_time_offset: Int64) throws {
         var errorCode: Int32 = -1
         let urlPointer = UnsafeMutablePointer<Int8>(mutating: (host_url as NSString).utf8String)

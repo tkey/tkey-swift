@@ -8,6 +8,14 @@ public final class KeyReconstructionDetails: Codable {
     public var seed_phrase: [String]
     public var all_keys: [String]
 
+    /// Instantiate a `KeyReconstructionDetails` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `KeyReconstructionDetails`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let key = withUnsafeMutablePointer(to: &errorCode, { error in

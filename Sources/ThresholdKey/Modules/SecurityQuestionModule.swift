@@ -26,6 +26,15 @@ public final class SecurityQuestionModule {
         }
     }
     
+    /// Generates a new security share on an existing `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - question: The security question.
+    ///   - answer: The answer for the security question.
+    ///
+    /// - Returns: `GenerateShareStoreResult` object.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String ) async throws -> GenerateShareStoreResult {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -63,6 +72,14 @@ public final class SecurityQuestionModule {
         }
     }
     
+    /// Inputs a stored security share into an existing `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - answer: The answer for the security question of the stored share.
+    ///
+    /// - Returns: `true` on success, `false` otherwise.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func input_share(threshold_key: ThresholdKey, answer: String ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -98,6 +115,15 @@ public final class SecurityQuestionModule {
         }
     }
     
+    /// Changes the question and answer for an existing security share on a `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - question: The security question.
+    ///   - answer: The answer for the security question.
+    ///
+    /// - Returns: `true` on success, `false` otherwise.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -112,6 +138,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
+    
     
     private static func store_answer(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
@@ -132,6 +159,14 @@ public final class SecurityQuestionModule {
         }
     }
     
+    /// Saves the answer for an existing security share on a `ThresholdKey` object to the tkey store.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - answer: The answer for the security question.
+    ///
+    /// - Returns: `true` on success, `false` otherwise.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func store_answer(threshold_key: ThresholdKey, answer: String ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -147,6 +182,10 @@ public final class SecurityQuestionModule {
         }
     }
 
+    /// Retrieves the answer for an existing security share on a `ThresholdKey`.
+    /// - Returns: `String`.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func get_answer(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -160,6 +199,10 @@ public final class SecurityQuestionModule {
         return string
     }
 
+    /// Retrieves the question for an existing security share on a `ThresholdKey`.
+    /// - Returns: `String`.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func get_questions(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in

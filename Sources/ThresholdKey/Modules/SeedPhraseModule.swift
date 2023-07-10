@@ -3,7 +3,7 @@ import Foundation
     import lib
 #endif
 
-public struct seedPhraseStruct: Codable {
+public struct SeedPhrase: Codable {
     public var seedPhrase: String
     public var type: String
 }
@@ -33,6 +33,14 @@ public final class SeedPhraseModule {
         }
     }
     
+    /// Sets a seed phrase on the metadata of a `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - format: "HD Key Tree" is the only supported format.
+    ///   - phrase: The seed phrase. Optional, will be generated if not provided.
+    ///   - number_of_wallets: Number of children derived from this seed phrase.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func set_seed_phrase(threshold_key: ThresholdKey, format: String, phrase: String?, number_of_wallets: UInt32 ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -68,6 +76,13 @@ public final class SeedPhraseModule {
         }
     }
     
+    /// Replaces an old seed phrase with a new seed phrase on a `ThresholdKey` object. Same format of seed phrase must be used.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - old_phrase: The original seed phrase.
+    ///   - new_phrase: The replacement phrase.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -83,7 +98,13 @@ public final class SeedPhraseModule {
         }
     }
 
-    public static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [seedPhraseStruct] {
+    /// Returns the seed phrases stored on a `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Returns: Array of SeedPhrase objects.
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
+    public static func get_seed_phrases(threshold_key: ThresholdKey) throws -> [SeedPhrase] {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             seed_phrase_get_seed_phrases(threshold_key.pointer, error)
@@ -94,7 +115,7 @@ public final class SeedPhraseModule {
         let string = String.init(cString: result!)
         string_free(result)
         let decoder = JSONDecoder()
-        let seed_array = try! decoder.decode( [seedPhraseStruct].self, from: string.data(using: String.Encoding.utf8)! )
+        let seed_array = try! decoder.decode( [SeedPhrase].self, from: string.data(using: String.Encoding.utf8)! )
         return seed_array
     }
 
@@ -118,6 +139,12 @@ public final class SeedPhraseModule {
         }
     }
     
+    /// Deletes a seed phrase stored on a `ThresholdKey` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - phrase: The phrase to be deleted.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func delete_seed_phrase(threshold_key: ThresholdKey, phrase: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -132,6 +159,7 @@ public final class SeedPhraseModule {
             }
         }
     }
+    
     /*
     static func get_seed_phrases_with_accounts(threshold_key: ThresholdKey, derivation_format: String) throws -> String
     {

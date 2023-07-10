@@ -7,10 +7,24 @@ import Foundation
 public class ShareStoreArray {
     private(set) var pointer: OpaquePointer?
 
-    public init(pointer: OpaquePointer) throws {
+    /// Instantiate a `ShareStoreArray` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `ShareStoreArray`
+    public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
     
+    /// Retrieves a `ShareStore` in the collection at a specified index.
+    ///
+    /// - Parameters:
+    ///   - index: index of `ShareStore` to be retrieved.
+    ///
+    /// - Returns: `ShareStore`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid index or invalid `KeyPointArray`.
     public func getAt(index: Int32) throws -> ShareStore {
         var errorCode: Int32 = -1
         
@@ -23,6 +37,11 @@ public class ShareStoreArray {
         return ShareStore.init(pointer: share_store!);
     }
     
+    /// Returns the number of items in the collection.
+    ///
+    /// - Returns: `Int32`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid `ShareStoreArray`.
     public func length() throws -> Int32{
         var errorCode: Int32 = -1
         

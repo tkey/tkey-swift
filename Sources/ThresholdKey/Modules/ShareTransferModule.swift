@@ -4,6 +4,15 @@ import Foundation
 #endif
 
 public final class ShareTransferModule {
+    /// This module facilitates the transfer of shares between devices, this ensure that both devies can share the same private key. The service provider configuration will need to be the same for both instances of the `ThresholdKey`. This is particularly useful where a user would want to share a login between multiple devices that they control without ending up with a common share between them after the process is complete.
+    /// Device A will fully reconstruct the `ThresholdKey`.
+    /// Device B will be initialized in the same way as Device A.
+    /// Device B will request a share from Device A.
+    /// Device A will then lookup and approve the share request for Device B.
+    /// Device B would then check the status of the request until it is approved.
+    /// Device B would then be able to reconstruct the `ThresholdKey`, reaching the same private key as Device A.
+    /// Device B would then cleanup the share request, automatic if enabled.
+    
     private static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, completion: @escaping (Result<String, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -26,6 +35,15 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Requests a new share for transfer for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - user_agent: `String` containing information about the device requesting the share.
+    ///   - available_share_indexes: Json represented as a `String` indicating the available share indexes on which the transfer should take place, can be an empty array `"[]"`
+    ///
+    /// - Returns: `String`, the encryption key.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String ) async throws -> String {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -61,6 +79,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Adds custom information to a share transfer request for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - enc_pub_key_x: The encryption key for the share transfer request.
+    ///   - custom_info: Json represented as a `String`, the custom information to be added.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -96,6 +121,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Searches for available share transfer requests for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Returns: Array of `String`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func look_for_request(threshold_key: ThresholdKey ) async throws -> [String] {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -112,14 +144,19 @@ public final class ShareTransferModule {
     }
     
     
-    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
+                var storePointer: OpaquePointer?
+                
+                if share_store != nil {
+                    storePointer = share_store!.pointer
+                }
                 let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
                 let encPointer = UnsafeMutablePointer<Int8>(mutating: (enc_pub_key_x as NSString).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_approve_request(threshold_key.pointer, encPointer, share_store.pointer, curvePointer, error)
+                    share_transfer_approve_request(threshold_key.pointer, encPointer, storePointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
@@ -131,7 +168,14 @@ public final class ShareTransferModule {
         }
     }
     
-    public static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore ) async throws {
+    /// Approves a share transfer request for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - enc_pub_key_x: The encryption key for the share transfer request.
+    ///   - share_store: The `ShareStore` for the share transfer request, optional.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
+    public static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore? = nil ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
             approve_request(threshold_key: threshold_key, enc_pub_key_x: enc_pub_key_x, share_store: share_store) {
@@ -166,6 +210,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Approves a share transfer request for a specific share index for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - enc_pub_key_x: The encryption key for the share transfer request.
+    ///   - share_index: The relevant share index for the share transfer request.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func approve_request_with_share_index(threshold_key: ThresholdKey, enc_pub_key_x: String, share_index: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -181,7 +232,6 @@ public final class ShareTransferModule {
         }
     }
 
-    
     private static func get_store(threshold_key: ThresholdKey, completion: @escaping (Result<ShareTransferStore, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -200,6 +250,12 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Retrieves the share transfer store for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Returns: `ShareTransferStore`
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func get_store(threshold_key: ThresholdKey ) async throws -> ShareTransferStore {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -233,6 +289,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Sets the share transfer store for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - store: The share transfer store.
+    ///
+    /// - Returns: `true` on success, `false` otherwise.
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func set_store(threshold_key: ThresholdKey, store: ShareTransferStore ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -268,6 +331,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Removes the share transfer store for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - enc_pub_key_x: The encryption key for the share transfer request.
+    ///
+    /// - Returns: `true` on success, `false` otherwise.
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String ) async throws -> Bool {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -283,6 +353,11 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Retrieves the encryption key for the current share transfer request of a  `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func get_current_encryption_key(threshold_key: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -319,6 +394,13 @@ public final class ShareTransferModule {
         }
     }
     
+    /// Checks the status of a share transfer request for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - enc_pub_key_x: The encryption key for the share transfer request.
+    ///   - delete_request_on_completion: Determines if the share request should be deleted on completion.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool ) async throws -> ShareStore {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -334,6 +416,11 @@ public final class ShareTransferModule {
         }
     }
 
+    /// Clears share transfer requests for a `Threshold Key` object.
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid threshold key.
     public static func cleanup_request(threshold_key: ThresholdKey) throws {
         var errorCode: Int32 = -1
         withUnsafeMutablePointer(to: &errorCode, { error in
