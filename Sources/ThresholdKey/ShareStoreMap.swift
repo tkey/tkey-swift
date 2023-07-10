@@ -1,10 +1,3 @@
-//
-//  ShareStoreMap.swift
-//  tkey_ios
-//
-//  Created by David Main.
-//
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -13,6 +6,14 @@ import Foundation
 public final class ShareStoreMap {
     public var share_maps = [String: ShareStore]()
 
+    /// Instantiate a `ShareStoreMap` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `ShareStoreMap`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in

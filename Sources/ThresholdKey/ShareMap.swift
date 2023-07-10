@@ -1,11 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by guru ramu on 13/01/23.
-//
-
-
 import Foundation
 #if canImport(lib)
     import lib
@@ -14,6 +6,14 @@ import Foundation
 public final class ShareMap {
     public var share_map = [String: String]()
     
+    /// Instantiate a `ShareMap` object using the underlying pointer.
+    ///
+    /// - Parameters:
+    ///   - pointer: The pointer to the underlying foreign function interface object.
+    ///
+    /// - Returns: `ShareMap`
+    ///
+    /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
     public init(pointer: OpaquePointer) throws {
         var errorCode: Int32 = -1
         let keys = withUnsafeMutablePointer(to: &errorCode, { error in
