@@ -47,7 +47,7 @@ public final class RssComm {
 
                 for (index, element) in json.enumerated() {
                     let json_elem = try! JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
-                    let json_escaped_string = StorageLayer.percentEscapeString(string: String(data: json_elem, encoding: .utf8)!)
+                    let json_escaped_string = RssComm.percentEscapeString(string: String(data: json_elem, encoding: .utf8)!)
                     let final_string = String(index) + "=" + json_escaped_string
                     form_data.append(final_string)
                 }
