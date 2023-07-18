@@ -910,6 +910,29 @@ public class ThresholdKey {
     ///   - private_key: The reconstructed key, optional.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    public func create_tagged_tss_share(deviceTssShare: String?, factorPub: String, deviceTssIndex: Int) {
+        var deviceShare
+        threshold_key_create_tagged_tss_share(self.pointer, <#T##device_tss_share: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##factor_pub: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##device_tss_index: Int32##Int32#>, <#T##curve_n: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##error_code: UnsafeMutablePointer<Int32>!##UnsafeMutablePointer<Int32>!#>)
+//        return try await withCheckedThrowingContinuation {
+//            continuation in
+//            self.storage_layer_get_metadata(private_key: private_key) {
+//                result in
+//                switch result {
+//                case .success(let result):
+//                    continuation.resume(returning: result)
+//                case .failure(let error):
+//                    continuation.resume(throwing: error)
+//                }
+//            }
+//        }
+    }
+    
+    /// Function to retrieve the metadata directly from the network, only used in very specific instances.
+    ///
+    /// - Parameters:
+    ///   - private_key: The reconstructed key, optional.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func storage_layer_get_metadata(private_key: String?) async throws -> String {
         return try await withCheckedThrowingContinuation {
             continuation in
@@ -1007,6 +1030,7 @@ public class ThresholdKey {
             }
         }
     }
+    
     
     public func service_provider_assign_public_key(tag: String, json: String, nonce: String, public_key: String) throws {
                 var errorCode: Int32 = -1

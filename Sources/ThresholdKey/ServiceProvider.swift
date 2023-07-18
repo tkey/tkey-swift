@@ -1,4 +1,5 @@
 import Foundation
+import TorusUtils
 #if canImport(lib)
     import lib
 #endif
@@ -13,11 +14,12 @@ public final class ServiceProvider {
     ///   - enable_logging: Determines if logging is enabled or not.
     ///   - postbox_key: The private key to be used for the ServiceProvider.
     ///   - useTss: Whether tss is used or not.
+    ///   - torus-utils : Torus-utils
     ///
     /// - Returns: `ServiceProvider`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters were used.
-    public init(enable_logging: Bool, postbox_key: String, useTss: Bool = false) throws {
+    public init(enable_logging: Bool, postbox_key: String, useTss: Bool = false, torusUtils: TorusUtils ) throws {
         var errorCode: Int32 = -1
         let postboxPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: postbox_key).utf8String)
         let curve = UnsafeMutablePointer<Int8>(mutating: NSString(string: curveN).utf8String)

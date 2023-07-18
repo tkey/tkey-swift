@@ -100,7 +100,14 @@
         void threshold_key_set_metadata(struct FFIThresholdKey* threshold_key, char* private_key, char* value, char* curve_n, int* error_code);
         void threshold_key_set_metadata_stream(struct FFIThresholdKey* threshold_key, char* private_keys, char* values, char* curve_n, int* error_code);
         void threshold_key_service_provider_assign_tss_public_key(struct FFIThresholdKey* threshold_key, char* tss_tag, char* tss_nonce, char* tss_public_key, int* error_code);
+        // Tss
+        void threshold_key_set_tss_tag(struct FFIThresholdKey* threshold_key, char* tss_tag);
+        void threshold_key_create_tagged_tss_share(struct FFIThresholdKey* threshold_key, char* device_tss_share, char* factor_pub, int device_tss_index, char* curve_n, int* error_code );
+        
+        void threshold_key_copy_factor_pub(struct FFIThresholdKey* threshold_key, char* new_factor_pub, int new_tss_index, char* factor_pub, char* curve_n, int* error_code );
 
+        void threshold_key_generate_tss_share(struct FFIThresholdKey* threshold_key, struct TssOptions* tss_options, char* curve_n, int* error_code );
+        void threshold_key_delete_tss_share(struct FFIThresholdKey* threshold_key, struct TssOptions* tss_options, char* curve_n, int* error_code );
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
