@@ -2,11 +2,18 @@ import Foundation
 #if canImport(lib)
     import lib
 #endif
+import TorusUtils
+import CommonSources
 
 public class ThresholdKey {
     private(set) var pointer: OpaquePointer?
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
     internal let tkeyQueue = DispatchQueue(label: "thresholdkey.queue")
+    internal var torusUtils : TorusUtils?;
+    internal var nodeDetails : AllNodeDetailsModel?;
+    
+    internal let serviceProvider : ServiceProvider?;
+    
 
     /// Instantiate a `ThresholdKey` object,
     ///
@@ -24,12 +31,16 @@ public class ThresholdKey {
     /// - Returns: `ThresholdKey`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters.
-    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool, rss_comm: RssComm? = nil) throws {
+    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool, rss_comm: RssComm? = nil, torusUtils: TorusUtils? = nil, nodeDetails: AllNodeDetailsModel? = nil) throws {
         var errorCode: Int32 = -1
         var providerPointer: OpaquePointer?
         if case .some(let provider) = service_provider {
             providerPointer = provider.pointer
         }
+        
+        self.torusUtils = torusUtils
+        self.nodeDetails = nodeDetails
+        self.serviceProvider = service_provider
         
         var sharesPointer: OpaquePointer?
         var metadataPointer: OpaquePointer?
@@ -65,9 +76,14 @@ public class ThresholdKey {
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey")
         }
+        
+//            fetch "default" tagged tss pub key -> torusutils, nodeEndpoint
+//      threhold_key_service_provider_assign_tss_public_key
+        
         pointer = result
        
     }
+    
 
     /// Returns the metadata,
     ///
@@ -438,7 +454,7 @@ public class ThresholdKey {
                     threshold_key_input_share(self.pointer, cShare, cShareType, curvePointer, error )
                 })
                 guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey generate_new_share")
+                    throw RuntimeError("Error in ThresholdKey input share")
                 }
                 completion(.success(()))
             } catch {
@@ -904,28 +920,6 @@ public class ThresholdKey {
         }
     }
     
-    /// Function to retrieve the metadata directly from the network, only used in very specific instances.
-    ///
-    /// - Parameters:
-    ///   - private_key: The reconstructed key, optional.
-    ///
-    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func create_tagged_tss_share(deviceTssShare: String?, factorPub: String, deviceTssIndex: Int) {
-        var deviceShare
-        threshold_key_create_tagged_tss_share(self.pointer, <#T##device_tss_share: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##factor_pub: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##device_tss_index: Int32##Int32#>, <#T##curve_n: UnsafeMutablePointer<CChar>!##UnsafeMutablePointer<CChar>!#>, <#T##error_code: UnsafeMutablePointer<Int32>!##UnsafeMutablePointer<Int32>!#>)
-//        return try await withCheckedThrowingContinuation {
-//            continuation in
-//            self.storage_layer_get_metadata(private_key: private_key) {
-//                result in
-//                switch result {
-//                case .success(let result):
-//                    continuation.resume(returning: result)
-//                case .failure(let error):
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-    }
     
     /// Function to retrieve the metadata directly from the network, only used in very specific instances.
     ///

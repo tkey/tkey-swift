@@ -27,6 +27,20 @@ public final class PrivateKey {
     public init(hex: String) {
         self.hex = hex
     }
+    
+    public func toPublic () throws -> String {
+        var errorCode: Int32 = -1
+        let secretPointer = UnsafeMutablePointer<Int8>(mutating: (self.hex as NSString).utf8String)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            private_to_public(secretPointer, error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in PrivateKey, generate")
+        }
+        let publicHex = String.init(cString: result!)
+        string_free(result)
+        return publicHex
+    }
 
     /// Instantiates a `PrivateKey` object by random generation.
     ///
@@ -38,7 +52,7 @@ public final class PrivateKey {
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             generate_private_key(curvePointer, error)
-                })
+        })
         guard errorCode == 0 else {
             throw RuntimeError("Error in PrivateKey, generate")
             }
