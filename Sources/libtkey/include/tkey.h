@@ -39,6 +39,7 @@
         struct Polynomial* lagrange_interpolate_polynomial(struct KeyPointArray* points, char* curve_n, int* error_code);
         char* key_point_get_x(struct KeyPoint* point, int* error_code);
         struct KeyPoint* key_point_new(char* x, char* y, int* error_code);
+        struct KeyPoint* key_point_new_addr(char* address, int* error_code);
         char* key_point_get_y(struct KeyPoint* point, int* error_code);
         char* key_point_encode(struct KeyPoint* point, char* enc, int* error_code);
         void key_point_free(struct KeyPoint* point);

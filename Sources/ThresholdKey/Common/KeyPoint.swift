@@ -63,6 +63,27 @@ public final class KeyPoint: Equatable {
         pointer = result;
     }
     
+    /// Instantiates a `KeyPoint` object using X and Y co-ordinates in hexadecimal format.
+    ///
+    /// - Parameters:
+    ///   - x: X value of co-ordinate pair.
+    ///   - y: Y value of co-ordinate pair.
+    ///
+    /// - Returns: `KeyPoint` object.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used.
+    public init(address: String ) throws {
+        var errorCode: Int32 = -1
+        let addressPtr = UnsafeMutablePointer<Int8>(mutating: (address as NSString).utf8String)
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            key_point_new_addr(addressPtr, error)
+        })
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in KeyPoint, new")
+            }
+        pointer = result;
+    }
+    
     /// Retrieves the X value of the co-ordinate pair.
     ///
     /// - Returns: X value in hexadecimal format as `String`

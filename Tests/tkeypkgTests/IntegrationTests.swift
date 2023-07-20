@@ -36,6 +36,13 @@ final class integrationTests: XCTestCase {
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
         let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
         print (retrievedShare)
+        let signature = retrievedShare.sessionTokenData
+        let signatures = try signature.map{ item in
+            guard let sig = item?.signature else {
+                throw RuntimeError("fail to get signature")
+            }
+            return sig
+        }
         
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -63,8 +70,8 @@ final class integrationTests: XCTestCase {
         
         let ( tss_index, tss_share) = try threshold.get_tss_share(factorKey: factorKey.hex)
         
-        // 2/2 -> 2/3 tss
-//        let new_tss_share = try await threshold.generate_tss_share(input_tss_share: <#T##String#>, tss_input_index: <#T##Int32#>, auth_signatures: <#T##String#>, factor_pub: <#T##KeyPoint#>)
+        try await threshold.sync_local_metadata_transistions()
+        
         
         threshold2 = try! ThresholdKey(
             storage_layer: storage_layer,
@@ -77,9 +84,16 @@ final class integrationTests: XCTestCase {
         try! await threshold2.input_share(share: share, shareType: nil)
         _ = try! await threshold2.reconstruct()
         
+        try await threshold2.set_tss_tag(tssTag: "testing")
         let ( tss_index2, tss_share2) = try threshold2.get_tss_share(factorKey: factorKey.hex)
+        
         XCTAssertEqual(tss_share, tss_share2)
         
+        
+        
+        
+        // 2/2 -> 2/3 tss
+        let new_tss_share = try await threshold.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures, factor_pub: KeyPoint(address: factorPub))
         
         
     }

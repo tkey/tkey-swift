@@ -5,7 +5,7 @@ import Foundation
 
 final class tkey_pkgTssOptionsTests: XCTestCase {
     func test_create() {
-        let auth_sigs = "[]"
+        let auth_sigs : [String] = []
         let selected_servers = "[1,2,3,4,5]"
         let device_tss_share = "930f4193f6e0419110989ddb579016d7a2aefeab093942ec3c2267be492fd72c"
         let tss_input_index: Int32 = 2

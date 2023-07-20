@@ -169,7 +169,7 @@ extension ThresholdKey {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func generate_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: String, factor_pub: KeyPoint) async throws {
+    public func generate_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: KeyPoint) async throws {
         var errorCode: Int32 = -1
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
@@ -192,7 +192,7 @@ extension ThresholdKey {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: String, factor_pub: KeyPoint) async throws {
+    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: KeyPoint) async throws {
         var errorCode: Int32 = -1
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
