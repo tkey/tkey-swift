@@ -103,6 +103,10 @@
         void threshold_key_set_metadata_stream(struct FFIThresholdKey* threshold_key, char* private_keys, char* values, char* curve_n, int* error_code);
         void threshold_key_service_provider_assign_tss_public_key(struct FFIThresholdKey* threshold_key, char* tss_tag, char* tss_nonce, char* tss_public_key, int* error_code);
         // Tss
+
+        char* threshold_key_get_tss_public_key(struct FFIThresholdKey* threshold_key, int* error_code );
+        char* threshold_key_get_all_tss_tags(struct FFIThresholdKey* threshold_key, int* error_code );
+
         void threshold_key_set_tss_tag(struct FFIThresholdKey* threshold_key, char* tss_tag, int* error_code );
         char* threshold_key_get_tss_tag(struct FFIThresholdKey* threshold_key, int* error_code );
         void threshold_key_create_tagged_tss_share(struct FFIThresholdKey* threshold_key, char* device_tss_share, char* factor_pub, int device_tss_index, char* curve_n, int* error_code );

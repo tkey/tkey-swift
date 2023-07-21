@@ -38,7 +38,7 @@ public final class TssModule {
         }
     }
     
-    /// set tss tag
+    /// get tss tag
     ///
     ///
     public func get_tss_tag () throws -> String{
@@ -46,6 +46,48 @@ public final class TssModule {
         
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_tss_tag(threshold_key.pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in get_tss_tag")
+        }
+        let string = String.init(cString: result!)
+        string_free(result)
+        return string
+    }
+    
+    
+    /// get all  tss tag
+    ///
+    ///
+    public func get_all_tss_tag () throws -> [String]{
+        var errorCode: Int32 = -1
+        
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_tss_tag(threshold_key.pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in get_tss_tag")
+        }
+        let string = String.init(cString: result!)
+        string_free(result)
+        guard let data = string.data(using: .utf8) else {
+            throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
+        }
+        guard let result_vec = try JSONSerialization.jsonObject(with: data ) as? [String] else {
+            throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
+        }
+        
+        return result_vec
+    }
+    
+    /// get tss pub key
+    ///
+    ///
+    public func get_tss_pub_key () throws -> String{
+        try self.set_tss_tag(tss_tag: self.tss_tag)
+        
+        var errorCode: Int32 = -1
+        
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_tss_public_key(threshold_key.pointer, error )})
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_tss_tag")
         }
@@ -224,7 +266,7 @@ public final class TssModule {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: String, selected_servers: [Int32]? = nil) async throws {
+    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
         try self.set_tss_tag(tss_tag: self.tss_tag)
         var errorCode: Int32 = -1
         
@@ -237,7 +279,7 @@ public final class TssModule {
             throw RuntimeError("auth signatures error")
         };
         let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (input_tss_share as NSString).utf8String)
-        let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (factor_pub as NSString).utf8String)
+        let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (delete_factor_pub as NSString).utf8String)
         
         let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (auth_signatures_str as NSString).utf8String)
         
@@ -252,7 +294,35 @@ public final class TssModule {
             threshold_key_delete_tss_share(threshold_key.pointer, inputSharePointer, tss_input_index, factorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ThresholdKey create_tagged_tss_share")
+            throw RuntimeError("Error in ThresholdKey delete tss share")
         }
+    }
+    
+    
+    /// add factor pub
+    /// moving from shares n / m -> n / m+1
+    /// - Parameters:
+    ///
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    public func add_factor_pub( factor_key: String, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, selected_servers: [Int32]?=nil) async throws {
+        try self.set_tss_tag(tss_tag: self.tss_tag)
+
+        let (tss_index, tss_share) = try self.get_tss_share(factorKey: factor_key)
+        try await self.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, new_factor_pub: new_factor_pub, new_tss_index: new_tss_index, selected_servers: selected_servers)
+    }
+    
+    
+    /// delete tss share with factor pub
+    /// moving from shares n / m -> n / m-1
+    /// - Parameters:
+    ///
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    public func delete_factor_pub(factor_key: String, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
+        try self.set_tss_tag(tss_tag: self.tss_tag)
+
+        let (tss_index, tss_share) = try self.get_tss_share(factorKey: factor_key)
+        try await self.delete_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, selected_servers: selected_servers)
     }
 }
