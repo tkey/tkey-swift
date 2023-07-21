@@ -20,9 +20,9 @@ public final class TssModule {
     init(threshold_key: ThresholdKey, tss_tag: String) async throws{
         self.tss_tag = tss_tag;
         self.threshold_key = threshold_key;
+        try self.set_tss_tag(tss_tag: tss_tag)
         
         try await self.update_tss_pub_key()
-        try self.set_tss_tag(tss_tag: tss_tag)
     }
 
     /// set tss tag
