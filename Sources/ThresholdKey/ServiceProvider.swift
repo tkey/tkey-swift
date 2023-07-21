@@ -53,31 +53,21 @@ public final class ServiceProvider {
             verifierIdPtr = UnsafeMutablePointer<Int8>(mutating: NSString(string: verifierId).utf8String)
         }
         
-        var sssPtr :OpaquePointer? = nil
-        var rssPtr :OpaquePointer? = nil
-        var tssPtr :OpaquePointer? = nil
         
-        if let nodeDetails = nodeDetails
-        {
+        var sss: NodeDetails? = nil
+        var rss: NodeDetails? = nil
+        var tss: NodeDetails? = nil
+        if let nodeDetails = nodeDetails{
             let sssEndpoints = try JSONSerialization.data(withJSONObject: nodeDetails.getTorusNodeSSSEndpoints())
             let rssEndpoints = try JSONSerialization.data(withJSONObject: nodeDetails.getTorusNodeRSSEndpoints())
             let tssEndpoints = try JSONSerialization.data(withJSONObject: nodeDetails.getTorusNodeTSSEndpoints())
             
             let pub = nodeDetails.torusNodePub
-//            let pubkey = try JSONSerialization.data(withJSONObject: pub)
             let pubkey = try JSONEncoder().encode(pub)
             
-            print( String(data: pubkey, encoding: .utf8))
-            
-                        
-            let sss = try NodeDetails(server_endpoints: String(data: sssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
-            let rss = try NodeDetails(server_endpoints: String(data: rssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
-            let tss = try NodeDetails(server_endpoints: String(data: tssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
-            
-            sssPtr = sss.pointer
-            rssPtr = rss.pointer
-            tssPtr = tss.pointer
-            
+            sss = try NodeDetails(server_endpoints: String(data: sssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
+            rss = try NodeDetails(server_endpoints: String(data: rssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
+            tss = try NodeDetails(server_endpoints: String(data: tssEndpoints, encoding: .utf8)!, server_public_keys: String(data: pubkey, encoding: .utf8)!, serverThreshold: 3)
         }
         
         
@@ -87,9 +77,9 @@ public final class ServiceProvider {
                 useTss,
                 verifierPtr,
                 verifierIdPtr,
-                 rssPtr,
-                 sssPtr,
-                 tssPtr,
+                 tss?.pointer,
+                 rss?.pointer,
+                 sss?.pointer,
                 error)
                 })
         guard errorCode == 0 else {

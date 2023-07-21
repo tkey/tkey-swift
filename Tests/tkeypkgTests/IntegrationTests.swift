@@ -47,11 +47,13 @@ final class integrationTests: XCTestCase {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
         let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex, useTss: true, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, nodeDetails: nodeDetail, torusUtils: torusUtils)
+        let rss_comm = try RssComm()
         threshold = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
-            manual_sync: false
+            manual_sync: false,
+            rss_comm: rss_comm
         )
         
         _ = try! await threshold.initialize()
@@ -72,28 +74,30 @@ final class integrationTests: XCTestCase {
         
         try await threshold.sync_local_metadata_transistions()
         
-        
+        // Initialize on Instance 2
         threshold2 = try! ThresholdKey(
             storage_layer: storage_layer,
             service_provider: service_provider,
             enable_logging: true,
             manual_sync: false
         )
-        
         _ = try! await threshold2.initialize()
         try! await threshold2.input_share(share: share, shareType: nil)
         _ = try! await threshold2.reconstruct()
         
+        // Try get testing tss tag share on Instance 2
         try await threshold2.set_tss_tag(tssTag: "testing")
         let ( tss_index2, tss_share2) = try threshold2.get_tss_share(factorKey: factorKey.hex)
-        
+
         XCTAssertEqual(tss_share, tss_share2)
         
         
         
-        
+        let newFactorKey = try PrivateKey.generate();
+        let newFactorPub = try newFactorKey.toPublic()
         // 2/2 -> 2/3 tss
-        let new_tss_share = try await threshold.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures, factor_pub: KeyPoint(address: factorPub))
+        try await threshold.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures, new_factor_pub: newFactorPub, new_tss_index: 3)
+        let (tss_index3, tss_share3) = try threshold.get_tss_share(factorKey: newFactorKey.hex)
         
         
     }

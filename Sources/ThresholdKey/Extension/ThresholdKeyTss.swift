@@ -169,20 +169,33 @@ extension ThresholdKey {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func generate_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: KeyPoint) async throws {
+    public func generate_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, selected_servers: [Int32]?=nil) async throws {
         var errorCode: Int32 = -1
+        try await update_tss_pub_key(prefetch: true)
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
         
-        let tssOptions = try TssOptions(input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, factor_pub: factor_pub)
+        let auth_signatures_json = try JSONSerialization.data(withJSONObject: auth_signatures)
+        guard let auth_signatures_str = String(data: auth_signatures_json, encoding: .utf8) else {
+            throw RuntimeError("auth signatures error")
+        };
+        let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (input_tss_share as NSString).utf8String)
+        let newFactorPubPointer = UnsafeMutablePointer<Int8>(mutating: (new_factor_pub as NSString).utf8String)
         
-        try await update_tss_pub_key(prefetch: true)
+        let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (auth_signatures_str as NSString).utf8String)
         
+        var serversPointer: UnsafeMutablePointer<Int8>?
+        if selected_servers != nil {
+            let selected_servers_json = try JSONSerialization.data(withJSONObject: selected_servers)
+            let selected_servers_str = String(data: selected_servers_json, encoding: .utf8)!
+            serversPointer = UnsafeMutablePointer<Int8>(mutating: (selected_servers_str as NSString).utf8String)
+        }
+
         withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_generate_tss_share(self.pointer, tssOptions.pointer, curvePointer, error)
+            threshold_key_generate_tss_share(self.pointer, inputSharePointer, tss_input_index, new_tss_index, newFactorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
         })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in ThresholdKey create_tagged_tss_share")
+            throw RuntimeError("Error in ThresholdKey generate_tss_share")
         }
     }
     
@@ -192,17 +205,31 @@ extension ThresholdKey {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: KeyPoint) async throws {
+    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], factor_pub: String, selected_servers: [Int32]? = nil) async throws {
         var errorCode: Int32 = -1
-        
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
-        
-        let tssOptions = try TssOptions(input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, factor_pub: factor_pub)
         
         try await update_tss_pub_key(prefetch: true)
         
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
+        
+        let auth_signatures_json = try JSONSerialization.data(withJSONObject: auth_signatures)
+        guard let auth_signatures_str = String(data: auth_signatures_json, encoding: .utf8) else {
+            throw RuntimeError("auth signatures error")
+        };
+        let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (input_tss_share as NSString).utf8String)
+        let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (factor_pub as NSString).utf8String)
+        
+        let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (auth_signatures_str as NSString).utf8String)
+        
+        var serversPointer: UnsafeMutablePointer<Int8>?
+        if selected_servers != nil {
+            let selected_servers_json = try JSONSerialization.data(withJSONObject: selected_servers)
+            let selected_servers_str = String(data: selected_servers_json, encoding: .utf8)!
+            serversPointer = UnsafeMutablePointer<Int8>(mutating: (selected_servers_str as NSString).utf8String)
+        }
+        
         withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_delete_tss_share(self.pointer, tssOptions.pointer, curvePointer, error)
+            threshold_key_delete_tss_share(self.pointer, inputSharePointer, tss_input_index, factorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey create_tagged_tss_share")

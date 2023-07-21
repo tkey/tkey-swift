@@ -111,8 +111,8 @@
         int threshold_key_get_tss_nonce(struct FFIThresholdKey* threshold_key, char* tss_tag, int* error_code );
         void threshold_key_copy_factor_pub(struct FFIThresholdKey* threshold_key, char* new_factor_pub, int new_tss_index, char* factor_pub, char* curve_n, int* error_code );
 
-        void threshold_key_generate_tss_share(struct FFIThresholdKey* threshold_key, struct TssOptions* tss_options, char* curve_n, int* error_code );
-        void threshold_key_delete_tss_share(struct FFIThresholdKey* threshold_key, struct TssOptions* tss_options, char* curve_n, int* error_code );
+        void threshold_key_generate_tss_share(struct FFIThresholdKey* threshold_key, char* input_tss_share, int input_tss_index, int new_tss_index, char* new_factor_pub, char* selected_servers, char* auth_signatures, char* curve_n, int* error_code );
+        void threshold_key_delete_tss_share(struct FFIThresholdKey* threshold_key, char* input_tss_share, int input_tss_index, char* factor_pub, char* selected_servers, char* auth_signatures, char* curve_n, int* error_code );
         // share description
         char* threshold_key_get_share_descriptions(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_add_share_description(struct FFIThresholdKey* threshold_key, char* key, char* description, bool update_metadata, char* curve_n, int* error_code);
