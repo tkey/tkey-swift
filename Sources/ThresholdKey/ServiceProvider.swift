@@ -100,9 +100,9 @@ public final class ServiceProvider {
         }
         let extendedVerifierId = "\(verifierId)\u{0015}\(tssTag)\u{0016}\(nonce)"
         
-        let result = try await self.torusUtils?.getPublicAddressExtended(endpoints: nodeDetails.torusNodeEndpoints, verifier: verifier, verifierId: verifierId, extendedVerifierId: extendedVerifierId)
+        let result = try await self.torusUtils?.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, verifier: verifier, verifierId: verifierId, extendedVerifierId: extendedVerifierId)
         print (result)
-        guard let x = result?.x , let y = result?.y, let nodeIndexes = result?.nodeIndexes else {
+        guard let x = result?.finalKeyData?.X , let y = result?.finalKeyData?.Y, let nodeIndexes = result?.nodesData?.nodeIndexes else {
             throw RuntimeError("conversion error")
         }
         let pubKey = GetTSSPubKeyResult.Point(x: x, y: y)

@@ -36,12 +36,9 @@ final class integrationTests: XCTestCase {
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
         let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
         print (retrievedShare)
-        let signature = retrievedShare.sessionTokenData
-        let signatures = try signature.map{ item in
-            guard let sig = item?.signature else {
-                throw RuntimeError("fail to get signature")
-            }
-            return sig
+        let signature = retrievedShare.sessionData?.sessionTokenData
+        let signatures = try signature?.compactMap { item in
+            return item.signature
         }
         
         let postbox_key = try! PrivateKey.generate()
@@ -96,7 +93,7 @@ final class integrationTests: XCTestCase {
         let newFactorKey = try PrivateKey.generate();
         let newFactorPub = try newFactorKey.toPublic()
         // 2/2 -> 2/3 tss
-        try await threshold.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures, new_factor_pub: newFactorPub, new_tss_index: 3)
+        try await threshold.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures!, new_factor_pub: newFactorPub, new_tss_index: 3)
         let (tss_index3, tss_share3) = try threshold.get_tss_share(factorKey: newFactorKey.hex)
         
         
@@ -112,12 +109,9 @@ final class integrationTests: XCTestCase {
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
         let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
         print (retrievedShare)
-        let signature = retrievedShare.sessionTokenData
-        let signatures = try signature.map{ item in
-            guard let sig = item?.signature else {
-                throw RuntimeError("fail to get signature")
-            }
-            return sig
+        let signature = retrievedShare.sessionData?.sessionTokenData
+        let signatures = try signature?.compactMap { item in
+            return item.signature
         }
         
         let postbox_key = try! PrivateKey.generate()
@@ -142,7 +136,7 @@ final class integrationTests: XCTestCase {
         let tss1 = try await TssModule(threshold_key: threshold, tss_tag: tssTag)
         let factorKey = try PrivateKey.generate();
         let factorPub = try factorKey.toPublic()
-        print(factorPub.count)
+        print("factorbub",factorPub.count)
 
         try tss1.create_tagged_tss_share(deviceTssShare: nil, factorPub: factorPub, deviceTssIndex: 2)
         
@@ -154,7 +148,7 @@ final class integrationTests: XCTestCase {
         let newFactorKey = try PrivateKey.generate();
         let newFactorPub = try newFactorKey.toPublic()
         // 2/2 -> 2/3 tss
-        try await tss1.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures, new_factor_pub: newFactorPub, new_tss_index: 3)
+        try await tss1.generate_tss_share(input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: signatures!, new_factor_pub: newFactorPub, new_tss_index: 3)
         let (tss_index3, tss_share3) = try tss1.get_tss_share(factorKey: newFactorKey.hex)
         
         let (_, tss_share_updated) = try tss1.get_tss_share(factorKey: factorKey.hex)
@@ -193,7 +187,7 @@ final class integrationTests: XCTestCase {
 
         
         // 2/3 -> 2/2 tss
-        try await tss1.delete_tss_share(input_tss_share: tss_share3, tss_input_index: Int32(tss_index3)!, auth_signatures: signatures, factor_pub: newFactorPub)
+        try await tss1.delete_tss_share(input_tss_share: tss_share3, tss_input_index: Int32(tss_index3)!, auth_signatures: signatures!, delete_factor_pub: newFactorPub)
         XCTAssertThrowsError( try tss1.get_tss_share(factorKey: newFactorKey.hex) )
         
         let ( tss_index_updated2, tss_share_updated2) = try await tss1.get_tss_share(factorKey: factorKey.hex)
