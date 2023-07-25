@@ -121,11 +121,8 @@ public final class TssModule {
         if (prefetch) { nonce += 1 }
         
         let nonceString = String(nonce)
-        var noncePointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: nonceString).utf8String)
-        print(nonceString)
-        print("updating.....")
+        let noncePointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: nonceString).utf8String)
         let result = try await serviceProvider.getTssPubAddress(tssTag: self.tss_tag, nonce: nonceString)
-        print(result)
         let resultJson = try JSONEncoder().encode(result)
         guard let resultString = String(data: resultJson, encoding: .utf8) else {
             throw RuntimeError("update_tss_pub_key - Conversion Error - ResultString")
@@ -178,6 +175,7 @@ public final class TssModule {
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func get_tss_share(factorKey: String, threshold: Int32 = 0) throws -> (String, String) {
+        if (factorKey.count > 66) {throw RuntimeError ("Invalid factor Key");}
         try self.set_tss_tag(tss_tag: self.tss_tag)
         
         var errorCode: Int32 = -1
@@ -203,7 +201,8 @@ public final class TssModule {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func copy_factor_pub(newFactorPub:String, tss_index : Int32, factorKey: String, threshold: Int32 = 0) throws {
+    public func copy_factor_pub(factorKey: String,  newFactorPub:String, tss_index : Int32, threshold: Int32 = 0) throws {
+        if (factorKey.count > 66) {throw RuntimeError ("Invalid factor Key");}
         try self.set_tss_tag(tss_tag: self.tss_tag)
         
         var errorCode: Int32 = -1
@@ -266,11 +265,9 @@ public final class TssModule {
     ///
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
+    internal func delete_tss_share_internal(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) throws {
         try self.set_tss_tag(tss_tag: self.tss_tag)
         var errorCode: Int32 = -1
-        
-        try await self.update_tss_pub_key(prefetch: true)
         
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
         
@@ -298,6 +295,20 @@ public final class TssModule {
         }
     }
     
+    /// delete tss share with factor pub
+    /// moving from shares n / m -> n / m-1
+    /// - Parameters:
+    ///
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
+
+        try await self.update_tss_pub_key(prefetch: true)
+        try self.delete_tss_share_internal(input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, selected_servers: selected_servers)
+        
+
+    }
+    
     
     /// add factor pub
     /// moving from shares n / m -> n / m+1
@@ -306,6 +317,7 @@ public final class TssModule {
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func add_factor_pub( factor_key: String, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, selected_servers: [Int32]?=nil) async throws {
+        if (factor_key.count > 66) {throw RuntimeError ("Invalid factor Key");}
         try self.set_tss_tag(tss_tag: self.tss_tag)
 
         let (tss_index, tss_share) = try self.get_tss_share(factorKey: factor_key)
@@ -320,6 +332,8 @@ public final class TssModule {
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func delete_factor_pub(factor_key: String, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
+        threshold_key.tkeyQueue
+        if (factor_key.count > 66) {throw RuntimeError ("Invalid factor Key");}
         try self.set_tss_tag(tss_tag: self.tss_tag)
 
         let (tss_index, tss_share) = try self.get_tss_share(factorKey: factor_key)
