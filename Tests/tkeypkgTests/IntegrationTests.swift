@@ -35,7 +35,6 @@ final class integrationTests: XCTestCase {
         let idToken = try generateIdToken(email: TORUS_TEST_EMAIL)
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
         let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
-        print (retrievedShare)
         let signature = retrievedShare.sessionData?.sessionTokenData
         let signatures = signature!.compactMap { item in
             return item.signature
@@ -58,13 +57,11 @@ final class integrationTests: XCTestCase {
         _ = try! await threshold.reconstruct()
         let shareIndex = try! await threshold.generate_new_share()
         let share = try threshold.output_share(shareIndex: shareIndex.hex)
-        print(share)
         
         let tssTag = "testing"
         let tss1 = try await TssModule(threshold_key: threshold, tss_tag: tssTag)
         let factorKey = try PrivateKey.generate();
         let factorPub = try factorKey.toPublic()
-        print("factorbub",factorPub.count)
 
         try tss1.create_tagged_tss_share(deviceTssShare: nil, factorPub: factorPub, deviceTssIndex: 2)
         
@@ -85,8 +82,6 @@ final class integrationTests: XCTestCase {
         XCTAssertNotEqual(tss_share, tss_share_updated)
         XCTAssertNotEqual(tss_share_updated, tss_share3)
         XCTAssertNotEqual(tss_index, tss_index3)
-        
-        
         // Initialize on Instance 2
         threshold2 = try! ThresholdKey(
             storage_layer: storage_layer,
@@ -112,13 +107,12 @@ final class integrationTests: XCTestCase {
         XCTAssertEqual(tss_share3, tss_share2_3)
         XCTAssertEqual(tss_index3, tss_index2_3)
 
-        
+
         // 2/3 -> 2/2 tss
         try await tss1.delete_tss_share(input_tss_share: tss_share3, tss_input_index: Int32(tss_index3)!, auth_signatures: signatures, delete_factor_pub: newFactorPub)
         XCTAssertThrowsError( try tss1.get_tss_share(factorKey: newFactorKey.hex) )
 
         let ( tss_index_updated2, tss_share_updated2) = try await tss1.get_tss_share(factorKey: factorKey.hex)
-
         XCTAssertEqual(tss_index_updated2, tss_index)
 
         XCTAssertNotEqual(tss_share, tss_share_updated2)
@@ -203,12 +197,11 @@ final class integrationTests: XCTestCase {
             try tssMod.create_tagged_tss_share(deviceTssShare: nil, factorPub: factorPub, deviceTssIndex: 2)
             
             
-            let ( tssIndex, tssShare) = try tssMod.get_tss_share(factorKey: factorKey.hex)
+            let ( tssIndex, tssShare) = try! tssMod.get_tss_share(factorKey: factorKey.hex)
             tssIndexes.append(tssIndex)
             tssShares.append(tssShare)
         }
         try await threshold.sync_local_metadata_transistions()
-        
 
         
         var newFactorKeys : [PrivateKey] = []
@@ -296,9 +289,7 @@ final class integrationTests: XCTestCase {
             // create tag tss module
             let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag)
             tssModsInstance2.append( tssMod )
-    
             let ( tss_index, tss_share) = try tssMod.get_tss_share(factorKey: factorKeys[index].hex)
-            
         }
 
         
