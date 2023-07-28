@@ -167,6 +167,24 @@ public final class TssModule {
         }
     }
     
+    /// Function to get nouce
+    ///
+    /// - Parameters:
+    ///
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    public func get_tss_nonce() throws -> Int32 {
+        var errorCode: Int32 = -1
+        let tss_tag_pointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: self.tss_tag).utf8String)
+        let nonce = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_tss_nonce(threshold_key.pointer, tss_tag_pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in ThresholdKey updateTssPubKey")
+        }
+        errorCode = -1
+        return nonce
+    }
+    
     
     /// Function to retrieve tss share
     ///
