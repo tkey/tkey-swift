@@ -17,7 +17,7 @@ public final class TssModule {
     var tss_tag = "default"
     var threshold_key : ThresholdKey
     
-    init(threshold_key: ThresholdKey, tss_tag: String) async throws{
+    public init(threshold_key: ThresholdKey, tss_tag: String) async throws{
         self.tss_tag = tss_tag;
         self.threshold_key = threshold_key;
         try self.set_tss_tag(tss_tag: tss_tag)
