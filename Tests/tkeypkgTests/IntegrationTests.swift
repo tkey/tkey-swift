@@ -183,6 +183,7 @@ final class integrationTests: XCTestCase {
         var tssIndexes : [String] = []
         var tssShares : [String] = []
         
+        print (try threshold.get_all_tss_tag())
         for tag in testTags {
             // create tag tss module
             let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag)
@@ -311,6 +312,7 @@ final class integrationTests: XCTestCase {
             
         }
         try await threshold.sync_local_metadata_transistions()
+        print (try threshold.get_all_tss_tag())
     }
 }
 

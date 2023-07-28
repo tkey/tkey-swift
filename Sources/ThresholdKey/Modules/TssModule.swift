@@ -58,11 +58,11 @@ public final class TssModule {
     /// get all  tss tag
     ///
     ///
-    public func get_all_tss_tag () throws -> [String]{
+    public func get_all_tss_tags () throws -> [String]{
         var errorCode: Int32 = -1
         
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_tag(threshold_key.pointer, error )})
+            threshold_key_get_all_tss_tags(threshold_key.pointer, error )})
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_tss_tag")
         }
