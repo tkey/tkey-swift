@@ -12,7 +12,7 @@ public class ThresholdKey {
     internal var torusUtils : TorusUtils?;
     internal var nodeDetails : AllNodeDetailsModel?;
     
-    internal let serviceProvider : ServiceProvider?;
+    public let serviceProvider : ServiceProvider?;
     
 
     /// Instantiate a `ThresholdKey` object,
