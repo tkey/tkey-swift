@@ -25,6 +25,8 @@ public final class ServiceProvider {
     internal var nodeDetails : AllNodeDetailsModel?
     internal var torusUtils : TorusUtils?
     
+    internal var assignedTssPubKey : [String : GetTSSPubKeyResult] = [:]
+    
     public var useTss : Bool
     
 
@@ -94,16 +96,16 @@ public final class ServiceProvider {
         pointer = result!
     }
     
-    func getTssPubAddress (tssTag : String, nonce: String) async throws -> GetTSSPubKeyResult  {
+    public func getTssPubAddress (tssTag : String, nonce: String) async throws -> GetTSSPubKeyResult  {
         guard let verifier = self.verifier, let verifierId = verifierId , let nodeDetails = self.nodeDetails else {
             throw RuntimeError("missing verifier, verifierId or nodeDetails")
         }
         guard let torusUtils = self.torusUtils else {
             throw RuntimeError("missing torusUtils")
         }
-        
+
+            
         let extendedVerifierId = "\(verifierId)\u{0015}\(tssTag)\u{0016}\(nonce)"
-        
         
         let result = try await torusUtils.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, torusNodePubs: nodeDetails.torusNodePub, verifier: verifier, verifierId: verifierId, extendedVerifierId: extendedVerifierId )
         
@@ -112,8 +114,8 @@ public final class ServiceProvider {
             throw RuntimeError("conversion error")
         }
         let pubKey = GetTSSPubKeyResult.Point(x: x, y: y)
-        
         return GetTSSPubKeyResult(publicKey: pubKey, nodeIndexes: nodeIndexes)
+
     }
     
     deinit {
