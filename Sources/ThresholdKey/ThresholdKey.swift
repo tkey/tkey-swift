@@ -1037,6 +1037,30 @@ public class ThresholdKey {
                 }
         }
     
+    
+    /// get all  tss tag
+    ///
+    ///
+    public func get_all_tss_tag () throws -> [String]{
+        var errorCode: Int32 = -1
+        
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_tss_tag(self.pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in get_tss_tag")
+        }
+        let string = String.init(cString: result!)
+        string_free(result)
+        guard let data = string.data(using: .utf8) else {
+            throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
+        }
+        guard let result_vec = try JSONSerialization.jsonObject(with: data ) as? [String] else {
+            throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
+        }
+        
+        return result_vec
+    }
+    
     deinit {
         threshold_key_free(pointer)
     }
