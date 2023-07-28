@@ -17,7 +17,7 @@ import TorusUtils
 final class integrationTests: XCTestCase {
     
     func test_TssModule() async throws {
-        let TORUS_TEST_EMAIL = "saasa2@tr.us";
+        let TORUS_TEST_EMAIL = "saasa2123@tr.us";
         let TORUS_IMPORT_EMAIL = "importeduser2@tor.us";
         
         let TORUS_EXTENDED_VERIFIER_EMAIL = "testextenderverifierid@example.com";
@@ -30,14 +30,14 @@ final class integrationTests: XCTestCase {
         
         let nodeManager = NodeDetailManager(network: .sapphire(.SAPPHIRE_DEVNET))
         let nodeDetail = try await nodeManager.getNodeDetails(verifier: TORUS_TEST_VERIFIER, verifierID: TORUS_TEST_EMAIL)
-        let torusUtils = TorusUtils(serverTimeOffset: 1000, network: .sapphire(.SAPPHIRE_DEVNET), metadataHost: "https://sapphire-dev-2-1.authnetwork.dev/metadata" )
+        let torusUtils = TorusUtils(serverTimeOffset: 1000, network: .sapphire(.SAPPHIRE_DEVNET) )
         
         let idToken = try generateIdToken(email: TORUS_TEST_EMAIL)
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
-        let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
+        let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeEndpoints, torusNodePubs: nodeDetail.torusNodePub, indexes: nodeDetail.torusIndexes, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
         let signature = retrievedShare.sessionData?.sessionTokenData
         let signatures = signature!.compactMap { item in
-            return item.signature
+            return item?.signature
         }
         
         
@@ -142,15 +142,15 @@ final class integrationTests: XCTestCase {
         
         let nodeManager = NodeDetailManager(network: .sapphire(.SAPPHIRE_DEVNET))
         let nodeDetail = try await nodeManager.getNodeDetails(verifier: TORUS_TEST_VERIFIER, verifierID: TORUS_TEST_EMAIL)
-        let torusUtils = TorusUtils(serverTimeOffset: 1000, network: .sapphire(.SAPPHIRE_DEVNET), metadataHost: "https://sapphire-dev-2-1.authnetwork.dev/metadata" )
+        let torusUtils = TorusUtils(serverTimeOffset: 1000, network: .sapphire(.SAPPHIRE_DEVNET) )
 
         let idToken = try generateIdToken(email: TORUS_TEST_EMAIL)
         let verifierParams = VerifierParams(verifier_id: TORUS_TEST_EMAIL)
-        let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
+        let retrievedShare = try await torusUtils.retrieveShares(endpoints: nodeDetail.torusNodeSSSEndpoints, torusNodePubs: nodeDetail.torusNodePub, indexes: nodeDetail.torusIndexes, verifier: TORUS_TEST_VERIFIER, verifierParams: verifierParams, idToken: idToken)
         print (retrievedShare)
         let signature = retrievedShare.sessionData!.sessionTokenData
         let signatures = signature.compactMap { item in
-            return item.signature
+            return item?.signature
         }
 
 
@@ -266,8 +266,8 @@ final class integrationTests: XCTestCase {
             XCTAssertEqual(tssIndex1, tssIndex2)
             XCTAssertEqual(tssShare1, tssShare2)
         }
-        
         try await threshold.sync_local_metadata_transistions()
+        
         
         
         
