@@ -12,7 +12,7 @@ public struct GetTSSPubKeyResult : Codable {
         public var y: String
         
         public func toFullAddr () -> String {
-            return "04" + x + y
+            return x + y
         }
     }
     public var publicKey : Point
