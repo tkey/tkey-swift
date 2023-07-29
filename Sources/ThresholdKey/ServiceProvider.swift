@@ -8,8 +8,12 @@ import CommonSources
 
 public struct GetTSSPubKeyResult : Codable {
     public struct Point: Codable {
-        var x: String;
-        var y: String
+        public var x: String
+        public var y: String
+        
+        public func toFullAddr () -> String {
+            return "04" + x + y
+        }
     }
     public var publicKey : Point
     public var nodeIndexes : [Int]
