@@ -1038,10 +1038,7 @@ public class ThresholdKey {
         }
     
     
-    /// get all  tss tag
-    ///
-    ///
-    public func get_all_tss_tag () throws -> [String]{
+    public func get_all_tss_tags() throws -> [String]{
         var errorCode: Int32 = -1
         
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
