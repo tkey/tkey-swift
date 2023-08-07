@@ -1035,7 +1035,7 @@ public class ThresholdKey {
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_all_tss_tags(self.pointer, error )})
         guard errorCode == 0 else {
-            throw RuntimeError("Error in get_tss_tag")
+            throw RuntimeError("Error in get_all_tss_tags")
         }
         let string = String.init(cString: result!)
         string_free(result)
