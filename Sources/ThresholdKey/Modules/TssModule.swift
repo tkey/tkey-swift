@@ -82,6 +82,8 @@ public final class TssModule {
     ///
     ///
     public func get_all_factor_pub () throws -> [String]{
+        try self.set_tss_tag(tss_tag: self.tss_tag)
+        
         var errorCode: Int32 = -1
         
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
