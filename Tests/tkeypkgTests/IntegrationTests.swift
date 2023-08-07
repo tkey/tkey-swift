@@ -18,9 +18,9 @@ final class integrationTests: XCTestCase {
     
     func test_TssModule() async throws {
         let TORUS_TEST_EMAIL = "saasa2123@tr.us";
-        let TORUS_IMPORT_EMAIL = "importeduser2@tor.us";
+        // let TORUS_IMPORT_EMAIL = "importeduser2@tor.us";
         
-        let TORUS_EXTENDED_VERIFIER_EMAIL = "testextenderverifierid@example.com";
+        // let TORUS_EXTENDED_VERIFIER_EMAIL = "testextenderverifierid@example.com";
         
         let TORUS_TEST_VERIFIER = "torus-test-health";
         
@@ -43,7 +43,7 @@ final class integrationTests: XCTestCase {
         
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex, useTss: true, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, nodeDetails: nodeDetail, torusUtils: torusUtils)
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex, useTss: true, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, nodeDetails: nodeDetail)
         let rss_comm = try RssComm()
         threshold = try! ThresholdKey(
             storage_layer: storage_layer,
@@ -59,7 +59,7 @@ final class integrationTests: XCTestCase {
         let share = try threshold.output_share(shareIndex: shareIndex.hex)
         
         let tssTag = "testing"
-        let tss1 = try await TssModule(threshold_key: threshold, tss_tag: tssTag)
+        let tss1 = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
         let factorKey = try PrivateKey.generate();
         let factorPub = try factorKey.toPublic()
 
@@ -94,7 +94,7 @@ final class integrationTests: XCTestCase {
         _ = try! await threshold2.reconstruct()
 
         // Try get testing tss tag share on Instance 2
-        let tss2 = try await TssModule(threshold_key: threshold2, tss_tag: tssTag)
+        let tss2 = try await TssModule(threshold_key: threshold2, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
 
         let ( tss_index2, tss_share2) = try tss2.get_tss_share(factorKey: factorKey.hex)
 
@@ -112,7 +112,7 @@ final class integrationTests: XCTestCase {
         try await tss1.delete_tss_share(input_tss_share: tss_share3, tss_input_index: Int32(tss_index3)!, auth_signatures: signatures, delete_factor_pub: newFactorPub)
         XCTAssertThrowsError( try tss1.get_tss_share(factorKey: newFactorKey.hex) )
 
-        let ( tss_index_updated2, tss_share_updated2) = try await tss1.get_tss_share(factorKey: factorKey.hex)
+        let ( tss_index_updated2, tss_share_updated2) = try tss1.get_tss_share(factorKey: factorKey.hex)
         XCTAssertEqual(tss_index_updated2, tss_index)
 
         XCTAssertNotEqual(tss_share, tss_share_updated2)
@@ -130,9 +130,9 @@ final class integrationTests: XCTestCase {
     
     func test_TssModule_multi_tag () async throws {
         let TORUS_TEST_EMAIL = "saasa3@tr.us";
-        let TORUS_IMPORT_EMAIL = "importeduser2@tor.us";
+        // let TORUS_IMPORT_EMAIL = "importeduser2@tor.us";
         
-        let TORUS_EXTENDED_VERIFIER_EMAIL = "testextenderverifierid@example.com";
+        // let TORUS_EXTENDED_VERIFIER_EMAIL = "testextenderverifierid@example.com";
         
         let TORUS_TEST_VERIFIER = "torus-test-health";
         
@@ -156,7 +156,7 @@ final class integrationTests: XCTestCase {
 
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex, useTss: true, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, nodeDetails: nodeDetail, torusUtils: torusUtils)
+        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex, useTss: true, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, nodeDetails: nodeDetail)
         let rss_comm = try RssComm()
         threshold = try! ThresholdKey(
             storage_layer: storage_layer,
@@ -183,10 +183,10 @@ final class integrationTests: XCTestCase {
         var tssIndexes : [String] = []
         var tssShares : [String] = []
         
-        print (try threshold.get_all_tss_tag())
+        print (try threshold.get_all_tss_tags())
         for tag in testTags {
             // create tag tss module
-            let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag)
+            let tssMod = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
             tssMods.append( tssMod )
             
             let factorKey = try PrivateKey.generate();
@@ -288,9 +288,9 @@ final class integrationTests: XCTestCase {
         // check on new instances (instance 2 )
         for (index, tag) in testTags.enumerated() {
             // create tag tss module
-            let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag)
+            let tssMod = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
             tssModsInstance2.append( tssMod )
-            let ( tss_index, tss_share) = try tssMod.get_tss_share(factorKey: factorKeys[index].hex)
+            let ( _, _) = try tssMod.get_tss_share(factorKey: factorKeys[index].hex)
         }
 
         
@@ -312,7 +312,7 @@ final class integrationTests: XCTestCase {
             
         }
         try await threshold.sync_local_metadata_transistions()
-        print (try threshold.get_all_tss_tag())
+        print (try threshold.get_all_tss_tags())
     }
 }
 

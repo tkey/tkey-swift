@@ -7,12 +7,9 @@ import CommonSources
 
 public class ThresholdKey {
     private(set) var pointer: OpaquePointer?
+    private(set) var use_tss: Bool = false
     internal let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
     internal let tkeyQueue = DispatchQueue(label: "thresholdkey.queue")
-    internal var torusUtils : TorusUtils?;
-    internal var nodeDetails : AllNodeDetailsModel?;
-    
-    public let serviceProvider : ServiceProvider?;
     
 
     /// Instantiate a `ThresholdKey` object,
@@ -31,16 +28,12 @@ public class ThresholdKey {
     /// - Returns: `ThresholdKey`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters.
-    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool, rss_comm: RssComm? = nil, torusUtils: TorusUtils? = nil, nodeDetails: AllNodeDetailsModel? = nil) throws {
+    public init(metadata: Metadata? = nil, shares: ShareStorePolyIdIndexMap? = nil, storage_layer: StorageLayer, service_provider: ServiceProvider? = nil, local_matadata_transitions: LocalMetadataTransitions? = nil, last_fetch_cloud_metadata: Metadata? = nil, enable_logging: Bool, manual_sync: Bool, rss_comm: RssComm? = nil) throws {
         var errorCode: Int32 = -1
         var providerPointer: OpaquePointer?
         if case .some(let provider) = service_provider {
             providerPointer = provider.pointer
         }
-        
-        self.torusUtils = torusUtils
-        self.nodeDetails = nodeDetails
-        self.serviceProvider = service_provider
         
         var sharesPointer: OpaquePointer?
         var metadataPointer: OpaquePointer?
@@ -68,6 +61,7 @@ public class ThresholdKey {
         
         if rss_comm != nil {
             rssCommPtr = rss_comm!.pointer
+            use_tss = true
         }
         
         let result = withUnsafeMutablePointer(to: &errorCode, { error -> OpaquePointer in
@@ -76,9 +70,6 @@ public class ThresholdKey {
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey")
         }
-        
-//            fetch "default" tagged tss pub key -> torusutils, nodeEndpoint
-//      threhold_key_service_provider_assign_tss_public_key
         
         pointer = result
        
