@@ -296,12 +296,6 @@ public final class TssModule {
         }
     }
 
-    /// delete tss share with factor pub
-    /// moving from shares n / m -> n / m-1
-    /// - Parameters:
-    ///
-    ///
-    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
     public func delete_tss_share(input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil) async throws {
         try await update_tss_pub_key(prefetch: true)
         try delete_tss_share_internal(input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, selected_servers: selected_servers)
