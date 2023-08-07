@@ -78,6 +78,32 @@ public final class TssModule {
         return result_vec
     }
     
+    /// get all  tss tag
+    ///
+    ///
+    public func get_all_factor_pub () throws -> [String]{
+        try self.set_tss_tag(tss_tag: self.tss_tag)
+        
+        var errorCode: Int32 = -1
+        
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_tss_tag_factor_pub(threshold_key.pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in get_all_factor_pub")
+        }
+        let string = String.init(cString: result!)
+        string_free(result)
+        guard let data = string.data(using: .utf8) else {
+            throw RuntimeError("Error in get_all_factor_pub : Invalid output ")
+        }
+        guard let result_vec = try JSONSerialization.jsonObject(with: data ) as? [String] else {
+            throw RuntimeError("Error in get_all_factor_pub : Invalid output ")
+        }
+        
+        return result_vec
+    }
+    
+    
     /// get tss pub key
     ///
     ///
