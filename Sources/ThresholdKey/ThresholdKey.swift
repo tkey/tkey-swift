@@ -1045,7 +1045,7 @@ public class ThresholdKey {
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             threshold_key_get_extended_verifier_id(self.pointer, error) })
         guard errorCode == 0 else {
-            throw RuntimeError("Error in get_all_tss_tags")
+            throw RuntimeError("Error in get_extended_verifier_id")
         }
         let string = String(cString: result!)
         string_free(result)
