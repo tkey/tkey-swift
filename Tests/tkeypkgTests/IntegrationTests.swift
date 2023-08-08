@@ -59,7 +59,7 @@ final class integrationTests: XCTestCase {
         let share = try threshold.output_share(shareIndex: shareIndex.hex)
         
         let tssTag = "testing"
-        let tss1 = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
+        let tss1 = try await TssModule(threshold_key: threshold, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
         let factorKey = try PrivateKey.generate();
         let factorPub = try factorKey.toPublic()
 
@@ -94,7 +94,7 @@ final class integrationTests: XCTestCase {
         _ = try! await threshold2.reconstruct()
 
         // Try get testing tss tag share on Instance 2
-        let tss2 = try await TssModule(threshold_key: threshold2, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
+        let tss2 = try await TssModule(threshold_key: threshold2, tss_tag: tssTag, torusUtils: torusUtils, nodeDetails: nodeDetail)
 
         let ( tss_index2, tss_share2) = try tss2.get_tss_share(factorKey: factorKey.hex)
 
@@ -186,7 +186,7 @@ final class integrationTests: XCTestCase {
         print (try threshold.get_all_tss_tags())
         for tag in testTags {
             // create tag tss module
-            let tssMod = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
+            let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
             tssMods.append( tssMod )
             
             let factorKey = try PrivateKey.generate();
@@ -288,7 +288,7 @@ final class integrationTests: XCTestCase {
         // check on new instances (instance 2 )
         for (index, tag) in testTags.enumerated() {
             // create tag tss module
-            let tssMod = try await TssModule(threshold_key: threshold, verifier: TORUS_TEST_VERIFIER, verifierId: TORUS_TEST_EMAIL, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
+            let tssMod = try await TssModule(threshold_key: threshold, tss_tag: tag, torusUtils: torusUtils, nodeDetails: nodeDetail)
             tssModsInstance2.append( tssMod )
             let ( _, _) = try tssMod.get_tss_share(factorKey: factorKeys[index].hex)
         }

@@ -30,21 +30,17 @@ public struct GetTSSPubKeyResult: Codable {
 }
 
 public final class TssModule {
-    private(set) var verifier: String
-    private(set) var verifierId: String
     private(set) var nodeDetails: AllNodeDetailsModel
     private(set) var torusUtils: TorusUtils
     private(set) var assignedTssPubKey: [String: GetTSSPubKeyResult] = [:]
     private(set) var tss_tag = "default"
     private(set) var threshold_key: ThresholdKey
 
-    public init(threshold_key: ThresholdKey, verifier: String, verifierId: String, tss_tag: String, torusUtils: TorusUtils, nodeDetails: AllNodeDetailsModel) async throws {
+    public init(threshold_key: ThresholdKey, tss_tag: String, torusUtils: TorusUtils, nodeDetails: AllNodeDetailsModel) async throws {
         self.threshold_key = threshold_key
         self.tss_tag = tss_tag
         self.nodeDetails = nodeDetails
         self.torusUtils = torusUtils
-        self.verifier = verifier
-        self.verifierId = verifierId
         try set_tss_tag(tss_tag: tss_tag)
         try await update_tss_pub_key()
     }
@@ -318,9 +314,10 @@ public final class TssModule {
     }
 
     public func getTssPubAddress(tssTag: String, nonce: String) async throws -> GetTSSPubKeyResult {
-        let extendedVerifierId = "\(verifierId)\u{0015}\(tssTag)\u{0016}\(nonce)"
+        let extendedVerifierId = try threshold_key.get_extended_verifier_id();
+        let split = extendedVerifierId.components(separatedBy: "\u{001c}")
 
-        let result = try await torusUtils.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, torusNodePubs: nodeDetails.torusNodePub, verifier: verifier, verifierId: verifierId, extendedVerifierId: extendedVerifierId)
+        let result = try await torusUtils.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, torusNodePubs: nodeDetails.torusNodePub, verifier: split[0], verifierId: split[1], extendedVerifierId:  "\(split[1])\u{0015}\(tssTag)\u{0016}\(nonce)")
 
         print("result in service provider", result)
         guard let x = result.finalKeyData?.X, let y = result.finalKeyData?.Y, let nodeIndexes = result.nodesData?.nodeIndexes else {
