@@ -107,6 +107,7 @@
         char* threshold_key_get_tss_public_key(struct FFIThresholdKey* threshold_key, int* error_code );
         char* threshold_key_get_all_tss_tags(struct FFIThresholdKey* threshold_key, int* error_code );
         char* threshold_key_get_tss_tag_factor_pub(struct FFIThresholdKey* threshold_key, int* error_code );
+        char* threshold_key_get_extended_verifier_id(struct FFIThresholdKey* threshold_key, int* error_code );
 
         void threshold_key_set_tss_tag(struct FFIThresholdKey* threshold_key, char* tss_tag, int* error_code );
         char* threshold_key_get_tss_tag(struct FFIThresholdKey* threshold_key, int* error_code );

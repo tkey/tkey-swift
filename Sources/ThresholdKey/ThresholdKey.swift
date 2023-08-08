@@ -1049,6 +1049,19 @@ public class ThresholdKey {
         return result_vec
     }
     
+    public func get_extended_verifier_id() throws -> String {
+        var errorCode: Int32 = -1
+        
+        let result = withUnsafeMutablePointer(to: &errorCode, { error in
+            threshold_key_get_extended_verifier_id(self.pointer, error )})
+        guard errorCode == 0 else {
+            throw RuntimeError("Error in get_all_tss_tags")
+        }
+        let string = String.init(cString: result!)
+        string_free(result)
+        return string
+    }
+    
     deinit {
         threshold_key_free(pointer)
     }
