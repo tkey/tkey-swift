@@ -1008,7 +1008,7 @@ public class ThresholdKey {
         }
     }
 
-    public func service_provider_assign_public_key(tag: String, json: String, nonce: String, public_key: String) throws {
+    public func service_provider_assign_public_key(tag: String, nonce: String, public_key: String) throws {
         var errorCode: Int32 = -1
         let tagPointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: tag).utf8String)
         let noncePointer = UnsafeMutablePointer<Int8>(mutating: NSString(string: nonce).utf8String)
