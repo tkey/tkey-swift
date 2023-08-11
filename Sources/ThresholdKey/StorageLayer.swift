@@ -56,7 +56,7 @@ public final class StorageLayer {
     /// - Returns: `StorageLayer`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters.
-    public init(enable_logging: Bool, host_url: String, server_time_offset: Int64) throws {
+    public init(enable_logging: Bool = false, host_url: String = "https://metadata.tor.us", server_time_offset: Int64 = 2) throws {
         var errorCode: Int32 = -1
         let urlPointer = UnsafeMutablePointer<Int8>(mutating: (host_url as NSString).utf8String)
 
