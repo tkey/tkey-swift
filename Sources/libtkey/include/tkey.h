@@ -61,7 +61,7 @@
         struct ServiceProvider* service_provider(bool enable_logging, char* postbox_key, char* curve_n, int* error_code);
         void service_provider_free(struct ServiceProvider* prt);
         struct FFIThresholdKey* threshold_key(struct Metadata* metadata, struct ShareStorePolyIDShareIndexMap* shares, struct FFIStorageLayer* storage_layer, struct ServiceProvider* service_provider, struct LocalMetadataTransitions* local_metadata_transitions, struct Metadata* last_fetch_cloud_metadata, bool enable_logging, bool manual_sync, int* error_code);
-        struct KeyDetails* threshold_key_initialize(struct FFIThresholdKey* threshold_key, char* import_share, struct ShareStore* input, bool never_initialize_new_key, bool include_local_metadata_transitions, char* curve_n, int* error_code);
+        struct KeyDetails* threshold_key_initialize(struct FFIThresholdKey* threshold_key, char* import_share, struct ShareStore* input, bool never_initialize_new_key, bool include_local_metadata_transitions, bool delete_1_of_1, char* curve_n, int* error_code);
         struct KeyDetails* threshold_key_get_key_details(struct FFIThresholdKey* threshold_key, int* error_code);
         struct KeyReconstructionDetails* threshold_key_reconstruct(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         void threshold_key_free(struct FFIThresholdKey* ptr);
@@ -87,6 +87,8 @@
         char* threshold_key_encrypt(struct FFIThresholdKey* threshold_key, char* data, char* curve_n, int* error_code);
         char* threshold_key_decrypt(struct FFIThresholdKey* threshold_key, char* data, int* error_code);
         struct LocalMetadataTransitions* threshold_key_get_local_metadata_transitions(struct FFIThresholdKey* threshold_key, int* error_code);
+        void threshold_key_add_local_metadata_transitions(struct FFIThresholdKey* threshold_key, char* input_json, char* private_key, char* curve_n, int* error_code);
+
         struct Polynomial* threshold_key_reconstruct_latest_poly(struct FFIThresholdKey *threshold_key, char* curve_n, int* error_code);
         struct Metadata* threshold_key_get_last_fetched_cloud_metadata(struct FFIThresholdKey* threshold_key, int* error_code);
         void threshold_key_sync_local_metadata_transitions(struct FFIThresholdKey *threshold_key, char* curve_n, int* error_code);
