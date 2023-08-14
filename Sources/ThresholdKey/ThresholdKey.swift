@@ -446,6 +446,26 @@ public class ThresholdKey {
             }
         }
     }
+    
+    
+    private func input_factor_key(factorKey: String, shareType: String?, completion: @escaping (Result<Void, Error>) -> Void) {
+        tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let cFactorKey = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
+
+                withUnsafeMutablePointer(to: &errorCode, { error in
+                    threshold_key_input_factor_key(self.pointer, cFactorKey, error)
+                })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey input share")
+                }
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 
     /// Inserts a share into `ThresholdKey`, this is used prior to reconstruction in order to ensure the number of shares meet the threshold.
     ///
@@ -622,6 +642,23 @@ public class ThresholdKey {
         }
         return LocalMetadataTransitions(pointer: result!)
     }
+    
+    /// Returns add metadata transitions , need sync localmetadata transistion to update server data
+     ///
+     /// - Returns:
+     ///
+     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+     public func add_local_metadata_transitions( input_json: String, private_key: String ) throws {
+         var errorCode: Int32 = -1
+
+         let curve = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
+         let input = UnsafeMutablePointer<Int8>(mutating: (input_json as NSString).utf8String)
+         let privateKey = UnsafeMutablePointer<Int8>(mutating: (private_key as NSString).utf8String)
+         withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_add_local_metadata_transitions(pointer, input, privateKey, curve, error)})
+         guard errorCode == 0 else {
+             throw RuntimeError("Error in ThresholdKey get_local_metadata_transitions")
+         }
+     }
 
     /// Returns the tKey store for a module.
     ///
