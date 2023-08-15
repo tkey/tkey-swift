@@ -219,7 +219,7 @@ public final class TssModule {
 
         let nonce = String(try get_tss_nonce(threshold_key: threshold_key, tss_tag: tss_tag, prefetch: prefetch))
 
-        let public_address = try await getTssPubAddress(threshold_key: threshold_key, tssTag: tss_tag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
+        let public_address = try await get_dkg_pub_key(threshold_key: threshold_key, tssTag: tss_tag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
         let pk_encoded = try JSONEncoder().encode(public_address)
         guard let public_key = String(data: pk_encoded, encoding: .utf8) else {
             throw RuntimeError("update_tss_pub_key - Conversion Error - ResultString")
@@ -422,7 +422,7 @@ public final class TssModule {
     }
 
 
-    public static func getTssPubAddress(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
+    public static func get_dkg_pub_key(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
         let extendedVerifierId = try threshold_key.get_extended_verifier_id()
         let split = extendedVerifierId.components(separatedBy: "\u{001c}")
 
