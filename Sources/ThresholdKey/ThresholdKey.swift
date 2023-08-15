@@ -447,26 +447,6 @@ public class ThresholdKey {
         }
     }
     
-    
-    private func input_factor_key(factorKey: String, shareType: String?, completion: @escaping (Result<Void, Error>) -> Void) {
-        tkeyQueue.async {
-            do {
-                var errorCode: Int32 = -1
-                let cFactorKey = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
-
-                withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_input_factor_key(self.pointer, cFactorKey, error)
-                })
-                guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey input share")
-                }
-                completion(.success(()))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-
     /// Inserts a share into `ThresholdKey`, this is used prior to reconstruction in order to ensure the number of shares meet the threshold.
     ///
     /// - Parameters:
