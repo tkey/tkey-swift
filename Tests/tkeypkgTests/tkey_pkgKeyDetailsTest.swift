@@ -25,7 +25,7 @@ final class tkey_pkgKeyDetailsTests: XCTestCase {
     }
     
     func test_public_key_point() {
-        XCTAssertNotEqual(try! data.pub_key.getAsCompressedPublicKey(format: "elliptic-compressed").count,0)
+        XCTAssertNotEqual(try! data.pub_key.getPublicKey(format: .EllipticCompress).count,0)
     }
     
     func test_threshold() {

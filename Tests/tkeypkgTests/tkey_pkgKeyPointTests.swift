@@ -34,7 +34,7 @@ final class tkey_pkgKeyPointTests: XCTestCase {
     }
     
     func test_required_shares() {
-        XCTAssertNotEqual(try data.getAsCompressedPublicKey(format: "elliptic-compressed").count,0)
+        XCTAssertNotEqual(try data.getPublicKey(format: .EllipticCompress).count,0)
     }
     
     func test_create_x_y() {
