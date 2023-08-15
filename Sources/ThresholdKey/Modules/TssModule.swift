@@ -421,7 +421,26 @@ public final class TssModule {
          }
     }
 
-
+    public static func find_device_share_index ( threshold_key: ThresholdKey, factor_key: String ) async throws -> String {
+        let result = try await threshold_key.storage_layer_get_metadata(private_key: factor_key)
+        guard let resultData = result.data(using: .utf8) else {
+            throw "Invalid factor key"
+        }
+        guard let resultJson = try JSONSerialization.jsonObject(with: resultData ) as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let deviceShareJson = resultJson["deviceShare"] as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let shareJson = deviceShareJson["share"] as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let shareIndex = shareJson["shareIndex"] as? String else {
+            throw "Invalid factor key"
+        }
+        return shareIndex
+    }
+    
     public static func get_dkg_pub_key(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
         let extendedVerifierId = try threshold_key.get_extended_verifier_id()
         let split = extendedVerifierId.components(separatedBy: "\u{001c}")
