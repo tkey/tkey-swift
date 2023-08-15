@@ -408,7 +408,7 @@ public final class TssModule {
     /// - Returns:
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
-    public static func backupShareWithFactorKey(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
+    public static func backup_share_with_factor_key(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
         var errorCode: Int32 = -1
 
         let cShareIndex = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
