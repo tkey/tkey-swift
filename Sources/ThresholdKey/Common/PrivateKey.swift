@@ -28,7 +28,7 @@ public final class PrivateKey {
         self.hex = hex
     }
     
-    public func toPublic () throws -> String {
+    public func toPublic (format: PublicKeyEncoding = .EllipticCompress ) throws -> String {
         var errorCode: Int32 = -1
         let secretPointer = UnsafeMutablePointer<Int8>(mutating: (self.hex as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
@@ -39,7 +39,9 @@ public final class PrivateKey {
         }
         let publicHex = String.init(cString: result!)
         string_free(result)
-        return publicHex
+        
+        let publicKey = try KeyPoint(address: publicHex).getPublicKey(format: format )
+        return publicKey
     }
 
     /// Instantiates a `PrivateKey` object by random generation.

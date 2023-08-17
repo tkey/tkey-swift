@@ -219,7 +219,7 @@ public final class TssModule {
 
         let nonce = String(try get_tss_nonce(threshold_key: threshold_key, tss_tag: tss_tag, prefetch: prefetch))
 
-        let public_address = try await getTssPubAddress(threshold_key: threshold_key, tssTag: tss_tag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
+        let public_address = try await get_dkg_pub_key(threshold_key: threshold_key, tssTag: tss_tag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
         let pk_encoded = try JSONEncoder().encode(public_address)
         guard let public_key = String(data: pk_encoded, encoding: .utf8) else {
             throw RuntimeError("update_tss_pub_key - Conversion Error - ResultString")
@@ -392,6 +392,7 @@ public final class TssModule {
 
         let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
         try await TssModule.generate_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, new_factor_pub: new_factor_pub, new_tss_index: new_tss_index, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
+        
     }
 
     public static func delete_factor_pub(threshold_key: ThresholdKey, tss_tag: String, factor_key: String, auth_signatures: [String], delete_factor_pub: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selected_servers: [Int32]? = nil) async throws {
@@ -401,8 +402,59 @@ public final class TssModule {
         let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
         try await TssModule.delete_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
     }
+    
+    
+    /// backup device share with factor key  
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - shareIndex: Index of the Share to be backed up.
+    ///   - factorKey: factor key to be used for backup.
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
+    public static func backup_share_with_factor_key(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
+        var errorCode: Int32 = -1
 
-    public static func getTssPubAddress(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
+        let cShareIndex = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
+        let cFactorKey = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+        
+        withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_backup_share_with_factor_key( threshold_key.pointer, cShareIndex, cFactorKey, curvePointer, error)})
+         guard errorCode == 0 else {
+             throw RuntimeError("Error in ThresholdKey backup_share_with_factor_key")
+         }
+    }
+
+    public static func find_device_share_index ( threshold_key: ThresholdKey, factor_key: String ) async throws -> String {
+        let result = try await threshold_key.storage_layer_get_metadata(private_key: factor_key)
+        guard let resultData = result.data(using: .utf8) else {
+            throw "Invalid factor key"
+        }
+        guard let resultJson = try JSONSerialization.jsonObject(with: resultData ) as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let deviceShareJson = resultJson["deviceShare"] as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let shareJson = deviceShareJson["share"] as? [String: Any] else {
+            throw "Invalid factor key"
+        }
+        guard let shareIndex = shareJson["shareIndex"] as? String else {
+            throw "Invalid factor key"
+        }
+        return shareIndex
+    }
+    
+    /// get dkg public key
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - tssTag: tssTag used.
+    ///   - nonce: nonce 
+    ///   - nodeDetails: node details
+    ///   - torusUtils: torus utils
+    /// - Returns: `GetTSSPubKeyResult`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
+    public static func get_dkg_pub_key(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
         let extendedVerifierId = try threshold_key.get_extended_verifier_id()
         let split = extendedVerifierId.components(separatedBy: "\u{001c}")
 

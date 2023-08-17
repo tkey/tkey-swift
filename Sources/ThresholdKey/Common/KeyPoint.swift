@@ -3,6 +3,21 @@ import Foundation
     import lib
 #endif
 
+
+public enum PublicKeyEncoding : Equatable, Hashable {
+    case EllipticCompress
+    case FullAddress
+    
+    public var value : String {
+        switch self {
+        case .EllipticCompress:
+            return "elliptic-compressed"
+        case .FullAddress :
+            return ""
+        }
+    }
+}
+
 public final class KeyPoint: Equatable {
     
     /// Compares two KeyPoint objects
@@ -66,8 +81,7 @@ public final class KeyPoint: Equatable {
     /// Instantiates a `KeyPoint` object using X and Y co-ordinates in hexadecimal format.
     ///
     /// - Parameters:
-    ///   - x: X value of co-ordinate pair.
-    ///   - y: Y value of co-ordinate pair.
+    ///   - address : compress or full address
     ///
     /// - Returns: `KeyPoint` object.
     ///
@@ -128,10 +142,10 @@ public final class KeyPoint: Equatable {
     /// - Returns: Serialized form of `KeyPoint` as `String`
     ///
     /// - Throws: `RuntimeError`, indicates either the underlying pointer is invalid or the co-ordinate pair is not a valid PublicKey.
-    public func getAsCompressedPublicKey(format: String) throws -> String {
+    public func getPublicKey(format: PublicKeyEncoding ) throws -> String {
         var errorCode: Int32 = -1
         
-        let encoder_format = UnsafeMutablePointer<Int8>(mutating: (format as NSString).utf8String)
+        let encoder_format = UnsafeMutablePointer<Int8>(mutating: (format.value as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_encode(pointer, encoder_format, error)
         })

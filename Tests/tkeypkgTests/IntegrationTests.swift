@@ -46,7 +46,8 @@ final class integrationTests: XCTestCase {
         let tssTag = "testing"
         let factorKey = try PrivateKey.generate()
         let factorPub = try factorKey.toPublic()
-
+        try TssModule.backup_share_with_factor_key(threshold_key: threshold, shareIndex: shareIndex.hex, factorKey: factorKey.hex)
+        
         try await TssModule.create_tagged_tss_share(threshold_key: threshold, tss_tag: tssTag, deviceTssShare: nil, factorPub: factorPub, deviceTssIndex: 2, nodeDetails: nodeDetail, torusUtils: torusUtils)
 
         let (tss_index, tss_share) = try await TssModule.get_tss_share(threshold_key: threshold, tss_tag: tssTag, factorKey: factorKey.hex)
@@ -73,7 +74,8 @@ final class integrationTests: XCTestCase {
             manual_sync: false
         )
         _ = try! await threshold2.initialize()
-        try! await threshold2.input_share(share: share, shareType: nil)
+        
+        try await threshold2.input_factor_key(factorKey: factorKey.hex)
         _ = try! await threshold2.reconstruct()
 
         // Try get testing tss tag share on Instance 2
