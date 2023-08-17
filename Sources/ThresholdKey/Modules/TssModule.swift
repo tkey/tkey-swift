@@ -403,11 +403,16 @@ public final class TssModule {
         try await TssModule.delete_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
     }
     
-    /// Returns 
+    
+    /// backup device share with factor key  
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - shareIndex: Index of the Share to be backed up.
+    ///   - factorKey: factor key to be used for backup.
     ///
-    /// - Returns:
+    /// - Returns: `Void`
     ///
-    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func backup_share_with_factor_key(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
         var errorCode: Int32 = -1
 
@@ -417,7 +422,7 @@ public final class TssModule {
         
         withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_backup_share_with_factor_key( threshold_key.pointer, cShareIndex, cFactorKey, curvePointer, error)})
          guard errorCode == 0 else {
-             throw RuntimeError("Error in ThresholdKey get_local_metadata_transitions")
+             throw RuntimeError("Error in ThresholdKey backup_share_with_factor_key")
          }
     }
 
@@ -441,6 +446,16 @@ public final class TssModule {
         return shareIndex
     }
     
+    /// get dkg public key
+    /// - Parameters:
+    ///   - threshold_key: The threshold key to act on.
+    ///   - tssTag: tssTag used.
+    ///   - nonce: nonce 
+    ///   - nodeDetails: node details
+    ///   - torusUtils: torus utils
+    /// - Returns: `GetTSSPubKeyResult`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func get_dkg_pub_key(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
         let extendedVerifierId = try threshold_key.get_extended_verifier_id()
         let split = extendedVerifierId.components(separatedBy: "\u{001c}")

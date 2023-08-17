@@ -74,7 +74,7 @@ final class integrationTests: XCTestCase {
             manual_sync: false
         )
         _ = try! await threshold2.initialize()
-//        try! await threshold2.input_share(share: share, shareType: nil)
+        
         try await threshold2.input_factor_key(factorKey: factorKey.hex)
         _ = try! await threshold2.reconstruct()
 

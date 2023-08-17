@@ -544,7 +544,7 @@ public class ThresholdKey {
                     threshold_key_input_factor_key(self.pointer, cFactorKey, error)
                 })
                 guard errorCode == 0 else {
-                    throw RuntimeError("Error in ThresholdKey input share")
+                    throw RuntimeError("Error in ThresholdKey input_factor_key")
                 }
                 completion(.success(()))
             } catch {
@@ -664,10 +664,13 @@ public class ThresholdKey {
     }
     
     /// Returns add metadata transitions , need sync localmetadata transistion to update server data
-     ///
-     /// - Returns:
-     ///
-     /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
+    ///
+    /// - Parameters:
+    ///   - input_json: input in json string
+    ///   - private_key: private key used to encrypt and store.
+    /// - Returns: `Void`
+    ///
+    /// - Throws: `RuntimeError`, indicates invalid parameters or invalid `ThresholdKey`.
      public func add_local_metadata_transitions( input_json: String, private_key: String ) throws {
          var errorCode: Int32 = -1
 
@@ -676,7 +679,7 @@ public class ThresholdKey {
          let privateKey = UnsafeMutablePointer<Int8>(mutating: (private_key as NSString).utf8String)
          withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_add_local_metadata_transitions(pointer, input, privateKey, curve, error)})
          guard errorCode == 0 else {
-             throw RuntimeError("Error in ThresholdKey get_local_metadata_transitions")
+             throw RuntimeError("Error in ThresholdKey add_local_metadata_transitions")
          }
      }
 
