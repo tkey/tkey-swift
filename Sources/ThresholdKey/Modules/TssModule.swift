@@ -410,8 +410,6 @@ public final class TssModule {
     ///   - shareIndex: Index of the Share to be backed up.
     ///   - factorKey: factor key to be used for backup.
     ///
-    /// - Returns: `Void`
-    ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func backup_share_with_factor_key(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
         var errorCode: Int32 = -1
