@@ -30,7 +30,7 @@
         struct TssOptions;
         struct NodeDetails;
         struct FFIRssComm;
-
+        struct ServerOpts;
         //Methods
         char* get_version(int* error_code);
         void string_free(char *ptr);
@@ -80,6 +80,7 @@
         void generate_share_store_result_free(struct GenerateShareStoreResult* ptr);
         void share_store_poly_id_index_map_free(struct ShareStorePolyIDShareIndexMap* ptr);
         struct GenerateShareStoreResult* threshold_key_generate_share(struct FFIThresholdKey* threshold_key, char* curve_n, bool use_tss, struct TssOptions* tss_options, int* error_code);
+        void threshold_key_import_tss_key(struct FFIThresholdKey* threshold_key, bool update_metadata, char* tss_tag, char* import_key, struct KeyPoint* factor_pub, int new_tss_index, struct ServerOpts* server_opts, char* curve_n, int* error_code);
         void threshold_key_delete_share(struct FFIThresholdKey* threshold_key, char* share_index, char* curve_n, bool use_tss, struct TssOptions* tss_options, int* error_code);
         void threshold_key_delete_tkey(struct FFIThresholdKey* threshold_key, char* curve_n, int* error_code);
         char* threshold_key_output_share(struct FFIThresholdKey* threshold_key, char* share_index, char* share_type, char* curve_n, int* error_code);
