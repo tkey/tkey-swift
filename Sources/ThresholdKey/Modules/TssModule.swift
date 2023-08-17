@@ -23,6 +23,43 @@ public struct GetTSSPubKeyResult: Codable {
 }
 
 public final class TssModule {
+    
+    private static func import_tss_key(threshold_key: ThresholdKey, update_metadata: Bool, tss_tag: String, import_key: String, factor_pub: KeyPoint, new_tss_index: Int32, server_opts: ServerOpts, completion: @escaping (Result<Void, Error>) -> Void) {
+        threshold_key.tkeyQueue.async {
+            do {
+                var errorCode: Int32 = -1
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+
+                let tss_tag_pointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: tss_tag).utf8String)
+                let import_key_pointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: import_key).utf8String)
+
+                withUnsafeMutablePointer(to: &errorCode, { error in
+                    threshold_key_import_tss_key(threshold_key.pointer, update_metadata, tss_tag_pointer, import_key_pointer, factor_pub.pointer, new_tss_index, server_opts.pointer, curvePointer, error) })
+                guard errorCode == 0 else {
+                    throw RuntimeError("Error in ThresholdKey set_tss_tag")
+                }
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    static func import_tss_key(threshold_key: ThresholdKey, update_metadata: Bool, tss_tag: String, import_key: String, factor_pub: KeyPoint, new_tss_index: Int32, server_opts: ServerOpts) async throws {
+        return try await withCheckedThrowingContinuation {
+            continuation in
+            import_tss_key(threshold_key: threshold_key, update_metadata: update_metadata, tss_tag: tss_tag, import_key: import_key, factor_pub: factor_pub, new_tss_index: new_tss_index, server_opts: server_opts) {
+                result in
+                switch result {
+                case let .success(result):
+                    continuation.resume(returning: result)
+                case let .failure(error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
     private static func set_tss_tag(threshold_key: ThresholdKey, tss_tag: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {

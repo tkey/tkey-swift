@@ -197,12 +197,15 @@
         // TssOptions
         struct TssOptions* tss_options(char* input_tss_share, int input_tss_index, struct KeyPoint* factor_pub, char* auth_signatures, char* selected_servers, int* new_tss_index, struct KeyPoint* new_factor_pub, int* error_code);
         void tss_options_free(struct TssOptions* ptr);
-        //NodeDetails
+        // NodeDetails
         struct NodeDetails* node_details(char* server_endpoints, char* server_public_keys, int server_threshold, int* error_code);
         void node_details_free(struct NodeDetails* ptr);
-        //RssComm
+        // RssComm
         struct FFIRSSComm* rss_comm(char* (*network_callback)(char*, char*, void*, int*), void* parent_instance_ref, int* error_code);
         void* rss_comm_free(struct FFIRssComm* ptr);
+        // ServerOpts
+        struct ServerOpts* server_opts(char* server_endpoints, char* server_pub_keys, int server_threshold, char* selected_servers, char* auth_signatures, int* error_code);
+        void* server_opts_free(struct ServerOpts* ptr);
     #ifdef __cplusplus
     } // extern "C"
     #endif
