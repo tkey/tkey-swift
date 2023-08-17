@@ -38,7 +38,7 @@ public final class LocalMetadataTransitions {
             }
         pointer = result
     }
-    
+
     /// Serialize to json
     ///
     /// - Returns:`String`
@@ -56,7 +56,7 @@ public final class LocalMetadataTransitions {
         string_free(result)
         return value
     }
-    
+
     deinit {
         local_metadata_transitions_free(pointer)
     }

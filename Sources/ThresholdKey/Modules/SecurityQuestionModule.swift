@@ -4,7 +4,7 @@ import Foundation
 #endif
 
 public final class SecurityQuestionModule {
-    
+
     private static func generate_new_share(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<GenerateShareStoreResult, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -25,7 +25,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     /// Generates a new security share on an existing `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -49,7 +49,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     private static func input_share(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -71,7 +71,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     /// Inputs a stored security share into an existing `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -94,7 +94,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     private static func change_question_and_answer(threshold_key: ThresholdKey, questions: String, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -114,7 +114,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     /// Changes the question and answer for an existing security share on a `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -138,8 +138,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
-    
+
     private static func store_answer(threshold_key: ThresholdKey, answer: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -158,7 +157,7 @@ public final class SecurityQuestionModule {
             }
         }
     }
-    
+
     /// Saves the answer for an existing security share on a `ThresholdKey` object to the tkey store.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.

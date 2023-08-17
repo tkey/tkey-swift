@@ -5,7 +5,7 @@ import lib
 
 public final class RssComm {
     private(set) var pointer: OpaquePointer?
-    
+
     // This is a placeholder to satisfy the interface,
     // tracking this object is not necessary in swift as it maintains context
     // on entry for the callback
@@ -24,7 +24,7 @@ public final class RssComm {
     public init() throws {
         var errorCode: Int32 = -1
 
-        let network_interface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?, UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, obj_ref, error_code in
+        let network_interface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?, UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, _, error_code in
             let sem = DispatchSemaphore.init(value: 0)
             let urlString = String.init(cString: url!)
             let dataString = String.init(cString: data!)
@@ -81,7 +81,7 @@ public final class RssComm {
         }
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            rss_comm(network_interface, obj_ref,  error)
+            rss_comm(network_interface, obj_ref,   error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error in RssComm")
@@ -90,6 +90,6 @@ public final class RssComm {
     }
 
     deinit {
-        let _ = rss_comm_free(pointer)
+        _ = rss_comm_free(pointer)
     }
 }

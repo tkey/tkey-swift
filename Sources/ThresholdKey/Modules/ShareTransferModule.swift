@@ -12,7 +12,7 @@ public final class ShareTransferModule {
     /// Device B would then check the status of the request until it is approved.
     /// Device B would then be able to reconstruct the `ThresholdKey`, reaching the same private key as Device A.
     /// Device B would then cleanup the share request, automatic if enabled.
-    
+
     private static func request_new_share(threshold_key: ThresholdKey, user_agent: String, available_share_indexes: String, completion: @escaping (Result<String, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -34,7 +34,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Requests a new share for transfer for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -58,7 +58,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     private static func add_custom_info_to_request(threshold_key: ThresholdKey, enc_pub_key_x: String, custom_info: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -78,7 +78,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Adds custom information to a share transfer request for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -100,7 +100,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     private static func look_for_request(threshold_key: ThresholdKey, completion: @escaping (Result<[String], Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -120,7 +120,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Searches for available share transfer requests for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -142,14 +142,13 @@ public final class ShareTransferModule {
             }
         }
     }
-    
-    
+
     private static func approve_request(threshold_key: ThresholdKey, enc_pub_key_x: String, share_store: ShareStore? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 var storePointer: OpaquePointer?
-                
+
                 if share_store != nil {
                     storePointer = share_store!.pointer
                 }
@@ -167,7 +166,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Approves a share transfer request for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -209,7 +208,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Approves a share transfer request for a specific share index for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -249,7 +248,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Retrieves the share transfer store for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -288,7 +287,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Sets the share transfer store for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -311,7 +310,6 @@ public final class ShareTransferModule {
         }
     }
 
-    
     private static func delete_store(threshold_key: ThresholdKey, enc_pub_key_x: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -330,7 +328,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Removes the share transfer store for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -352,7 +350,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Retrieves the encryption key for the current share transfer request of a  `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -373,7 +371,7 @@ public final class ShareTransferModule {
         string_free(result)
         return string
     }
-    
+
     private static func request_status_check(threshold_key: ThresholdKey, enc_pub_key_x: String, delete_request_on_completion: Bool, completion: @escaping (Result<ShareStore, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -393,7 +391,7 @@ public final class ShareTransferModule {
             }
         }
     }
-    
+
     /// Checks the status of a share transfer request for a `Threshold Key` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.

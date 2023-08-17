@@ -446,7 +446,7 @@ public class ThresholdKey {
             }
         }
     }
-    
+
     /// Inserts a share into `ThresholdKey`, this is used prior to reconstruction in order to ensure the number of shares meet the threshold.
     ///
     /// - Parameters:
@@ -533,7 +533,7 @@ public class ThresholdKey {
             }
         }
     }
-    
+
     private func input_factor_key(factorKey: String, completion: @escaping (Result<Void, Error>) -> Void) {
         tkeyQueue.async {
             do {
@@ -573,7 +573,7 @@ public class ThresholdKey {
             }
         }
     }
-    
+
     /// Retrieves all share indexes for a `ThresholdKey`.
     ///
     /// - Returns: Array of `String`
@@ -662,7 +662,7 @@ public class ThresholdKey {
         }
         return LocalMetadataTransitions(pointer: result!)
     }
-    
+
     /// Returns add metadata transitions , need sync localmetadata transistion to update server data
     ///
     /// - Parameters:

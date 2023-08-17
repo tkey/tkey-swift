@@ -6,19 +6,19 @@ import Foundation
 
 public class KeyPointArray {
     private(set) var pointer: OpaquePointer?
-    
+
     /// Instantiate a new `KeyPointArray` object.
     ///
     /// - Returns: `KeyPointArray`
     public init() {
-        self.pointer = key_point_array_new();
+        self.pointer = key_point_array_new()
     }
 
     /// Instantiate a `KeyPointArray` object using the underlying pointer.
     ///
     /// - Returns: `KeyPointArray`
     public init(pointer: OpaquePointer) {
-        self.pointer = pointer;
+        self.pointer = pointer
     }
 
     /// Removes a `KeyPoint` from the collection at a specified index.
@@ -29,7 +29,7 @@ public class KeyPointArray {
     /// - Throws: `RuntimeError`, indicates invalid index or invalid `KeyPointArray`.
     public func removeAt(index: Int32) throws {
         var errorCode: Int32  = -1
-        
+
         withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_remove(pointer, index, error)
         })
@@ -37,7 +37,7 @@ public class KeyPointArray {
             throw RuntimeError("Error in KeyPointArray, key_point_array_remove")
         }
     }
-    
+
     /// Inserts a `KeyPoint` into the collection at the end.
     ///
     /// - Parameters:
@@ -53,7 +53,7 @@ public class KeyPointArray {
             throw RuntimeError("Error in KeyPointArray, key_point_array_insert")
         }
     }
-    
+
     /// Replaces a `KeyPoint` in the collection at a specified index.
     ///
     /// - Parameters:
@@ -63,7 +63,7 @@ public class KeyPointArray {
     /// - Throws: `RuntimeError`, indicates invalid `KeyPoint`, index or invalid `KeyPointArray`.
     public func update(point: KeyPoint, index: Int32) throws {
         var errorCode: Int32 = -1
-        
+
         withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_update_at_index(pointer, index, point.pointer, error)
         })
@@ -71,7 +71,7 @@ public class KeyPointArray {
             throw RuntimeError("Error in KeyPointArray, key_point_array_update_at_index")
         }
     }
-    
+
     /// Retrieves a `KeyPoint` in the collection at a specified index.
     ///
     /// - Parameters:
@@ -80,18 +80,17 @@ public class KeyPointArray {
     /// - Returns: `KeyPoint`
     ///
     /// - Throws: `RuntimeError`, indicates invalid index or invalid `KeyPointArray`.
-    public func getAt(index: Int32) throws -> KeyPoint
-    {
+    public func getAt(index: Int32) throws -> KeyPoint {
         var errorCode: Int32 = -1
-        
+
         let key_point = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_get_value_by_index(pointer, index, error)})
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_value_by_index")
         }
-        return KeyPoint.init(pointer: key_point!);
+        return KeyPoint.init(pointer: key_point!)
     }
-    
+
     /// Number of items contained in the collection.
     ///
     /// - Returns: `Int32`
@@ -99,17 +98,17 @@ public class KeyPointArray {
     /// - Throws: `RuntimeError`, invalid `KeyPointArray`.
     public func length() throws -> Int32 {
         var errorCode: Int32 = -1
-        
+
         let key_point_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_get_len(pointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_len")
         }
-        return key_point_array_length;
+        return key_point_array_length
 
     }
-    
+
     /// Performs lagrange interpolation on the items contained in the collection.
     ///
     /// - Returns: `Polynomial`
@@ -127,10 +126,10 @@ public class KeyPointArray {
         guard errorCode == 0 else {
             throw RuntimeError("Error in lagrange, lagrange_interpolate_polynomial method")
         }
-        
-        return Polynomial.init(pointer: poly_result!);
+
+        return Polynomial.init(pointer: poly_result!)
     }
-    
+
     deinit {
         key_point_array_free(pointer)
     }

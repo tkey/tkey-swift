@@ -1,6 +1,5 @@
 import Foundation
 
-import Foundation
 #if canImport(lib)
     import lib
 #endif
@@ -392,7 +391,7 @@ public final class TssModule {
 
         let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
         try await TssModule.generate_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, new_factor_pub: new_factor_pub, new_tss_index: new_tss_index, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
-        
+
     }
 
     public static func delete_factor_pub(threshold_key: ThresholdKey, tss_tag: String, factor_key: String, auth_signatures: [String], delete_factor_pub: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selected_servers: [Int32]? = nil) async throws {
@@ -402,8 +401,7 @@ public final class TssModule {
         let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
         try await TssModule.delete_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
     }
-    
-    
+
     /// backup device share with factor key  
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -419,7 +417,7 @@ public final class TssModule {
         let cShareIndex = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
         let cFactorKey = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
-        
+
         withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_backup_share_with_factor_key( threshold_key.pointer, cShareIndex, cFactorKey, curvePointer, error)})
          guard errorCode == 0 else {
              throw RuntimeError("Error in ThresholdKey backup_share_with_factor_key")
@@ -445,7 +443,7 @@ public final class TssModule {
         }
         return shareIndex
     }
-    
+
     /// get dkg public key
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.

@@ -3,23 +3,22 @@ import Foundation
     import lib
 #endif
 
-
-public enum PublicKeyEncoding : Equatable, Hashable {
+public enum PublicKeyEncoding: Equatable, Hashable {
     case EllipticCompress
     case FullAddress
-    
-    public var value : String {
+
+    public var value: String {
         switch self {
         case .EllipticCompress:
             return "elliptic-compressed"
-        case .FullAddress :
+        case .FullAddress:
             return ""
         }
     }
 }
 
 public final class KeyPoint: Equatable {
-    
+
     /// Compares two KeyPoint objects
     ///
     /// - Parameters:
@@ -33,8 +32,7 @@ public final class KeyPoint: Equatable {
             let lhsy = try lhs.getY()
             let rhsx = try rhs.getX()
             let rhsy = try rhs.getY()
-            if  lhsx == rhsx && lhsy == rhsy
-            {
+            if  lhsx == rhsx && lhsy == rhsy {
                 return true
             } else {
                 return false
@@ -43,9 +41,9 @@ public final class KeyPoint: Equatable {
             return false
         }
     }
-    
+
     public var pointer: OpaquePointer?
-    
+
     /// Instantiate a `KeyPoint` object using the underlying pointer.
     ///
     /// - Returns: `KeyPoint`
@@ -55,7 +53,7 @@ public final class KeyPoint: Equatable {
     public init(pointer: OpaquePointer) {
         self.pointer = pointer
     }
-    
+
     /// Instantiates a `KeyPoint` object using X and Y co-ordinates in hexadecimal format.
     ///
     /// - Parameters:
@@ -75,9 +73,9 @@ public final class KeyPoint: Equatable {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, new")
             }
-        pointer = result;
+        pointer = result
     }
-    
+
     /// Instantiates a `KeyPoint` object using X and Y co-ordinates in hexadecimal format.
     ///
     /// - Parameters:
@@ -95,9 +93,9 @@ public final class KeyPoint: Equatable {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, new")
             }
-        pointer = result;
+        pointer = result
     }
-    
+
     /// Retrieves the X value of the co-ordinate pair.
     ///
     /// - Returns: X value in hexadecimal format as `String`
@@ -115,7 +113,7 @@ public final class KeyPoint: Equatable {
         string_free(result)
         return x
     }
-    
+
     /// Retrieves the Y value of the co-ordinate pair.
     ///
     /// - Returns: Y value in hexadecimal format as `String`
@@ -133,7 +131,7 @@ public final class KeyPoint: Equatable {
         string_free(result)
         return y
     }
-    
+
     /// Gets the serialized form of a `KeyPoint`, should it be a valid PublicKey.
     ///
     /// - Parameters:
@@ -144,7 +142,7 @@ public final class KeyPoint: Equatable {
     /// - Throws: `RuntimeError`, indicates either the underlying pointer is invalid or the co-ordinate pair is not a valid PublicKey.
     public func getPublicKey(format: PublicKeyEncoding ) throws -> String {
         var errorCode: Int32 = -1
-        
+
         let encoder_format = UnsafeMutablePointer<Int8>(mutating: (format.value as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_encode(pointer, encoder_format, error)
@@ -156,7 +154,7 @@ public final class KeyPoint: Equatable {
         string_free(result)
         return compressed
     }
-    
+
     deinit {
         key_point_free(pointer)
     }

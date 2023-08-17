@@ -17,7 +17,7 @@ public final class PrivateKey {
         hex = String.init(cString: pointer)
         string_free(pointer)
     }
-    
+
     /// Instantiates a `PrivateKey` object from its' serialized format.
     ///
     /// - Parameters:
@@ -27,7 +27,7 @@ public final class PrivateKey {
     public init(hex: String) {
         self.hex = hex
     }
-    
+
     public func toPublic (format: PublicKeyEncoding = .EllipticCompress ) throws -> String {
         var errorCode: Int32 = -1
         let secretPointer = UnsafeMutablePointer<Int8>(mutating: (self.hex as NSString).utf8String)
@@ -39,7 +39,7 @@ public final class PrivateKey {
         }
         let publicHex = String.init(cString: result!)
         string_free(result)
-        
+
         let publicKey = try KeyPoint(address: publicHex).getPublicKey(format: format )
         return publicKey
     }

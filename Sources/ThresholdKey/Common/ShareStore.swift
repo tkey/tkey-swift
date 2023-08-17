@@ -5,7 +5,7 @@ import Foundation
 
 public final class ShareStore {
     private(set) var pointer: OpaquePointer?
-    
+
     /// Instantiate a `ShareStore` object using the underlying pointer.
     ///
     /// - Parameters:

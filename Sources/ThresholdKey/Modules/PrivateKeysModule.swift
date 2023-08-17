@@ -10,7 +10,7 @@ public struct KeyData: Decodable {
 }
 
 public final class PrivateKeysModule {
-    
+
     private static func set_private_key(threshold_key: ThresholdKey, key: String?, format: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -33,7 +33,7 @@ public final class PrivateKeysModule {
             }
         }
     }
-    
+
     /// Sets an extra private key on an existing `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -57,7 +57,7 @@ public final class PrivateKeysModule {
             }
         }
     }
-    
+
     /// Returns stored extra private keys on an existing `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.

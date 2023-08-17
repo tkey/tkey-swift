@@ -5,7 +5,7 @@ import Foundation
 
 public final class ShareMap {
     public var share_map = [String: String]()
-    
+
     /// Instantiate a `ShareMap` object using the underlying pointer.
     ///
     /// - Parameters:
@@ -34,10 +34,9 @@ public final class ShareMap {
             guard errorCode == 0 else {
                 throw RuntimeError("Error in Share Map")
                 }
-            share_map[item] = String.init(cString: value!);
+            share_map[item] = String.init(cString: value!)
             string_free(value)
         }
         share_map_free(pointer)
     }
 }
-

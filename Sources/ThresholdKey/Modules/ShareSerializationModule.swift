@@ -15,9 +15,9 @@ public final class ShareSerializationModule {
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func serialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
-        
+
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
-        
+
         var formatPointer: UnsafeMutablePointer<Int8>?
         if format != nil {
             formatPointer = UnsafeMutablePointer<Int8>(mutating: (format! as NSString).utf8String)
@@ -45,9 +45,9 @@ public final class ShareSerializationModule {
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
     public static func deserialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
-        
+
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
-        
+
         var formatPointer: UnsafeMutablePointer<Int8>?
         if format != nil {
             formatPointer = UnsafeMutablePointer<Int8>(mutating: (format! as NSString).utf8String)

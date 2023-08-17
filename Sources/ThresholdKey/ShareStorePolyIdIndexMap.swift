@@ -4,7 +4,7 @@ import Foundation
 #endif
 
 public final class ShareStorePolyIdIndexMap {
-    private(set) var pointer: OpaquePointer;
+    private(set) var pointer: OpaquePointer
     public var share_maps = [String: ShareStoreMap]()
 
     /// Instantiate a `ShareStorePolyIdIndexMap` object using the underlying pointer.
@@ -40,10 +40,10 @@ public final class ShareStorePolyIdIndexMap {
 
         self.pointer = pointer
     }
-    
+
     deinit {
         share_store_poly_id_index_map_free(pointer)
     }
-    
-    //TODO: Class requires a init(json: String) throws method and an export() throws -> String method.
+
+    // TODO: Class requires a init(json: String) throws method and an export() throws -> String method.
 }

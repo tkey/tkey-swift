@@ -32,7 +32,7 @@ public final class SeedPhraseModule {
             }
         }
     }
-    
+
     /// Sets a seed phrase on the metadata of a `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -55,7 +55,7 @@ public final class SeedPhraseModule {
             }
         }
     }
-    
+
     private static func change_phrase(threshold_key: ThresholdKey, old_phrase: String, new_phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -75,7 +75,7 @@ public final class SeedPhraseModule {
             }
         }
     }
-    
+
     /// Replaces an old seed phrase with a new seed phrase on a `ThresholdKey` object. Same format of seed phrase must be used.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -119,7 +119,6 @@ public final class SeedPhraseModule {
         return seed_array
     }
 
-    
     private static func delete_seed_phrase(threshold_key: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
         threshold_key.tkeyQueue.async {
             do {
@@ -138,7 +137,7 @@ public final class SeedPhraseModule {
             }
         }
     }
-    
+
     /// Deletes a seed phrase stored on a `ThresholdKey` object.
     /// - Parameters:
     ///   - threshold_key: The threshold key to act on.
@@ -159,7 +158,7 @@ public final class SeedPhraseModule {
             }
         }
     }
-    
+
     /*
     static func get_seed_phrases_with_accounts(threshold_key: ThresholdKey, derivation_format: String) throws -> String
     {
