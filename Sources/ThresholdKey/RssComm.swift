@@ -42,19 +42,31 @@ public final class RssComm {
             if urlString.split(separator: "/").last == "bulk_set_stream" {
                 request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-                guard let json = try JSONSerialization.jsonObject(with: dataString.data(using: String.Encoding.utf8)!, options: .allowFragments)
+                guard let json = try? JSONSerialization.jsonObject(with: dataString.data(using: String.Encoding.utf8)!, options: .allowFragments)
                         as? [[String: Any]] else {
-                    throw RuntimeError("JsonSerialization Error")
+                    let code: Int32 = 1
+                    errorCode?.pointee = code
+                    let result = NSString("")
+                    let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+                    return resultPointer
                 }
 
                 var formData: [String] = []
 
                 for (index, element) in json.enumerated() {
-                    guard let jsonElem = try JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes) else {
-                        throw RuntimeError("JsonSerialization Error")
+                    guard let jsonElem = try? JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes) else {
+                        let code: Int32 = 1
+                        errorCode?.pointee = code
+                        let result = NSString("")
+                        let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+                        return resultPointer
                     }
                     guard let jsonStr = String(data: jsonElem, encoding: .utf8) else {
-                        throw RuntimeError("Stringify JsonSerialization Error")
+                        let code: Int32 = 1
+                        errorCode?.pointee = code
+                        let result = NSString("")
+                        let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+                        return resultPointer
                     }
                     let jsonEscapedString = RssComm.percentEscapeString(string: jsonStr)
                     let finalString = String(index) + "=" + jsonEscapedString

@@ -61,7 +61,8 @@ public final class StorageLayer {
         let urlPointer = UnsafeMutablePointer<Int8>(mutating: (hostUrl as NSString).utf8String)
 
         let networkInterface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?,
-                                               UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, _, errorCode in
+                                               UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)?
+        = {url, data, _, errorCode in
             let sem = DispatchSemaphore.init(value: 0)
             let urlString = String.init(cString: url!)
             let dataString = String.init(cString: data!)
@@ -80,11 +81,21 @@ public final class StorageLayer {
                 // request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
                 request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-                guard let data = dataString.data(using: String.Encoding.utf8) else {
-                    throw RuntimeError("Sring to data Error")
-                }
-                guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]] else {
-                    throw RuntimeError("JsonSerialization Error")
+                let data = dataString.data(using: String.Encoding.utf8)!
+//                else {
+//                    let code: Int32 = 1
+//                    errorCode?.pointee = code
+//                    let result = NSString("")
+//                    let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+//                    return resultPointer
+//
+//                }
+                guard let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]] else {
+                    let code: Int32 = 1
+                    errorCode?.pointee = code
+                    let result = NSString("")
+                    let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+                    return resultPointer
                 }
 
                 // for item in json {
@@ -96,10 +107,15 @@ public final class StorageLayer {
 
                 // urlencoded item format: "(key)=(self.percentEscapeString(value))"
                 for (index, element) in json.enumerated() {
-                    let jsonElem = try JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
+                    let jsonElem = try? JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
                     
-                    guard let jsonStr = String(data: jsonElem, encoding: .utf8) else {
-                        throw RuntimeError("Stringify json")
+                    guard let jsonStr = String(data: jsonElem!, encoding: .utf8)
+                    else {
+                        let code: Int32 = 1
+                        errorCode?.pointee = code
+                        let result = NSString("")
+                        let resultPointer = UnsafeMutablePointer<CChar>(mutating: result.utf8String)
+                        return resultPointer
                     }
                     let jsonEscapedString = StorageLayer.percentEscapeString(string: jsonStr )
                     let finalString = String(index) + "=" + jsonEscapedString

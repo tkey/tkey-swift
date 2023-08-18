@@ -15,15 +15,15 @@ public final class ShareTransferModule {
     /// Device B would then be able to reconstruct the `ThresholdKey`, reaching the same private key as Device A.
     /// Device B would then cleanup the share request, automatic if enabled.
 
-    private static func request_new_share(thresholdkey: ThresholdKey, userAgent: String, availableShareIndexes: String, completion: @escaping (Result<String, Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+    private static func request_new_share(thresholdKey: ThresholdKey, userAgent: String, availableShareIndexes: String, completion: @escaping (Result<String, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdkey.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 let agentPointer = UnsafeMutablePointer<Int8>(mutating: (userAgent as NSString).utf8String)
                 let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (availableShareIndexes as NSString).utf8String)
                 let result = withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_request_new_share(thresholdkey.pointer, agentPointer, indexesPointer, curvePointer, error)
+                    share_transfer_request_new_share(thresholdKey.pointer, agentPointer, indexesPointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, request share. Error Code: \(errorCode)")
@@ -39,17 +39,17 @@ public final class ShareTransferModule {
 
     /// Requests a new share for transfer for a `Threshold Key` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - user_agent: `String` containing information about the device requesting the share.
     ///   - availableShareIndexes: Json represented as a `String` indicating the available share indexes on which the transfer should take place, can be an empty array `"[]"`
     ///
     /// - Returns: `String`, the encryption key.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func request_new_share(thresholdkey: ThresholdKey, userAgent: String, availableShareIndexes: String ) async throws -> String {
+    public static func request_new_share(thresholdKey: ThresholdKey, userAgent: String, availableShareIndexes: String ) async throws -> String {
         return try await withCheckedThrowingContinuation {
             continuation in
-            request_new_share(thresholdkey: thresholdkey, userAgent: userAgent, availableShareIndexes: availableShareIndexes) {
+            request_new_share(thresholdKey: thresholdKey, userAgent: userAgent, availableShareIndexes: availableShareIndexes) {
                 result in
                 switch result {
                 case .success(let result):
@@ -61,15 +61,15 @@ public final class ShareTransferModule {
         }
     }
 
-    private static func add_custom_info_to_request(thresholdkey: ThresholdKey, encPubKeyX: String, customInfo: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private static func add_custom_info_to_request(thresholdKey: ThresholdKey, encPubKeyX: String, customInfo: String, completion: @escaping (Result<Void, Error>) -> Void) {
         thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let encPointer = UnsafeMutablePointer<Int8>(mutating: (encPubKeyX as NSString).utf8String)
                 let customPointer = UnsafeMutablePointer<Int8>(mutating: (customInfo as NSString).utf8String)
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdkey.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_add_custom_info_to_request(thresholdkey.pointer, encPointer, customPointer, curvePointer, error)
+                    share_transfer_add_custom_info_to_request(thresholdKey.pointer, encPointer, customPointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, add custom info to request. Error Code: \(errorCode)")
@@ -83,15 +83,15 @@ public final class ShareTransferModule {
 
     /// Adds custom information to a share transfer request for a `Threshold Key` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - enc_pub_key_x: The encryption key for the share transfer request.
     ///   - custom_info: Json represented as a `String`, the custom information to be added.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func add_custom_info_to_request(thresholdkey: ThresholdKey, encPubKeyX: String, customInfo: String ) async throws {
+    public static func add_custom_info_to_request(thresholdKey: ThresholdKey, encPubKeyX: String, customInfo: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            add_custom_info_to_request(thresholdkey: thresholdKey, enc_pub_key_x: encPubKeyX, custom_info: customInfo) {
+            add_custom_info_to_request(thresholdKey: thresholdKey, encPubKeyX: encPubKeyX, customInfo: customInfo) {
                 result in
                 switch result {
                 case .success(let result):
@@ -103,18 +103,20 @@ public final class ShareTransferModule {
         }
     }
 
-    private static func look_for_request(thresholdkey: ThresholdKey, completion: @escaping (Result<[String], Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+    private static func look_for_request(thresholdKey: ThresholdKey, completion: @escaping (Result<[String], Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let result = withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_look_for_request(thresholdkey.pointer, error)
+                    share_transfer_look_for_request(thresholdKey.pointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, lookup for request. Error Code: \(errorCode)")
                     }
                 let string = String.init(cString: result!)
-                let indicatorArray = try JSONSerialization.jsonObject(with: string.data(using: String.Encoding.utf8)!, options: .allowFragments) as [String]
+                guard let indicatorArray = try JSONSerialization.jsonObject(with: string.data(using: String.Encoding.utf8)!, options: .allowFragments) as? [String] else {
+                    throw RuntimeError("JsonSerialization Error")
+                }
                 string_free(result)
                 completion(.success(indicatorArray))
             } catch {
@@ -130,10 +132,10 @@ public final class ShareTransferModule {
     /// - Returns: Array of `String`
     ///
     /// - Throws: `RuntimeError`, indicates invalid threshold key.
-    public static func look_for_request(thresholdkey: ThresholdKey ) async throws -> [String] {
+    public static func look_for_request(thresholdKey: ThresholdKey ) async throws -> [String] {
         return try await withCheckedThrowingContinuation {
             continuation in
-            look_for_request(thresholdkey: thresholdkey) {
+            look_for_request(thresholdKey: thresholdKey) {
                 result in
                 switch result {
                 case .success(let result):
@@ -145,8 +147,8 @@ public final class ShareTransferModule {
         }
     }
 
-    private static func approve_request(thresholdkey: ThresholdKey, encPubKeyX: String, shareStore: ShareStore? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+    private static func approve_request(thresholdKey: ThresholdKey, encPubKeyX: String, shareStore: ShareStore? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 var storePointer: OpaquePointer?
@@ -154,10 +156,10 @@ public final class ShareTransferModule {
                 if shareStore != nil {
                     storePointer = shareStore!.pointer
                 }
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdkey.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 let encPointer = UnsafeMutablePointer<Int8>(mutating: (encPubKeyX as NSString).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_approve_request(thresholdkey.pointer, encPointer, storePointer, curvePointer, error)
+                    share_transfer_approve_request(thresholdKey.pointer, encPointer, storePointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, change_question_and_answer. Error Code: \(errorCode)")
@@ -171,15 +173,15 @@ public final class ShareTransferModule {
 
     /// Approves a share transfer request for a `Threshold Key` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - enc_pub_key_x: The encryption key for the share transfer request.
     ///   - share_store: The `ShareStore` for the share transfer request, optional.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func approve_request(thresholdkey: ThresholdKey, encPubKeyX: String, shareStore: ShareStore? = nil ) async throws {
+    public static func approve_request(thresholdKey: ThresholdKey, encPubKeyX: String, shareStore: ShareStore? = nil ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            approve_request(thresholdkey: thresholdkey, encPubKeyX: encPubKeyX, shareStore: shareStore) {
+            approve_request(thresholdKey: thresholdKey, encPubKeyX: encPubKeyX, shareStore: shareStore) {
                 result in
                 switch result {
                 case .success(let result):
@@ -191,15 +193,15 @@ public final class ShareTransferModule {
         }
     }
 
-    private static func approve_request_with_share_index(thresholdkey: ThresholdKey, encPubKeyX: String, shareIndex: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+    private static func approve_request_with_share_index(thresholdKey: ThresholdKey, encPubKeyX: String, shareIndex: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdkey.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 let encPointer = UnsafeMutablePointer<Int8>(mutating: (encPubKeyX as NSString).utf8String)
                 let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_approve_request_with_share_indexes(thresholdkey.pointer, encPointer, indexesPointer, curvePointer, error)
+                    share_transfer_approve_request_with_share_indexes(thresholdKey.pointer, encPointer, indexesPointer, curvePointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, approve request with share index. Error Code: \(errorCode)")
@@ -213,15 +215,15 @@ public final class ShareTransferModule {
 
     /// Approves a share transfer request for a specific share index for a `Threshold Key` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - enc_pub_key_x: The encryption key for the share transfer request.
     ///   - share_index: The relevant share index for the share transfer request.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func approve_request_with_share_index(thresholdkey: ThresholdKey, encPubKeyX: String, shareIndex: String ) async throws {
+    public static func approve_request_with_share_index(thresholdKey: ThresholdKey, encPubKeyX: String, shareIndex: String ) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            approve_request_with_share_index(thresholdkey: thresholdkey, encPubKeyX: encPubKeyX, shareIndex: shareIndex) {
+            approve_request_with_share_index(thresholdKey: thresholdKey, encPubKeyX: encPubKeyX, shareIndex: shareIndex) {
                 result in
                 switch result {
                 case .success(let result):
@@ -233,12 +235,12 @@ public final class ShareTransferModule {
         }
     }
 
-    private static func get_store(thresholdkey: ThresholdKey, completion: @escaping (Result<ShareTransferStore, Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+    private static func get_store(thresholdKey: ThresholdKey, completion: @escaping (Result<ShareTransferStore, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
                 let ptr = withUnsafeMutablePointer(to: &errorCode, { error in
-                    share_transfer_get_store(thresholdkey.pointer, error)
+                    share_transfer_get_store(thresholdKey.pointer, error)
                         })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ShareTransferModule, get store. Error Code: \(errorCode)")

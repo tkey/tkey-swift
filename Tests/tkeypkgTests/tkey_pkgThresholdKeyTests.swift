@@ -4,27 +4,29 @@ import Foundation
 
 final class tkey_pkgThresholdKeyTests: XCTestCase {
     func test_basic_threshold_key_reconstruct() async {
-        let postbox = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
+        )
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
     }
 
     func test_basic_threshold_key_method_test() async {
-        let postbox = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
+        )
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! threshold_key.get_key_details()
@@ -34,15 +36,15 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
         let output = try! threshold_key.output_share(shareIndex: share.hex)
         _ = try! threshold_key.output_share_store(shareIndex: share.hex, polyId: nil)
         _ = try! threshold_key.share_to_share_store(share: output)
-        try! await threshold_key.delete_share(share_index: share.hex)
+        try! await threshold_key.delete_share(shareIndex: share.hex)
         let share2 = try! await threshold_key.generate_new_share()
         let input = try! threshold_key.output_share(shareIndex: share2.hex)
         let input_store = try! threshold_key.output_share_store(shareIndex: share2.hex, polyId: nil)
-        let threshold_key2 = try! ThresholdKey.init(storage_layer: storage_layer, service_provider: service_provider, enable_logging: true, manual_sync: false)
+        let threshold_key2 = try! ThresholdKey.init(storageLayer: storageLayer, serviceProvider: serviceProvider, enableLogging: true, manualSync: false)
         _ = try! await threshold_key2.initialize()
         try! await threshold_key2.input_share(share: input, shareType: nil)
         _ = try! await threshold_key2.reconstruct()
-        let threshold_key3 = try! ThresholdKey.init(storage_layer: storage_layer, service_provider: service_provider, enable_logging: true, manual_sync: false)
+        let threshold_key3 = try! ThresholdKey.init(storageLayer: storageLayer, serviceProvider: serviceProvider, enableLogging: true, manualSync: false)
         _ = try! await threshold_key3.initialize()
         try! await threshold_key3.input_share_store(shareStore: input_store)
         _ = try! await threshold_key3.reconstruct()
@@ -50,14 +52,15 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
     }
 
     func test_threshold_key_manual_sync() async {
-        let postbox = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: true)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
+        )
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
         _ = try! await threshold_key.generate_new_share()
@@ -66,18 +69,19 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
     }
 
     func test_threshold_key_internal_queue() async {
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let key1 = try! PrivateKey.generate()
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: true)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
+        )
 
         _ = try! await threshold_key.initialize()
         var key_details = try! threshold_key.get_key_details()
-        XCTAssertEqual(key_details.total_shares, 2)
+        XCTAssertEqual(key_details.totalShares, 2)
 
         // prepare the private key list
         var pklist: [String] = []
@@ -99,28 +103,28 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
 
         _ = await set5keys
         key_details = try! threshold_key.get_key_details()
-        XCTAssertEqual(key_details.total_shares, 2)
-        let pknum = try! PrivateKeysModule.get_private_key_accounts(threshold_key: threshold_key).count
+        XCTAssertEqual(key_details.totalShares, 2)
+        let pknum = try! PrivateKeysModule.get_private_key_accounts(thresholdKey: threshold_key).count
         XCTAssertEqual(pknum, 5)
     }
 
     func test_threshold_key_multi_instance() async {
         let postbox = try! PrivateKey.generate()
         let postbox2 = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let storage_layer2 = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox.hex)
-        let service_provider2 = try! ServiceProvider(enable_logging: true, postbox_key: postbox2.hex)
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let storage_layer2 = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postbox.hex)
+        let service_provider2 = try! ServiceProvider(enableLogging: true, postboxKey: postbox2.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false)
         let threshold_key2 = try! ThresholdKey(
-            storage_layer: storage_layer2,
-            service_provider: service_provider2,
-            enable_logging: true,
-            manual_sync: false)
+            storageLayer: storage_layer2,
+            serviceProvider: service_provider2,
+            enableLogging: true,
+            manualSync: false)
         _ = try! await threshold_key.initialize()
         let reconstruct1 = try! await threshold_key.reconstruct()
         _ = try! await threshold_key2.initialize()
@@ -129,14 +133,14 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
     }
 
     func test_encrypt_decrypt() async {
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
         let key1 = try! PrivateKey.generate()
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: key1.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: true)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: true)
 
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()
@@ -148,14 +152,14 @@ final class tkey_pkgThresholdKeyTests: XCTestCase {
     }
 
     func test_share_descriptions() async {
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
         let key1 = try! PrivateKey.generate()
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: key1.hex)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: key1.hex)
         let threshold_key = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: true)
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: true)
 
         _ = try! await threshold_key.initialize()
         _ = try! await threshold_key.reconstruct()

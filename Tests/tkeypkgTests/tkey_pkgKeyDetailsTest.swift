@@ -6,14 +6,14 @@ final class tkey_pkgKeyDetailsTests: XCTestCase {
     private var data: KeyDetails!
 
     override func setUp() async throws {
-        let postbox_key = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
         )
 
         data = try! await threshold.initialize()
@@ -24,7 +24,7 @@ final class tkey_pkgKeyDetailsTests: XCTestCase {
     }
 
     func test_public_key_point() {
-        XCTAssertNotEqual(try! data.pubKey.getPublicKey(format: .EllipticCompress).count, 0)
+        XCTAssertNotEqual(try! data.pubKey.getPublicKey(format: .ellipticCompress).count, 0)
     }
 
     func test_threshold() {
@@ -32,14 +32,14 @@ final class tkey_pkgKeyDetailsTests: XCTestCase {
     }
 
     func test_required_shares() {
-        XCTAssertEqual(data.required_shares, 0)
+        XCTAssertEqual(data.requiredShares, 0)
     }
 
     func test_total_shares() {
-        XCTAssertNotEqual(data.total_shares, 0)
+        XCTAssertNotEqual(data.totalShares, 0)
     }
 
     func test_share_descriptions() {
-        XCTAssertNotEqual(data.share_descriptions.count, 0)
+        XCTAssertNotEqual(data.shareDescriptions.count, 0)
     }
 }

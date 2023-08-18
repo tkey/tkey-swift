@@ -35,7 +35,7 @@ public final class SeedPhraseModule {
 
     /// Sets a seed phrase on the metadata of a `ThresholdKey` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - format: "HD Key Tree" is the only supported format.
     ///   - phrase: The seed phrase. Optional, will be generated if not provided.
     ///   - number_of_wallets: Number of children derived from this seed phrase.
@@ -78,7 +78,7 @@ public final class SeedPhraseModule {
 
     /// Replaces an old seed phrase with a new seed phrase on a `ThresholdKey` object. Same format of seed phrase must be used.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - old_phrase: The original seed phrase.
     ///   - new_phrase: The replacement phrase.
     ///
@@ -100,7 +100,7 @@ public final class SeedPhraseModule {
 
     /// Returns the seed phrases stored on a `ThresholdKey` object.
     /// - Parameters:
-    ///   - thresholdkey: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///
     /// - Returns: Array of SeedPhrase objects.
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
@@ -115,12 +115,15 @@ public final class SeedPhraseModule {
         let string = String.init(cString: result!)
         string_free(result)
         let decoder = JSONDecoder()
-        let seedArray = try decoder.decode( [SeedPhrase].self, from: string.data(using: String.Encoding.utf8) )
+        guard let data = string.data(using: String.Encoding.utf8) else {
+            throw RuntimeError("String to data error")
+        }
+        let seedArray = try decoder.decode( [SeedPhrase].self, from: data )
         return seedArray
     }
 
     private static func delete_seed_phrase(thresholdKey: ThresholdKey, phrase: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        thresholdkey.tkeyQueue.async {
+        thresholdKey.tkeyQueue.async {
             do {
                 let phrasePointer = UnsafeMutablePointer<Int8>(mutating: (phrase as NSString).utf8String)
 
@@ -160,12 +163,12 @@ public final class SeedPhraseModule {
     }
 
     /*
-    static func get_seed_phrases_with_accounts(thresholdkey: ThresholdKey, derivation_format: String) throws -> String
+    static func get_seed_phrases_with_accounts(thresholdKey: ThresholdKey, derivation_format: String) throws -> String
     {
         var errorCode: Int32 = -1
         let derivationPointer = UnsafeMutablePointer<Int8>(mutating: (derivation_format as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            seed_phrase_get_seed_phrases_with_accounts(thresholdkey.pointer, derivationPointer, error)
+            seed_phrase_get_seed_phrases_with_accounts(thresholdKey.pointer, derivationPointer, error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error in SeedPhraseModule, get_seed_phrases_with_accounts")
@@ -177,12 +180,12 @@ public final class SeedPhraseModule {
     */
 
     /*
-    static func get_accounts(thresholdkey: ThresholdKey, derivation_format: String) throws -> String
+    static func get_accounts(thresholdKey: ThresholdKey, derivation_format: String) throws -> String
     {
         var errorCode: Int32 = -1
         let derivationPointer = UnsafeMutablePointer<Int8>(mutating: (derivation_format as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            seed_phrase_get_accounts(thresholdkey.pointer, derivationPointer, error)
+            seed_phrase_get_accounts(thresholdKey.pointer, derivationPointer, error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error in SeedPhraseModule, get_accounts")

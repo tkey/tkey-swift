@@ -6,8 +6,8 @@ final class tkey_pkgKeyPointArrayTests: XCTestCase {
     func test_key_point_array() {
         let point_array = KeyPointArray()
         XCTAssertEqual(try! point_array.length(), 0)
-        let point = try! KeyPoint(x: try! PrivateKey.generate().hex, y: try! PrivateKey.generate().hex)
-        let point2 = try! KeyPoint(x: try! PrivateKey.generate().hex, y: try! PrivateKey.generate().hex)
+        let point = try! KeyPoint(valueX: try! PrivateKey.generate().hex, valueY: try! PrivateKey.generate().hex)
+        let point2 = try! KeyPoint(valueX: try! PrivateKey.generate().hex, valueY: try! PrivateKey.generate().hex)
         try! point_array.insert(point: point)
         XCTAssertEqual(try! point_array.length(), 1)
         try! point_array.insert(point: point)

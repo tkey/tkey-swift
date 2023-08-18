@@ -6,14 +6,14 @@ final class tkey_pkgKeyReconstructionDetailsTests: XCTestCase {
     private var data: KeyReconstructionDetails!
 
     override func setUp() async throws {
-        let postbox_key = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
         )
 
         _ = try! await threshold.initialize()
@@ -29,7 +29,7 @@ final class tkey_pkgKeyReconstructionDetailsTests: XCTestCase {
     }
 
     func test_get_all_keys() {
-        XCTAssertEqual(data.all_keys.count, 0)
+        XCTAssertEqual(data.allKeys.count, 0)
     }
 
     func test_get_seed_phrase() {

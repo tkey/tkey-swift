@@ -6,14 +6,14 @@ final class tkey_pkgKeyPointTests: XCTestCase {
     private var data: KeyPoint!
 
     override func setUp() async throws {
-        let postbox_key = try! PrivateKey.generate()
-        let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
-        let service_provider = try! ServiceProvider(enable_logging: true, postbox_key: postbox_key.hex)
+        let postboxKey = try! PrivateKey.generate()
+        let storageLayer = try! StorageLayer(enableLogging: true, hostUrl: "https://metadata.tor.us", serverTimeOffset: 2)
+        let serviceProvider = try! ServiceProvider(enableLogging: true, postboxKey: postboxKey.hex)
         let threshold = try! ThresholdKey(
-            storage_layer: storage_layer,
-            service_provider: service_provider,
-            enable_logging: true,
-            manual_sync: false
+            storageLayer: storageLayer,
+            serviceProvider: serviceProvider,
+            enableLogging: true,
+            manualSync: false
         )
 
         let key_details = try! await threshold.initialize()
@@ -33,11 +33,11 @@ final class tkey_pkgKeyPointTests: XCTestCase {
     }
 
     func test_required_shares() {
-        XCTAssertNotEqual(try data.getPublicKey(format: .EllipticCompress).count, 0)
+        XCTAssertNotEqual(try data.getPublicKey(format: .ellipticCompress).count, 0)
     }
 
     func test_create_x_y() {
-        let point = try! KeyPoint(x: try! data.getX(), y: try! data.getY())
+        let point = try! KeyPoint(valueX: try! data.getX(), valueY: try! data.getY())
         XCTAssertEqual(try! point.getX(), try! data.getX())
         XCTAssertEqual(try! point.getY(), try! data.getY())
     }
