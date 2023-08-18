@@ -308,7 +308,7 @@ public final class TssModule {
                 }
 
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_generate_tss_share(thresholdKey.pointer, inputSharePointer, tssInputIndex, tssInputIndex, newFactorPubPointer,
+                    threshold_key_generate_tss_share(thresholdKey.pointer, inputSharePointer, tssInputIndex, newTssIndex, newFactorPubPointer,
                                                      serversPointer, authSignaturesPointer, curvePointer, error)
                 })
                 guard errorCode == 0 else {
