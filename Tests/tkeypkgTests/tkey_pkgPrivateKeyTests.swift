@@ -1,7 +1,6 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgPrivateKeyTests: XCTestCase {
     func test_generate() {

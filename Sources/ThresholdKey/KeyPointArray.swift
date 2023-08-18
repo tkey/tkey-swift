@@ -83,12 +83,12 @@ public class KeyPointArray {
     public func getAt(index: Int32) throws -> KeyPoint {
         var errorCode: Int32 = -1
 
-        let key_point = withUnsafeMutablePointer(to: &errorCode, { error in
+        let keyPoint = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_get_value_by_index(pointer, index, error)})
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_value_by_index")
         }
-        return KeyPoint.init(pointer: key_point!)
+        return KeyPoint.init(pointer: keyPoint!)
     }
 
     /// Number of items contained in the collection.
@@ -99,13 +99,13 @@ public class KeyPointArray {
     public func length() throws -> Int32 {
         var errorCode: Int32 = -1
 
-        let key_point_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
+        let keyPointArrayLength = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_array_get_len(pointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_len")
         }
-        return key_point_array_length
+        return keyPointArrayLength
 
     }
 
@@ -120,14 +120,14 @@ public class KeyPointArray {
         let curveN = "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
 
-        let poly_result = withUnsafeMutablePointer(to: &errorCode, { error in
+        let polyResult = withUnsafeMutablePointer(to: &errorCode, { error in
             lagrange_interpolate_polynomial(pointer, curvePointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in lagrange, lagrange_interpolate_polynomial method")
         }
 
-        return Polynomial.init(pointer: poly_result!)
+        return Polynomial.init(pointer: polyResult!)
     }
 
     deinit {

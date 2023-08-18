@@ -1,11 +1,10 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgMetadataTests: XCTestCase {
     private var data: Metadata!
-    
+
     override func setUp() async throws {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -21,11 +20,11 @@ final class tkey_pkgMetadataTests: XCTestCase {
         _ = try! await threshold.reconstruct()
         data = try! threshold.get_metadata()
     }
-    
+
     override func tearDown() {
         data = nil
     }
-    
+
     func test_export() {
         let export = try! data.export()
         let meta = try! Metadata.init(json: export)

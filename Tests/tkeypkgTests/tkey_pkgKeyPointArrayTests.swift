@@ -1,7 +1,6 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgKeyPointArrayTests: XCTestCase {
     func test_key_point_array() {
@@ -20,8 +19,8 @@ final class tkey_pkgKeyPointArrayTests: XCTestCase {
         try! point_array.update(point: point2, index: 1)
         let retrieved_point1 = try! point_array.getAt(index: 0)
         let retrieved_point2 = try! point_array.getAt(index: 1)
-        XCTAssertEqual(point,retrieved_point1)
-        XCTAssertEqual(point2,retrieved_point2)
+        XCTAssertEqual(point, retrieved_point1)
+        XCTAssertEqual(point2, retrieved_point2)
         _ = try! point_array.lagrange()
     }
 }

@@ -6,7 +6,7 @@ import Foundation
 public final class GenerateShareStoreResult {
     private(set) var pointer: OpaquePointer?
     public var hex: String
-    public var share_store: ShareStoreMap
+    public var shareStore: ShareStoreMap
 
     /// Instantiate a `GenerateShareStoreResult` object using the underlying pointer.
     ///
@@ -33,7 +33,7 @@ public final class GenerateShareStoreResult {
         guard errorCode == 0 else {
             throw RuntimeError("Error in GenerateShareStoreResult, field share_store")
             }
-        share_store = try! ShareStoreMap.init(pointer: storePtr!)
+        shareStore = try ShareStoreMap.init(pointer: storePtr!)
     }
 
     deinit {

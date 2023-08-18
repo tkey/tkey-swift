@@ -21,6 +21,9 @@ let package = Package(
         // dev dependencies only
         .package(name:"CryptoSwift", url: "https://github.com/krzyzanowskim/CryptoSwift.git",from: "1.5.1"),
         .package(name:"jwt-kit", url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0"),
+        .package(name: "SwiftLint", url: "https://github.com/realm/SwiftLint", from: "0.52.4")
+        
+        
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -35,7 +38,8 @@ let package = Package(
         .target(
             name: "tkey-pkg",
             dependencies: ["lib", "TorusUtils"],
-            path: "Sources/ThresholdKey"
+            path: "Sources/ThresholdKey",
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "SwiftLint")]
         ),
         .testTarget(
             name: "tkey-pkgTests",

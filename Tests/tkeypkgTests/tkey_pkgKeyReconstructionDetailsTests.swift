@@ -1,11 +1,10 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgKeyReconstructionDetailsTests: XCTestCase {
     private var data: KeyReconstructionDetails!
-    
+
     override func setUp() async throws {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -20,20 +19,20 @@ final class tkey_pkgKeyReconstructionDetailsTests: XCTestCase {
         _ = try! await threshold.initialize()
         data = try! await threshold.reconstruct()
     }
-    
+
     override func tearDown() {
         data = nil
     }
-    
+
     func test_get_key() {
-        XCTAssertNotEqual(data.key.count,0)
+        XCTAssertNotEqual(data.key.count, 0)
     }
-    
+
     func test_get_all_keys() {
-        XCTAssertEqual(data.all_keys.count,0)
+        XCTAssertEqual(data.all_keys.count, 0)
     }
-    
+
     func test_get_seed_phrase() {
-        XCTAssertNotEqual(data.seed_phrase.count,0)
+        XCTAssertNotEqual(data.seedPhrase.count, 0)
     }
 }

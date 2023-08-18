@@ -19,7 +19,7 @@ public final class StorageLayer {
     // This is a placeholder to satisfy the interface,
     // tracking this object is not necessary in swift as it maintains context
     // on entry for the callback
-    private var obj_ref: UnsafeMutableRawPointer?
+    private var objRef: UnsafeMutableRawPointer?
 
     /* for multipart form data
     static func createMultipartBody(data: Data, boundary: String, file: String) -> Data {
@@ -49,18 +49,19 @@ public final class StorageLayer {
     /// Instantiate a `StorageLayer` object,
     ///
     /// - Parameters:
-    ///   - enable_logging: Determines whether logging is enabled or not (pending).
-    ///   - host_url: Url for the metadata server.
-    ///   - server_time_offset: Timezone offset for the metadata server.
+    ///   - enableLogging: Determines whether logging is enabled or not (pending).
+    ///   - hostUrl: Url for the metadata server.
+    ///   - serverTimeOffset: Timezone offset for the metadata server.
     ///
     /// - Returns: `StorageLayer`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters.
-    public init(enable_logging: Bool, host_url: String, server_time_offset: Int64) throws {
+    public init(enableLogging: Bool, hostUrl: String, serverTimeOffset: Int64) throws {
         var errorCode: Int32 = -1
-        let urlPointer = UnsafeMutablePointer<Int8>(mutating: (host_url as NSString).utf8String)
+        let urlPointer = UnsafeMutablePointer<Int8>(mutating: (hostUrl as NSString).utf8String)
 
-        let network_interface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?, UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, _, error_code in
+        let networkInterface: (@convention(c) (UnsafeMutablePointer<CChar>?, UnsafeMutablePointer<CChar>?,
+                                               UnsafeMutableRawPointer?, UnsafeMutablePointer<Int32>?) -> UnsafeMutablePointer<CChar>?)? = {url, data, _, errorCode in
             let sem = DispatchSemaphore.init(value: 0)
             let urlString = String.init(cString: url!)
             let dataString = String.init(cString: data!)
@@ -79,25 +80,34 @@ public final class StorageLayer {
                 // request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
                 request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-                let json = try! JSONSerialization.jsonObject(with: dataString.data(using: String.Encoding.utf8)!, options: .allowFragments) as! [[String: Any]]
+                guard let data = dataString.data(using: String.Encoding.utf8) else {
+                    throw RuntimeError("Sring to data Error")
+                }
+                guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]] else {
+                    throw RuntimeError("JsonSerialization Error")
+                }
 
                 // for item in json {
                     // let dataItem = try! JSONSerialization.data(withJSONObject: item, options: .prettyPrinted)
                     // requestData.append(StorageLayer.createMultipartBody(data: dataItem, boundary: boundary, file: "multipartData"))
                 // }
 
-                var form_data: [String] = []
+                var formData: [String] = []
 
                 // urlencoded item format: "(key)=(self.percentEscapeString(value))"
                 for (index, element) in json.enumerated() {
-                    let json_elem = try! JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
-                    let json_escaped_string = StorageLayer.percentEscapeString(string: String(data: json_elem, encoding: .utf8)!)
-                    let final_string = String(index) + "=" + json_escaped_string
-                    form_data.append(final_string)
+                    let jsonElem = try JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
+                    
+                    guard let jsonStr = String(data: jsonElem, encoding: .utf8) else {
+                        throw RuntimeError("Stringify json")
+                    }
+                    let jsonEscapedString = StorageLayer.percentEscapeString(string: jsonStr )
+                    let finalString = String(index) + "=" + jsonEscapedString
+                    formData.append(finalString)
                 }
-                let body_data = form_data.joined(separator: "&")
+                let bodyData = formData.joined(separator: "&")
 
-                request.httpBody = body_data.data(using: String.Encoding.utf8)
+                request.httpBody = bodyData.data(using: String.Encoding.utf8)
             } else {
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.httpBody = dataString.data(using: String.Encoding.utf8)
@@ -110,7 +120,7 @@ public final class StorageLayer {
                 }
                 if error != nil {
                     let code: Int32 = 1
-                    error_code?.pointee = code
+                    errorCode?.pointee = code
                 }
                 if let data = data {
                     let resultString: String = String(decoding: data, as: UTF8.self)
@@ -125,7 +135,7 @@ public final class StorageLayer {
         }
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            storage_layer(enable_logging, urlPointer, server_time_offset, network_interface, obj_ref,   error)
+            storage_layer(enableLogging, urlPointer, serverTimeOffset, networkInterface, objRef,    error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error in StorageLayer")

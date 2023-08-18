@@ -9,7 +9,10 @@ import TorusUtils
 
 public struct GetTSSPubKeyResult: Codable {
     public struct Point: Codable {
+        
+        // swiftlint:disable:next identifier_name
         public var x: String
+        // swiftlint:disable:next identifier_name
         public var y: String
 
         public func toFullAddr() -> String {
@@ -21,14 +24,16 @@ public struct GetTSSPubKeyResult: Codable {
     public var nodeIndexes: [Int]
 }
 
+
+// swiftlint:disable type_body_length
 public final class TssModule {
-    private static func set_tss_tag(threshold_key: ThresholdKey, tss_tag: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func set_tss_tag(thresholdKey: ThresholdKey, tssTag: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
-                let tss_tag_pointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: tss_tag).utf8String)
+                let tssTagPointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: tssTag).utf8String)
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_set_tss_tag(threshold_key.pointer, tss_tag_pointer, error) })
+                    threshold_key_set_tss_tag(thresholdKey.pointer, tssTagPointer, error) })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey set_tss_tag")
                 }
@@ -39,10 +44,10 @@ public final class TssModule {
         }
     }
 
-    static func set_tss_tag(threshold_key: ThresholdKey, tss_tag: String) async throws {
+    static func set_tss_tag(thresholdKey: ThresholdKey, tssTag: String) async throws {
         return try await withCheckedThrowingContinuation {
             continuation in
-            set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag) {
+            set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag) {
                 result in
                 switch result {
                 case let .success(result):
@@ -54,10 +59,10 @@ public final class TssModule {
         }
     }
 
-    public static func get_tss_tag(threshold_key: ThresholdKey) throws -> String {
+    public static func get_tss_tag(thresholdKey: ThresholdKey) throws -> String {
         var errorCode: Int32 = -1
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_tag(threshold_key.pointer, error) })
+            threshold_key_get_tss_tag(thresholdKey.pointer, error) })
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_tss_tag")
         }
@@ -66,11 +71,11 @@ public final class TssModule {
         return string
     }
 
-    public static func get_all_tss_tags(threshold_key: ThresholdKey) throws -> [String] {
+    public static func get_all_tss_tags(thresholdKey: ThresholdKey) throws -> [String] {
         var errorCode: Int32 = -1
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_all_tss_tags(threshold_key.pointer, error) })
+            threshold_key_get_all_tss_tags(thresholdKey.pointer, error) })
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_tss_tag")
         }
@@ -79,20 +84,20 @@ public final class TssModule {
         guard let data = string.data(using: .utf8) else {
             throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
         }
-        guard let result_vec = try JSONSerialization.jsonObject(with: data) as? [String] else {
+        guard let resultVec = try JSONSerialization.jsonObject(with: data) as? [String] else {
             throw RuntimeError("Error in get_all_tss_tag : Invalid output ")
         }
 
-        return result_vec
+        return resultVec
     }
 
-    public static func get_all_factor_pub(threshold_key: ThresholdKey, tss_tag: String) async throws -> [String] {
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func get_all_factor_pub(thresholdKey: ThresholdKey, tssTag: String) async throws -> [String] {
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
         var errorCode: Int32 = -1
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_tag_factor_pub(threshold_key.pointer, error) })
+            threshold_key_get_tss_tag_factor_pub(thresholdKey.pointer, error) })
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_all_factor_pub")
         }
@@ -101,20 +106,20 @@ public final class TssModule {
         guard let data = string.data(using: .utf8) else {
             throw RuntimeError("Error in get_all_factor_pub : Invalid output ")
         }
-        guard let result_vec = try JSONSerialization.jsonObject(with: data) as? [String] else {
+        guard let resultVec = try JSONSerialization.jsonObject(with: data) as? [String] else {
             throw RuntimeError("Error in get_all_factor_pub : Invalid output ")
         }
 
-        return result_vec
+        return resultVec
     }
 
-    public static func get_tss_pub_key(threshold_key: ThresholdKey, tss_tag: String) async throws -> String {
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func get_tss_pub_key(thresholdKey: ThresholdKey, tssTag: String) async throws -> String {
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
         var errorCode: Int32 = -1
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_public_key(threshold_key.pointer, error) })
+            threshold_key_get_tss_public_key(thresholdKey.pointer, error) })
         guard errorCode == 0 else {
             throw RuntimeError("Error in get_tss_tag")
         }
@@ -123,11 +128,11 @@ public final class TssModule {
         return string
     }
 
-    public static func get_tss_nonce(threshold_key: ThresholdKey, tss_tag: String, prefetch: Bool = false) throws -> Int32 {
+    public static func get_tss_nonce(thresholdKey: ThresholdKey, tssTag: String, prefetch: Bool = false) throws -> Int32 {
         var errorCode: Int32 = -1
-        let tss_tag_pointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: tss_tag).utf8String)
+        let tssTagPointer: UnsafeMutablePointer<Int8>? = UnsafeMutablePointer<Int8>(mutating: NSString(string: tssTag).utf8String)
         var nonce = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_nonce(threshold_key.pointer, tss_tag_pointer, error) })
+            threshold_key_get_tss_nonce(thresholdKey.pointer, tssTagPointer, error) })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_tss_nonce")
         }
@@ -139,17 +144,17 @@ public final class TssModule {
         return nonce
     }
 
-    public static func get_tss_share(threshold_key: ThresholdKey, tss_tag: String, factorKey: String, threshold: Int32 = 0) async throws -> (String, String) {
+    public static func get_tss_share(thresholdKey: ThresholdKey, tssTag: String, factorKey: String, threshold: Int32 = 0) async throws -> (String, String) {
         if factorKey.count > 66 { throw RuntimeError("Invalid factor Key") }
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
         var errorCode: Int32 = -1
 
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
         let factorKeyPointer = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            threshold_key_get_tss_share(threshold_key.pointer, factorKeyPointer, threshold, curvePointer, error)
+            threshold_key_get_tss_share(thresholdKey.pointer, factorKeyPointer, threshold, curvePointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in ThresholdKey get_tss_share")
@@ -160,12 +165,12 @@ public final class TssModule {
         return (String(splitString[0]), String(splitString[1]))
     }
 
-    private static func create_tagged_tss_share(threshold_key: ThresholdKey, deviceTssShare: String?, factorPub: String, deviceTssIndex: Int32, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func create_tagged_tss_share(thresholdKey: ThresholdKey, deviceTssShare: String?, factorPub: String, deviceTssIndex: Int32, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
 
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 var deviceTssSharePointer: UnsafeMutablePointer<Int8>?
                 if let deviceTssShare = deviceTssShare {
                     deviceTssSharePointer = UnsafeMutablePointer<Int8>(mutating: (deviceTssShare as NSString).utf8String)
@@ -173,7 +178,7 @@ public final class TssModule {
                 let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (factorPub as NSString).utf8String)
 
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_create_tagged_tss_share(threshold_key.pointer, deviceTssSharePointer, factorPubPointer, deviceTssIndex, curvePointer, error)
+                    threshold_key_create_tagged_tss_share(thresholdKey.pointer, deviceTssSharePointer, factorPubPointer, deviceTssIndex, curvePointer, error)
                 })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey create_tagged_tss_share")
@@ -185,12 +190,13 @@ public final class TssModule {
         }
     }
 
-    public static func create_tagged_tss_share(threshold_key: ThresholdKey, tss_tag: String, deviceTssShare: String?, factorPub: String, deviceTssIndex: Int32, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws {
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
-        try await TssModule.update_tss_pub_key(threshold_key: threshold_key, tss_tag: tss_tag, nodeDetails: nodeDetails, torusUtils: torusUtils)
+    public static func create_tagged_tss_share(thresholdKey: ThresholdKey, tssTag: String, deviceTssShare: String?,
+                                               factorPub: String, deviceTssIndex: Int32, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws {
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
+        try await TssModule.update_tss_pub_key(thresholdKey: thresholdKey, tssTag: tssTag, nodeDetails: nodeDetails, torusUtils: torusUtils)
         return try await withCheckedThrowingContinuation {
             continuation in
-            create_tagged_tss_share(threshold_key: threshold_key, deviceTssShare: deviceTssShare, factorPub: factorPub, deviceTssIndex: deviceTssIndex) {
+            create_tagged_tss_share(thresholdKey: thresholdKey, deviceTssShare: deviceTssShare, factorPub: factorPub, deviceTssIndex: deviceTssIndex) {
                 result in
                 switch result {
                 case let .success(result):
@@ -202,10 +208,10 @@ public final class TssModule {
         }
     }
 
-    private static func update_tss_pub_key(threshold_key: ThresholdKey, tss_tag: String, nonce: String, public_key: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func update_tss_pub_key(thresholdKey: ThresholdKey, tssTag: String, nonce: String, publicKey: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
-                try threshold_key.service_provider_assign_public_key(tag: tss_tag, nonce: nonce, public_key: public_key)
+                try thresholdKey.service_provider_assign_public_key(tag: tssTag, nonce: nonce, publicKey: publicKey)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
@@ -213,20 +219,20 @@ public final class TssModule {
         }
     }
 
-    public static func update_tss_pub_key(threshold_key: ThresholdKey, tss_tag: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, prefetch: Bool = false) async throws {
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func update_tss_pub_key(thresholdKey: ThresholdKey, tssTag: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, prefetch: Bool = false) async throws {
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
-        let nonce = String(try get_tss_nonce(threshold_key: threshold_key, tss_tag: tss_tag, prefetch: prefetch))
+        let nonce = String(try get_tss_nonce(thresholdKey: thresholdKey, tssTag: tssTag, prefetch: prefetch))
 
-        let public_address = try await get_dkg_pub_key(threshold_key: threshold_key, tssTag: tss_tag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
-        let pk_encoded = try JSONEncoder().encode(public_address)
-        guard let public_key = String(data: pk_encoded, encoding: .utf8) else {
+        let publicAddress = try await get_dkg_pub_key(thresholdKey: thresholdKey, tssTag: tssTag, nonce: nonce, nodeDetails: nodeDetails, torusUtils: torusUtils)
+        let pkEncoded = try JSONEncoder().encode(publicAddress)
+        guard let publicKey = String(data: pkEncoded, encoding: .utf8) else {
             throw RuntimeError("update_tss_pub_key - Conversion Error - ResultString")
         }
 
         return try await withCheckedThrowingContinuation {
             continuation in
-            update_tss_pub_key(threshold_key: threshold_key, tss_tag: tss_tag, nonce: nonce, public_key: public_key) {
+            update_tss_pub_key(thresholdKey: thresholdKey, tssTag: tssTag, nonce: nonce, publicKey: publicKey) {
                 result in
                 switch result {
                 case let .success(result):
@@ -238,17 +244,17 @@ public final class TssModule {
         }
     }
 
-    private static func copy_factor_pub(threshold_key: ThresholdKey, factorKey: String, newFactorPub: String, tss_index: Int32, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func copy_factor_pub(thresholdKey: ThresholdKey, factorKey: String, newFactorPub: String, tssIndex: Int32, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
 
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
                 let factorKeyPointer = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
                 let newFactorPubPointer = UnsafeMutablePointer<Int8>(mutating: (newFactorPub as NSString).utf8String)
 
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_copy_factor_pub(threshold_key.pointer, newFactorPubPointer, tss_index, factorKeyPointer, curvePointer, error)
+                    threshold_key_copy_factor_pub(thresholdKey.pointer, newFactorPubPointer, tssIndex, factorKeyPointer, curvePointer, error)
                 })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey copy_factor_pub")
@@ -260,13 +266,13 @@ public final class TssModule {
         }
     }
 
-    public static func copy_factor_pub(threshold_key: ThresholdKey, tss_tag: String, factorKey: String, newFactorPub: String, tss_index: Int32, threshold: Int32 = 0) async throws {
+    public static func copy_factor_pub(thresholdKey: ThresholdKey, tssTag: String, factorKey: String, newFactorPub: String, tssIndex: Int32, threshold: Int32 = 0) async throws {
         if factorKey.count > 66 { throw RuntimeError("Invalid factor Key") }
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
         return try await withCheckedThrowingContinuation {
             continuation in
-            copy_factor_pub(threshold_key: threshold_key, factorKey: factorKey, newFactorPub: newFactorPub, tss_index: tss_index) {
+            copy_factor_pub(thresholdKey: thresholdKey, factorKey: factorKey, newFactorPub: newFactorPub, tssIndex: tssIndex) {
                 result in
                 switch result {
                 case let .success(result):
@@ -278,30 +284,32 @@ public final class TssModule {
         }
     }
 
-    private static func generate_tss_share(threshold_key: ThresholdKey, input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, selected_servers: [Int32]? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func generate_tss_share(thresholdKey: ThresholdKey, inputTssShare: String, tssInputIndex: Int32, authSignatures: [String], newFactorPub: String,
+                                           newTssIndex: Int32, selectedServers: [Int32]? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
 
-                let auth_signatures_json = try JSONSerialization.data(withJSONObject: auth_signatures)
-                guard let auth_signatures_str = String(data: auth_signatures_json, encoding: .utf8) else {
+                let authSignaturesJson = try JSONSerialization.data(withJSONObject: authSignatures)
+                guard let authSignaturesStr = String(data: authSignaturesJson, encoding: .utf8) else {
                     throw RuntimeError("auth signatures error")
                 }
-                let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (input_tss_share as NSString).utf8String)
-                let newFactorPubPointer = UnsafeMutablePointer<Int8>(mutating: (new_factor_pub as NSString).utf8String)
+                let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (inputTssShare as NSString).utf8String)
+                let newFactorPubPointer = UnsafeMutablePointer<Int8>(mutating: (newFactorPub as NSString).utf8String)
 
-                let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (auth_signatures_str as NSString).utf8String)
+                let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (authSignaturesStr as NSString).utf8String)
 
                 var serversPointer: UnsafeMutablePointer<Int8>?
-                if selected_servers != nil {
-                    let selected_servers_json = try JSONSerialization.data(withJSONObject: selected_servers as Any)
-                    let selected_servers_str = String(data: selected_servers_json, encoding: .utf8)!
-                    serversPointer = UnsafeMutablePointer<Int8>(mutating: (selected_servers_str as NSString).utf8String)
+                if selectedServers != nil {
+                    let selectedServersJson = try JSONSerialization.data(withJSONObject: selectedServers as Any)
+                    let selectedServersStr = String(data: selectedServersJson, encoding: .utf8)!
+                    serversPointer = UnsafeMutablePointer<Int8>(mutating: (selectedServersStr as NSString).utf8String)
                 }
 
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_generate_tss_share(threshold_key.pointer, inputSharePointer, tss_input_index, new_tss_index, newFactorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
+                    threshold_key_generate_tss_share(thresholdKey.pointer, inputSharePointer, tssInputIndex, tssInputIndex, newFactorPubPointer,
+                                                     serversPointer, authSignaturesPointer, curvePointer, error)
                 })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey generate_tss_share")
@@ -313,14 +321,18 @@ public final class TssModule {
         }
     }
 
-    public static func generate_tss_share(threshold_key: ThresholdKey, tss_tag: String, input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selected_servers: [Int32]? = nil) async throws {
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    
+    // swiftlint:disable:next function_parameter_count
+    public static func generate_tss_share(thresholdKey: ThresholdKey, tssTag: String, inputTssShare: String, tssInputIndex: Int32, authSignatures: [String],
+                                          newFactorPub: String, newTssIndex: Int32, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selectedServers: [Int32]? = nil) async throws {
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
-        try await update_tss_pub_key(threshold_key: threshold_key, tss_tag: tss_tag, nodeDetails: nodeDetails, torusUtils: torusUtils, prefetch: true)
+        try await update_tss_pub_key(thresholdKey: thresholdKey, tssTag: tssTag, nodeDetails: nodeDetails, torusUtils: torusUtils, prefetch: true)
 
         return try await withCheckedThrowingContinuation {
             continuation in
-            generate_tss_share(threshold_key: threshold_key, input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, new_factor_pub: new_factor_pub, new_tss_index: new_tss_index) {
+            generate_tss_share(thresholdKey: thresholdKey, inputTssShare: inputTssShare, tssInputIndex: tssInputIndex, authSignatures: authSignatures,
+                               newFactorPub: newFactorPub, newTssIndex: newTssIndex) {
                 result in
                 switch result {
                 case let .success(result):
@@ -332,30 +344,31 @@ public final class TssModule {
         }
     }
 
-    private static func delete_tss_share(threshold_key: ThresholdKey, input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, selected_servers: [Int32]? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
-        threshold_key.tkeyQueue.async {
+    private static func delete_tss_share(thresholdKey: ThresholdKey, inputTssShare: String, tssInputIndex: Int32, authSignatures: [String],
+                                         deleteFactorPub: String, selectedServers: [Int32]? = nil, completion: @escaping (Result<Void, Error>) -> Void) {
+        thresholdKey.tkeyQueue.async {
             do {
                 var errorCode: Int32 = -1
-                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+                let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
 
-                let auth_signatures_json = try JSONSerialization.data(withJSONObject: auth_signatures)
-                guard let auth_signatures_str = String(data: auth_signatures_json, encoding: .utf8) else {
+                let authSignaturesJson = try JSONSerialization.data(withJSONObject: authSignatures)
+                guard let authSignaturesStr = String(data: authSignaturesJson, encoding: .utf8) else {
                     throw RuntimeError("auth signatures error")
                 }
-                let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (input_tss_share as NSString).utf8String)
-                let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (delete_factor_pub as NSString).utf8String)
+                let inputSharePointer = UnsafeMutablePointer<Int8>(mutating: (inputTssShare as NSString).utf8String)
+                let factorPubPointer = UnsafeMutablePointer<Int8>(mutating: (deleteFactorPub as NSString).utf8String)
 
-                let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (auth_signatures_str as NSString).utf8String)
+                let authSignaturesPointer = UnsafeMutablePointer<Int8>(mutating: (authSignaturesStr as NSString).utf8String)
 
                 var serversPointer: UnsafeMutablePointer<Int8>?
-                if selected_servers != nil {
-                    let selected_servers_json = try JSONSerialization.data(withJSONObject: selected_servers as Any)
-                    let selected_servers_str = String(data: selected_servers_json, encoding: .utf8)!
-                    serversPointer = UnsafeMutablePointer<Int8>(mutating: (selected_servers_str as NSString).utf8String)
+                if selectedServers != nil {
+                    let selectedServersJson = try JSONSerialization.data(withJSONObject: selectedServers as Any)
+                    let selectedServersStr = String(data: selectedServersJson, encoding: .utf8)!
+                    serversPointer = UnsafeMutablePointer<Int8>(mutating: (selectedServersStr as NSString).utf8String)
                 }
 
                 withUnsafeMutablePointer(to: &errorCode, { error in
-                    threshold_key_delete_tss_share(threshold_key.pointer, inputSharePointer, tss_input_index, factorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
+                    threshold_key_delete_tss_share(thresholdKey.pointer, inputSharePointer, tssInputIndex, factorPubPointer, serversPointer, authSignaturesPointer, curvePointer, error)
                 })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in ThresholdKey delete tss share")
@@ -367,13 +380,14 @@ public final class TssModule {
         }
     }
 
-    public static func delete_tss_share(threshold_key: ThresholdKey, tss_tag: String, input_tss_share: String, tss_input_index: Int32, auth_signatures: [String], delete_factor_pub: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selected_servers: [Int32]? = nil) async throws {
-        try await update_tss_pub_key(threshold_key: threshold_key, tss_tag: tss_tag, nodeDetails: nodeDetails, torusUtils: torusUtils, prefetch: true)
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func delete_tss_share(thresholdKey: ThresholdKey, tssTag: String, inputTssShare: String, tssInputIndex: Int32, authSignatures: [String],
+                                        deleteFactorPub: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selectedServers: [Int32]? = nil) async throws {
+        try await update_tss_pub_key(thresholdKey: thresholdKey, tssTag: tssTag, nodeDetails: nodeDetails, torusUtils: torusUtils, prefetch: true)
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
         return try await withCheckedThrowingContinuation {
             continuation in
-            delete_tss_share(threshold_key: threshold_key, input_tss_share: input_tss_share, tss_input_index: tss_input_index, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub) {
+            delete_tss_share(thresholdKey: thresholdKey, inputTssShare: inputTssShare, tssInputIndex: tssInputIndex, authSignatures: authSignatures, deleteFactorPub: deleteFactorPub) {
                 result in
                 switch result {
                 case let .success(result):
@@ -385,47 +399,53 @@ public final class TssModule {
         }
     }
 
-    public static func add_factor_pub(threshold_key: ThresholdKey, tss_tag: String, factor_key: String, auth_signatures: [String], new_factor_pub: String, new_tss_index: Int32, selected_servers: [Int32]? = nil, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws {
-        if factor_key.count > 66 { throw RuntimeError("Invalid factor Key") }
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func add_factor_pub(thresholdKey: ThresholdKey, tssTag: String, factorKey: String, authSignatures: [String], newFactorPub: String,
+                                      newTssIndex: Int32, selectedServers: [Int32]? = nil, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws {
+        if factorKey.count > 66 { throw RuntimeError("Invalid factor Key") }
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
-        let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
-        try await TssModule.generate_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, new_factor_pub: new_factor_pub, new_tss_index: new_tss_index, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
+        let (tssIndex, tssShare) = try await get_tss_share(thresholdKey: thresholdKey, tssTag: tssTag, factorKey: factorKey)
+        try await TssModule.generate_tss_share(thresholdKey: thresholdKey, tssTag: tssTag, inputTssShare: tssShare, tssInputIndex: Int32(tssIndex)!,
+                                               authSignatures: authSignatures, newFactorPub: newFactorPub, newTssIndex: newTssIndex, nodeDetails: nodeDetails,
+                                               torusUtils: torusUtils, selectedServers: selectedServers)
 
     }
 
-    public static func delete_factor_pub(threshold_key: ThresholdKey, tss_tag: String, factor_key: String, auth_signatures: [String], delete_factor_pub: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selected_servers: [Int32]? = nil) async throws {
-        if factor_key.count > 66 { throw RuntimeError("Invalid factor Key") }
-        try await TssModule.set_tss_tag(threshold_key: threshold_key, tss_tag: tss_tag)
+    public static func delete_factor_pub(thresholdKey: ThresholdKey, tssTag: String, factorKey: String, authSignatures: [String], deleteFactorPub: String,
+                                         nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils, selectedServers: [Int32]? = nil) async throws {
+        if factorKey.count > 66 { throw RuntimeError("Invalid factor Key") }
+        try await TssModule.set_tss_tag(thresholdKey: thresholdKey, tssTag: tssTag)
 
-        let (tss_index, tss_share) = try await get_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, factorKey: factor_key)
-        try await TssModule.delete_tss_share(threshold_key: threshold_key, tss_tag: tss_tag, input_tss_share: tss_share, tss_input_index: Int32(tss_index)!, auth_signatures: auth_signatures, delete_factor_pub: delete_factor_pub, nodeDetails: nodeDetails, torusUtils: torusUtils, selected_servers: selected_servers)
+        let (tssIndex, tssShare) = try await get_tss_share(thresholdKey: thresholdKey, tssTag: tssTag, factorKey: factorKey)
+        try await TssModule.delete_tss_share(thresholdKey: thresholdKey, tssTag: tssTag, inputTssShare: tssShare, tssInputIndex: Int32(tssIndex)!,
+                                             authSignatures: authSignatures, deleteFactorPub: deleteFactorPub, nodeDetails: nodeDetails, torusUtils: torusUtils,
+                                             selectedServers: selectedServers)
     }
 
     /// backup device share with factor key  
     /// - Parameters:
-    ///   - threshold_key: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - shareIndex: Index of the Share to be backed up.
     ///   - factorKey: factor key to be used for backup.
     ///
     /// - Returns: `Void`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func backup_share_with_factor_key(threshold_key: ThresholdKey, shareIndex: String, factorKey: String) throws {
+    public static func backup_share_with_factor_key(thresholdKey: ThresholdKey, shareIndex: String, factorKey: String) throws {
         var errorCode: Int32 = -1
 
         let cShareIndex = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
         let cFactorKey = UnsafeMutablePointer<Int8>(mutating: (factorKey as NSString).utf8String)
-        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (threshold_key.curveN as NSString).utf8String)
+        let curvePointer = UnsafeMutablePointer<Int8>(mutating: (thresholdKey.curveN as NSString).utf8String)
 
-        withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_backup_share_with_factor_key( threshold_key.pointer, cShareIndex, cFactorKey, curvePointer, error)})
+        withUnsafeMutablePointer(to: &errorCode, { error in threshold_key_backup_share_with_factor_key( thresholdKey.pointer, cShareIndex, cFactorKey, curvePointer, error)})
          guard errorCode == 0 else {
              throw RuntimeError("Error in ThresholdKey backup_share_with_factor_key")
          }
     }
 
-    public static func find_device_share_index ( threshold_key: ThresholdKey, factor_key: String ) async throws -> String {
-        let result = try await threshold_key.storage_layer_get_metadata(private_key: factor_key)
+    public static func find_device_share_index ( thresholdKey: ThresholdKey, factorKey: String ) async throws -> String {
+        let result = try await thresholdKey.storage_layer_get_metadata(privateKey: factorKey)
         guard let resultData = result.data(using: .utf8) else {
             throw "Invalid factor key"
         }
@@ -446,7 +466,7 @@ public final class TssModule {
 
     /// get dkg public key
     /// - Parameters:
-    ///   - threshold_key: The threshold key to act on.
+    ///   - thresholdKey: The threshold key to act on.
     ///   - tssTag: tssTag used.
     ///   - nonce: nonce 
     ///   - nodeDetails: node details
@@ -454,17 +474,18 @@ public final class TssModule {
     /// - Returns: `GetTSSPubKeyResult`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func get_dkg_pub_key(threshold_key: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
-        let extendedVerifierId = try threshold_key.get_extended_verifier_id()
+    public static func get_dkg_pub_key(thresholdKey: ThresholdKey, tssTag: String, nonce: String, nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> GetTSSPubKeyResult {
+        let extendedVerifierId = try thresholdKey.get_extended_verifier_id()
         let split = extendedVerifierId.components(separatedBy: "\u{001c}")
 
-        let result = try await torusUtils.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, torusNodePubs: nodeDetails.torusNodePub, verifier: split[0], verifierId: split[1], extendedVerifierId: "\(split[1])\u{0015}\(tssTag)\u{0016}\(nonce)")
+        let result = try await torusUtils.getPublicAddress(endpoints: nodeDetails.torusNodeEndpoints, torusNodePubs: nodeDetails.torusNodePub,
+                                                           verifier: split[0], verifierId: split[1], extendedVerifierId: "\(split[1])\u{0015}\(tssTag)\u{0016}\(nonce)")
 
         print("result in service provider", result)
-        guard let x = result.finalKeyData?.X, let y = result.finalKeyData?.Y, let nodeIndexes = result.nodesData?.nodeIndexes else {
+        guard let valueX = result.finalKeyData?.X, let valueY = result.finalKeyData?.Y, let nodeIndexes = result.nodesData?.nodeIndexes else {
             throw RuntimeError("conversion error")
         }
-        let pubKey = GetTSSPubKeyResult.Point(x: x, y: y)
+        let pubKey = GetTSSPubKeyResult.Point(x: valueX, y: valueY)
         return GetTSSPubKeyResult(publicKey: pubKey, nodeIndexes: nodeIndexes)
     }
 }

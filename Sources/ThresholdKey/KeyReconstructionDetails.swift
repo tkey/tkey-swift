@@ -5,8 +5,8 @@ import Foundation
 
 public final class KeyReconstructionDetails: Codable {
     public var key: String
-    public var seed_phrase: [String]
-    public var all_keys: [String]
+    public var seedPhrase: [String]
+    public var allKeys: [String]
 
     /// Instantiate a `KeyReconstructionDetails` object using the underlying pointer.
     ///
@@ -27,43 +27,43 @@ public final class KeyReconstructionDetails: Codable {
         self.key = String.init(cString: key!)
         string_free(key)
 
-        self.seed_phrase = []
-        let seed_len = withUnsafeMutablePointer(to: &errorCode, { error in
+        self.seedPhrase = []
+        let seedLen = withUnsafeMutablePointer(to: &errorCode, { error in
            key_reconstruction_get_seed_phrase_len(pointer, error)
                })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Seed Phrase")
             }
-        if seed_len > 0 {
-            for index in 0...seed_len-1 {
-                let seed_item = withUnsafeMutablePointer(to: &errorCode, { error in
+        if seedLen > 0 {
+            for index in 0...seedLen-1 {
+                let seedItem = withUnsafeMutablePointer(to: &errorCode, { error in
                    key_reconstruction_get_seed_phrase_at(pointer, index, error)
                        })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + String(index))
                     }
-                self.seed_phrase.append(String.init(cString: seed_item!))
-                string_free(seed_item)
+                self.seedPhrase.append(String.init(cString: seedItem!))
+                string_free(seedItem)
             }
         }
 
-        self.all_keys = []
-        let keys_len = withUnsafeMutablePointer(to: &errorCode, { error in
+        self.allKeys = []
+        let keysLen = withUnsafeMutablePointer(to: &errorCode, { error in
            key_reconstruction_get_all_keys_len(pointer, error)
                })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Seed Phrase")
             }
-        if keys_len > 0 {
-            for index in 0...keys_len-1 {
-                let seed_item = withUnsafeMutablePointer(to: &errorCode, { error in
+        if keysLen > 0 {
+            for index in 0...keysLen-1 {
+                let seedItem = withUnsafeMutablePointer(to: &errorCode, { error in
                    key_reconstruction_get_all_keys_at(pointer, index, error)
                        })
                 guard errorCode == 0 else {
                     throw RuntimeError("Error in KeyDetails, field Seed Phrase, index " + String(index))
                     }
-                self.all_keys.append(String.init(cString: seed_item!))
-                string_free(seed_item)
+                self.allKeys.append(String.init(cString: seedItem!))
+                string_free(seedItem)
             }
         }
 

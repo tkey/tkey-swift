@@ -4,14 +4,14 @@ import Foundation
 #endif
 
 public enum PublicKeyEncoding: Equatable, Hashable {
-    case EllipticCompress
-    case FullAddress
+    case ellipticCompress
+    case fullAddress
 
     public var value: String {
         switch self {
-        case .EllipticCompress:
+        case .ellipticCompress:
             return "elliptic-compressed"
-        case .FullAddress:
+        case .fullAddress:
             return ""
         }
     }
@@ -63,10 +63,10 @@ public final class KeyPoint: Equatable {
     /// - Returns: `KeyPoint` object.
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used.
-    public init(x: String, y: String) throws {
+    public init(valueX: String, valueY: String) throws {
         var errorCode: Int32 = -1
-        let xPtr = UnsafeMutablePointer<Int8>(mutating: (x as NSString).utf8String)
-        let yPtr = UnsafeMutablePointer<Int8>(mutating: (y as NSString).utf8String)
+        let xPtr = UnsafeMutablePointer<Int8>(mutating: (valueX as NSString).utf8String)
+        let yPtr = UnsafeMutablePointer<Int8>(mutating: (valueY as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
             key_point_new(xPtr, yPtr, error)
         })
@@ -109,9 +109,9 @@ public final class KeyPoint: Equatable {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, field X")
             }
-        let x = String.init(cString: result!)
+        let valueX = String.init(cString: result!)
         string_free(result)
-        return x
+        return valueX
     }
 
     /// Retrieves the Y value of the co-ordinate pair.
@@ -127,9 +127,9 @@ public final class KeyPoint: Equatable {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, field Y")
             }
-        let y = String.init(cString: result!)
+        let valueY = String.init(cString: result!)
         string_free(result)
-        return y
+        return valueY
     }
 
     /// Gets the serialized form of a `KeyPoint`, should it be a valid PublicKey.
@@ -139,13 +139,14 @@ public final class KeyPoint: Equatable {
     ///
     /// - Returns: Serialized form of `KeyPoint` as `String`
     ///
-    /// - Throws: `RuntimeError`, indicates either the underlying pointer is invalid or the co-ordinate pair is not a valid PublicKey.
+    /// - Throws: `RuntimeError`, indicates either the underlying pointer is invalid or the co-ordinate pair is not a
+    /// valid PublicKey.
     public func getPublicKey(format: PublicKeyEncoding ) throws -> String {
         var errorCode: Int32 = -1
 
-        let encoder_format = UnsafeMutablePointer<Int8>(mutating: (format.value as NSString).utf8String)
+        let encoderFormat = UnsafeMutablePointer<Int8>(mutating: (format.value as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            key_point_encode(pointer, encoder_format, error)
+            key_point_encode(pointer, encoderFormat, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPoint, getAsCompressedPublicKey")

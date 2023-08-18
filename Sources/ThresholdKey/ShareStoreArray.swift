@@ -28,13 +28,13 @@ public class ShareStoreArray {
     public func getAt(index: Int32) throws -> ShareStore {
         var errorCode: Int32 = -1
 
-        let share_store = withUnsafeMutablePointer(to: &errorCode, { error in
+        let shareStore = withUnsafeMutablePointer(to: &errorCode, { error in
             share_store_array_get_value_by_index(pointer, index, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_value_by_index")
         }
-        return ShareStore.init(pointer: share_store!)
+        return ShareStore.init(pointer: shareStore!)
     }
 
     /// Returns the number of items in the collection.
@@ -45,13 +45,13 @@ public class ShareStoreArray {
     public func length() throws -> Int32 {
         var errorCode: Int32 = -1
 
-        let share_stores_array_length = withUnsafeMutablePointer(to: &errorCode, { error in
+        let shareStoresArrayLength = withUnsafeMutablePointer(to: &errorCode, { error in
             share_store_array_get_len(pointer, error)
         })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyPointArray, key_point_array_get_len")
         }
-        return share_stores_array_length
+        return shareStoresArrayLength
     }
 
     deinit {

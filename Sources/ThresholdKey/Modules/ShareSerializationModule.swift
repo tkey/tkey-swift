@@ -6,14 +6,14 @@ import Foundation
 public final class ShareSerializationModule {
     /// Serializes a share on a `Threshold Key` object.
     /// - Parameters:
-    ///   - threshold_key: The threshold key to act on.
+    ///   - thresholdkey: The threshold key to act on.
     ///   - format: Optional, can either be nil or `"mnemonic"`.
     ///   - share: Share to be serialized.
     ///
     /// - Returns: `String`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func serialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
+    public static func serialize_share(thresholdkey: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
 
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -24,7 +24,7 @@ public final class ShareSerializationModule {
         }
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_serialization_serialize_share(threshold_key.pointer, sharePointer, formatPointer, error)
+            share_serialization_serialize_share(thresholdkey.pointer, sharePointer, formatPointer, error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error ShareSerializationModule, serialize_share")
@@ -36,14 +36,14 @@ public final class ShareSerializationModule {
 
     /// Deserialize a share on a `Threshold Key` object.
     /// - Parameters:
-    ///   - threshold_key: The threshold key to act on.
+    ///   - thresholdkey: The threshold key to act on.
     ///   - format: Optional, can either be nil or `"mnemonic"`.
     ///   - share: Share to be serialized.
     ///
     /// - Returns: `String`
     ///
     /// - Throws: `RuntimeError`, indicates invalid parameters was used or invalid threshold key.
-    public static func deserialize_share(threshold_key: ThresholdKey, share: String, format: String? = nil) throws -> String {
+    public static func deserialize_share(thresholdkey: ThresholdKey, share: String, format: String? = nil) throws -> String {
         var errorCode: Int32 = -1
 
         let sharePointer = UnsafeMutablePointer<Int8>(mutating: (share as NSString).utf8String)
@@ -54,7 +54,7 @@ public final class ShareSerializationModule {
         }
 
         let result = withUnsafeMutablePointer(to: &errorCode, { error in
-            share_serialization_deserialize_share(threshold_key.pointer, sharePointer, formatPointer, error)
+            share_serialization_deserialize_share(thresholdkey.pointer, sharePointer, formatPointer, error)
                 })
         guard errorCode == 0 else {
             throw RuntimeError("Error ShareSerializationModule, deserialize_share")

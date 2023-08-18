@@ -1,11 +1,10 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgSeedPhraseModuleTests: XCTestCase {
     private var threshold_key: ThresholdKey!
-    
+
     override func setUp() async throws {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -21,11 +20,11 @@ final class tkey_pkgSeedPhraseModuleTests: XCTestCase {
         _ = try! await threshold.reconstruct()
         threshold_key = threshold
     }
-    
+
     override func tearDown() {
         threshold_key = nil
     }
-    
+
     func test() async {
         let seedPhraseToSet = "seed sock milk update focus rotate barely fade car face mechanic mercy"
         let seedPhraseToSet2 = "object brass success calm lizard science syrup planet exercise parade honey impulse"
@@ -41,10 +40,10 @@ final class tkey_pkgSeedPhraseModuleTests: XCTestCase {
         try! await SeedPhraseModule.set_seed_phrase(threshold_key: threshold_key, format: "HD Key Tree", phrase: nil, number_of_wallets: 0)
         let seedResult_4 = try! SeedPhraseModule.get_seed_phrases(threshold_key: threshold_key)
         XCTAssertEqual(seedResult_4.count, 2)
-        try! await SeedPhraseModule.change_phrase(threshold_key: threshold_key, old_phrase: seedPhraseToSet2, new_phrase: seedPhraseToSet)
+        try! await SeedPhraseModule.change_phrase(thresholdKey: threshold_key, old_phrase: seedPhraseToSet2, new_phrase: seedPhraseToSet)
         let tkey_store = try! threshold_key.get_tkey_store(moduleName: "seedPhraseModule")
         let id = tkey_store[0]["id"] as! String
         let item = try! threshold_key.get_tkey_store_item(moduleName: "seedPhraseModule", id: id)["seedPhrase"] as! String
-        XCTAssertEqual(seedPhraseToSet,item)
+        XCTAssertEqual(seedPhraseToSet, item)
     }
 }

@@ -28,7 +28,7 @@ public final class PrivateKey {
         self.hex = hex
     }
 
-    public func toPublic (format: PublicKeyEncoding = .EllipticCompress ) throws -> String {
+    public func toPublic (format: PublicKeyEncoding = .ellipticCompress ) throws -> String {
         var errorCode: Int32 = -1
         let secretPointer = UnsafeMutablePointer<Int8>(mutating: (self.hex as NSString).utf8String)
         let result = withUnsafeMutablePointer(to: &errorCode, { error in

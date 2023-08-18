@@ -4,7 +4,7 @@ import Foundation
 #endif
 
 public final class ShareMap {
-    public var share_map = [String: String]()
+    public var shareMap = [String: String]()
 
     /// Instantiate a `ShareMap` object using the underlying pointer.
     ///
@@ -25,8 +25,10 @@ public final class ShareMap {
         let value = String.init(cString: keys!)
         string_free(keys)
         let data = Data(value.utf8)
-        let key_array = try JSONSerialization.jsonObject(with: data) as! [String]
-        for item in key_array {
+        guard let keyArray = try JSONSerialization.jsonObject(with: data) as? [String] else {
+            throw RuntimeError("JsonSerialization Error ")
+        }
+        for item in keyArray {
             let keyPointer = UnsafeMutablePointer<Int8>(mutating: (item as NSString).utf8String)
             let value = withUnsafeMutablePointer(to: &errorCode, { error in
                 share_map_get_share_by_key(pointer, keyPointer, error)
@@ -34,7 +36,7 @@ public final class ShareMap {
             guard errorCode == 0 else {
                 throw RuntimeError("Error in Share Map")
                 }
-            share_map[item] = String.init(cString: value!)
+            shareMap[item] = String.init(cString: value!)
             string_free(value)
         }
         share_map_free(pointer)

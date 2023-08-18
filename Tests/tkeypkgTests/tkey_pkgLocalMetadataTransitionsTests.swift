@@ -1,11 +1,10 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgLocalMetadataTransitionsTests: XCTestCase {
     private var data: LocalMetadataTransitions!
-    
+
     override func setUp() async throws {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -23,15 +22,15 @@ final class tkey_pkgLocalMetadataTransitionsTests: XCTestCase {
         _ = try! await threshold.delete_share(share_index: share.hex)
         data = try! threshold.get_local_metadata_transitions()
     }
-    
+
     override func tearDown() {
         data = nil
     }
-    
+
     func test_export() {
-        XCTAssertNotEqual(try! data.export().count,0)
+        XCTAssertNotEqual(try! data.export().count, 0)
     }
-    
+
     func test_create() {
         let export = try! data.export()
         _ = try! LocalMetadataTransitions.init(json: export)

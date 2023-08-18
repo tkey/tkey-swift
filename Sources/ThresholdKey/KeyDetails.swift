@@ -4,11 +4,11 @@ import Foundation
 #endif
 
 public final class KeyDetails {
-    public let pub_key: KeyPoint
-    public let required_shares: Int32
+    public let pubKey: KeyPoint
+    public let requiredShares: Int32
     public let threshold: UInt32
-    public let total_shares: UInt32
-    public let share_descriptions: String
+    public let totalShares: UInt32
+    public let shareDescriptions: String
 
     /// Instantiate a `KeyDetails` object using the underlying pointer.
     ///
@@ -26,7 +26,7 @@ public final class KeyDetails {
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Point")
             }
-        pub_key = KeyPoint.init(pointer: point!)
+        pubKey = KeyPoint.init(pointer: point!)
 
         let theshold = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_threshold(pointer, error)
@@ -36,30 +36,30 @@ public final class KeyDetails {
             }
         self.threshold = theshold
 
-        let required_shares = withUnsafeMutablePointer(to: &errorCode, { error in
+        let requiredShares = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_required_shares(pointer, error)
                })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Required Shares")
             }
-        self.required_shares = required_shares
+        self.requiredShares = requiredShares
 
-        let total_shares = withUnsafeMutablePointer(to: &errorCode, { error in
+        let totalShares = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_total_shares(pointer, error)
                })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Total Shares")
             }
-        self.total_shares = total_shares
+        self.totalShares = totalShares
 
-        let share_descriptions = withUnsafeMutablePointer(to: &errorCode, { error in
+        let shareDescriptions = withUnsafeMutablePointer(to: &errorCode, { error in
            key_details_get_share_descriptions(pointer, error)
                })
         guard errorCode == 0 else {
             throw RuntimeError("Error in KeyDetails, field Share Descriptions")
             }
-        self.share_descriptions = String.init(cString: share_descriptions!)
-        string_free(share_descriptions)
+        self.shareDescriptions = String.init(cString: shareDescriptions!)
+        string_free(shareDescriptions)
         key_details_free(pointer)
     }
 }

@@ -44,11 +44,11 @@ public final class Polynomial {
     /// - Returns: `ShareMap`
     ///
     /// - Throws: `RuntimeError`, indicates underlying pointer is invalid.
-    public func generateShares(share_index: String) throws -> ShareMap {
+    public func generateShares(shareIndex: String) throws -> ShareMap {
         var errorCode: Int32  = -1
 
         let curvePointer = UnsafeMutablePointer<Int8>(mutating: (curveN as NSString).utf8String)
-        let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (share_index as NSString).utf8String)
+        let indexesPointer = UnsafeMutablePointer<Int8>(mutating: (shareIndex as NSString).utf8String)
 
         let result = withUnsafeMutablePointer(to: &errorCode, {error in
             polynomial_generate_shares(self.pointer, indexesPointer, curvePointer, error)
@@ -56,7 +56,7 @@ public final class Polynomial {
         guard errorCode == 0 else {
             throw RuntimeError("Error in Polynomial, generateShares")
         }
-        return try! ShareMap.init(pointer: result!)
+        return try ShareMap.init(pointer: result!)
     }
 
     deinit {

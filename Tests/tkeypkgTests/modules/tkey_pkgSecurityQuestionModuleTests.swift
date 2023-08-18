@@ -1,11 +1,10 @@
 import XCTest
 import Foundation
 @testable import tkey_pkg
-import Foundation
 
 final class tkey_pkgSecurityQuestionModuleTests: XCTestCase {
     private var threshold_key: ThresholdKey!
-    
+
     override func setUp() async throws {
         let postbox_key = try! PrivateKey.generate()
         let storage_layer = try! StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
@@ -20,17 +19,17 @@ final class tkey_pkgSecurityQuestionModuleTests: XCTestCase {
         _ = try! await threshold.initialize()
         threshold_key = threshold
     }
-    
+
     override func tearDown() {
         threshold_key = nil
     }
-    
+
     func test() async {
         let key_reconstruction_details = try! await threshold_key.reconstruct()
         let question = "favorite marvel character"
         let answer = "iron man"
         let answer_2 = "captain america"
-        let new_share = try! await SecurityQuestionModule.generate_new_share(threshold_key: threshold_key, questions: question, answer: answer)
+        let new_share = try! await SecurityQuestionModule.generate_new_share(thresholdKey: threshold_key, questions: question, answer: answer)
         let share_index = new_share.hex
         let sq_question = try! SecurityQuestionModule.get_questions(threshold_key: threshold_key)
         XCTAssertEqual(sq_question, question)
@@ -44,7 +43,7 @@ final class tkey_pkgSecurityQuestionModuleTests: XCTestCase {
         XCTAssertEqual(security_input, true)
         let get_answer = try! SecurityQuestionModule.get_answer(threshold_key: threshold_key)
         XCTAssertEqual(get_answer, answer_2)
-        let _ = try! await SecurityQuestionModule.store_answer(threshold_key: threshold_key, answer: answer_2)
+        _ = try! await SecurityQuestionModule.store_answer(threshold_key: threshold_key, answer: answer_2)
         let key_reconstruction_details_2 = try! await threshold_key.reconstruct()
         XCTAssertEqual(key_reconstruction_details.key, key_reconstruction_details_2.key)
         try! await threshold_key.delete_share(share_index: share_index)
@@ -53,6 +52,6 @@ final class tkey_pkgSecurityQuestionModuleTests: XCTestCase {
         let tkey_store = try! threshold_key.get_tkey_store(moduleName: "securityQuestions")
         let id = tkey_store[0]["id"] as! String
         let item = try! threshold_key.get_tkey_store_item(moduleName: "securityQuestions", id: id)["answer"] as! String
-        XCTAssertEqual(answer_2,item)
+        XCTAssertEqual(answer_2, item)
     }
 }
