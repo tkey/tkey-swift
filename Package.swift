@@ -4,15 +4,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "tkey_pkg",
+    name: "tkey-swift",
     platforms: [
-        .iOS(SupportedPlatform.IOSVersion.v14), .macOS(.v10_15)
+        .iOS(SupportedPlatform.IOSVersion.v15), .macOS(.v10_15)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "ThresholdKey",
-            targets: ["tkey-pkg"]),
+            name: "tkey-swift",
+            targets: ["tkey-swift"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -29,13 +29,13 @@ let package = Package(
                 path: "Sources/libtkey"
         ),
         .target(
-            name: "tkey-pkg",
+            name: "tkey-swift",
             dependencies: ["lib"],
             path: "Sources/ThresholdKey"
         ),
         .testTarget(
-            name: "tkey-pkgTests",
-            dependencies: ["tkey-pkg"],
+            name: "tkey-swiftTests",
+            dependencies: ["tkey-swift"],
             path: "Tests/tkeypkgTests"
         ),
     ]
