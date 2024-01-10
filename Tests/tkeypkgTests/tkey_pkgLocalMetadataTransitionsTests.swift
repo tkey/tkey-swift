@@ -1,6 +1,6 @@
 import XCTest
 import Foundation
-@testable import tkey_pkg
+@testable import tkey_swift
 import Foundation
 
 final class tkey_pkgLocalMetadataTransitionsTests: XCTestCase {

@@ -1,6 +1,6 @@
 import XCTest
 import Foundation
-@testable import tkey_pkg
+@testable import tkey_swift
 
 final class tkey_pkgVersionTests: XCTestCase {
     func test_library_version() {
