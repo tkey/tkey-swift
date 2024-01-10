@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "tkey-swift",
     platforms: [
-        .iOS(SupportedPlatform.IOSVersion.v15), .macOS(.v10_15)
+        .iOS(SupportedPlatform.IOSVersion.v14), .macOS(.v10_15)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
