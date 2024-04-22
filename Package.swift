@@ -11,8 +11,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "tkey-swift",
-            targets: ["tkey-swift"]),
+            name: "tkey",
+            targets: ["tkey"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -29,13 +29,13 @@ let package = Package(
                 path: "Sources/libtkey"
         ),
         .target(
-            name: "tkey-swift",
+            name: "tkey",
             dependencies: ["lib"],
             path: "Sources/ThresholdKey"
         ),
         .testTarget(
             name: "tkey-swiftTests",
-            dependencies: ["tkey-swift"],
+            dependencies: ["tkey"],
             path: "Tests/tkeypkgTests"
         ),
     ]

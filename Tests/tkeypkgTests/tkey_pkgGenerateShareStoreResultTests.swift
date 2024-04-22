@@ -1,6 +1,6 @@
 import XCTest
 import Foundation
-@testable import tkey_swift
+@testable import tkey
 import Foundation
 
 final class tkey_pkgGenerateShareStoreResultTests: XCTestCase {
