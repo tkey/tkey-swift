@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "tkey-swift"
-  spec.version      = "1.0.0"
+  spec.version      = "2.0.0"
   spec.platform = :ios, "14.0"
   spec.summary      = "SDK allows you to create threshold key setup natively"
   spec.homepage     = "https://web3auth.io/"
