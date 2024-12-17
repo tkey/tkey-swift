@@ -3,16 +3,6 @@ import Foundation
     import lib
 #endif
 
-/*
-extension NSMutableData {
-    func appendString(_ string: String) {
-        if let data = string.data(using: .utf8) {
-            append(data)
-        }
-    }
-}
-*/
-
 public final class StorageLayer {
     private(set) var pointer: OpaquePointer?
     
@@ -20,21 +10,6 @@ public final class StorageLayer {
     // tracking this object is not necessary in swift as it maintains context
     // on entry for the callback
     private var obj_ref: UnsafeMutableRawPointer?
-
-    /* for multipart form data
-    static func createMultipartBody(data: Data, boundary: String, file: String) -> Data {
-          let body = NSMutableData()
-          let lineBreak = "\r\n"
-          let boundaryPrefix = "--\(boundary)\r\n"
-          body.appendString(boundaryPrefix)
-          body.appendString("Content-Disposition: form-data; name=\"\(file)\"\r\n")
-          body.appendString("Content-Type: \("application/json;charset=utf-8")\r\n\r\n")
-          body.append(data)
-          body.appendString("\r\n")
-          body.appendString("--\(boundary)--\(lineBreak)")
-          return body as Data
-      }
-     */
 
     private static func percentEscapeString( string: String ) -> String {
       var characterSet = CharacterSet.alphanumerics
@@ -75,29 +50,23 @@ public final class StorageLayer {
             request.addValue("Content-Type", forHTTPHeaderField: "Access-Control-Allow-Headers")
 
             if urlString.split(separator: "/").last == "bulk_set_stream" {
-                // let boundary = UUID().uuidString;
-                // request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-                request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+                let boundary = "Boundary-\(UUID().uuidString)"
+                request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
                 let json = try! JSONSerialization.jsonObject(with: dataString.data(using: String.Encoding.utf8)!, options: .allowFragments) as! [[String: Any]]
-
-                // for item in json {
-                    // let dataItem = try! JSONSerialization.data(withJSONObject: item, options: .prettyPrinted)
-                    // requestData.append(StorageLayer.createMultipartBody(data: dataItem, boundary: boundary, file: "multipartData"))
-                // }
-
-                var form_data: [String] = []
-
-                // urlencoded item format: "(key)=(self.percentEscapeString(value))"
-                for (index, element) in json.enumerated() {
-                    let json_elem = try! JSONSerialization.data(withJSONObject: element, options: .withoutEscapingSlashes)
-                    let json_escaped_string = StorageLayer.percentEscapeString(string: String(data: json_elem, encoding: .utf8)!)
-                    let final_string = String(index) + "=" + json_escaped_string
-                    form_data.append(final_string)
+                
+                var body_data = Data()
+                
+                for (index, item) in json.enumerated() {
+                    body_data.append("--\(boundary)\r\n".data(using: .utf8)!)
+                    body_data.append("Content-Disposition: form-data; name=\"\(index)\"\r\n\r\n".data(using: .utf8)!)
+                     
+                    let dataItem = String(data: try! JSONSerialization.data(withJSONObject: item), encoding: .utf8)!
+                    body_data.append("\(dataItem)\r\n".data(using: .utf8)!)
                 }
-                let body_data = form_data.joined(separator: "&")
-
-                request.httpBody = body_data.data(using: String.Encoding.utf8)
+                body_data.append("--\(boundary)--\r\n".data(using: .utf8)!)
+                
+                request.httpBody = body_data
             } else {
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.httpBody = dataString.data(using: String.Encoding.utf8)
